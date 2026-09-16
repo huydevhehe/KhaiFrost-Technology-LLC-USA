@@ -1,34 +1,47 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
+import { useLocalizedField } from "@/lib/useLocalizedField";
 import { blogPosts } from "@/content/blogPosts";
+import { BlogPost } from "@/types";
+
+function BlogCard({ post }: { post: BlogPost }) {
+  const title = useLocalizedField(post.title);
+
+  return (
+    <a href={post.href} className="block">
+      <VideoThumbnail
+        src={post.thumbnail}
+        alt={title}
+        showVideoBadge={post.hasVideo}
+      />
+      <h3 className="mt-3 text-sm font-semibold text-slate-900">{title}</h3>
+      <p className="mt-1 text-xs text-slate-500">{post.date}</p>
+    </a>
+  );
+}
 
 export function BlogPreview() {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <SectionEyebrow>Insights</SectionEyebrow>
-            <SectionHeading>Latest From Our Blog</SectionHeading>
+            <SectionEyebrow>{t("blog.eyebrow")}</SectionEyebrow>
+            <SectionHeading>{t("blog.heading")}</SectionHeading>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
-            View all articles →
+            {t("blog.viewAll")}
           </a>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
           {blogPosts.map((post) => (
-            <a key={post.id} href={post.href} className="block">
-              <VideoThumbnail
-                src={post.thumbnail}
-                alt={post.title}
-                showVideoBadge={post.hasVideo}
-              />
-              <h3 className="mt-3 text-sm font-semibold text-slate-900">
-                {post.title}
-              </h3>
-              <p className="mt-1 text-xs text-slate-500">{post.date}</p>
-            </a>
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
       </div>
