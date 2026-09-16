@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 
 export function SiteFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-navy py-8 text-white">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
@@ -11,12 +16,10 @@ export function SiteFooter() {
           </span>
           <span className="text-sm font-semibold">KHAIFROST</span>
         </div>
-        <p className="text-xs text-white/50">
-          © 2025 KhaiFrost Technology. All rights reserved.
-        </p>
+        <p className="text-xs text-white/50">{t("footer.copyright")}</p>
         <div className="flex items-center gap-4 text-xs text-white/50">
-          <Link href="#">Privacy</Link>
-          <Link href="#">Terms</Link>
+          <Link href="#">{t("footer.privacy")}</Link>
+          <Link href="#">{t("footer.terms")}</Link>
           <SocialIcons />
         </div>
       </div>
