@@ -42,3 +42,9 @@ next-env.d.ts
 
 # playwright debug scratch (from browser-based verification)
 .playwright-mcp/
+
+# local reference materials only — never pushed (business docs, design mockups, docs/plans)
+*.docx
+*.pdf
+*.md
+/*.png
