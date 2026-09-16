@@ -6,9 +6,9 @@ export interface ContactFormValues {
 }
 
 export interface ContactFormErrors {
-  name?: string;
-  email?: string;
-  message?: string;
+  name?: "required";
+  email?: "required" | "invalid";
+  message?: "required";
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -19,17 +19,17 @@ export function validateContactForm(
   const errors: ContactFormErrors = {};
 
   if (!values.name.trim()) {
-    errors.name = "Vui lòng nhập tên của bạn";
+    errors.name = "required";
   }
 
   if (!values.email.trim()) {
-    errors.email = "Vui lòng nhập email";
+    errors.email = "required";
   } else if (!EMAIL_REGEX.test(values.email)) {
-    errors.email = "Email không hợp lệ";
+    errors.email = "invalid";
   }
 
   if (!values.message.trim()) {
-    errors.message = "Vui lòng nhập nội dung";
+    errors.message = "required";
   }
 
   return errors;

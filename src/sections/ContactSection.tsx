@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { siteConfig } from "@/content/siteConfig";
 import {
   validateContactForm,
@@ -20,6 +21,7 @@ const initialValues: ContactFormValues = {
 };
 
 export function ContactSection() {
+  const { t } = useTranslation();
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -35,18 +37,28 @@ export function ContactSection() {
     }
   }
 
+  const nameErrorText = errors.name
+    ? t("contact.form.errors.nameRequired")
+    : undefined;
+  const emailErrorText =
+    errors.email === "required"
+      ? t("contact.form.errors.emailRequired")
+      : errors.email === "invalid"
+      ? t("contact.form.errors.emailInvalid")
+      : undefined;
+  const messageErrorText = errors.message
+    ? t("contact.form.errors.messageRequired")
+    : undefined;
+
   return (
     <section className="bg-navy py-16 text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-2">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
-            Get In Touch
+            {t("contact.eyebrow")}
           </p>
-          <h2 className="text-3xl font-bold">Let&apos;s Build Something Great</h2>
-          <p className="mt-4 text-white/70">
-            Have a project in mind? We&apos;d love to hear from you. Send us a
-            message and we&apos;ll get back to you soon.
-          </p>
+          <h2 className="text-3xl font-bold">{t("contact.heading")}</h2>
+          <p className="mt-4 text-white/70">{t("contact.subtext")}</p>
           <div className="mt-6 space-y-2 text-sm text-white/80">
             <p>{siteConfig.email}</p>
             <p>{siteConfig.phone}</p>
@@ -60,12 +72,12 @@ export function ContactSection() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="contact-name" className="sr-only">
-                Họ và tên
+                {t("contact.form.nameLabel")}
               </label>
               <input
                 id="contact-name"
                 type="text"
-                placeholder="Your name *"
+                placeholder={t("contact.form.namePlaceholder")}
                 value={values.name}
                 onChange={(e) =>
                   setValues({ ...values, name: e.target.value })
@@ -74,23 +86,23 @@ export function ContactSection() {
                 aria-describedby={errors.name ? "contact-name-error" : undefined}
                 className={fieldClassName}
               />
-              {errors.name && (
+              {nameErrorText && (
                 <p
                   id="contact-name-error"
                   className="mt-1 text-xs text-red-400"
                 >
-                  {errors.name}
+                  {nameErrorText}
                 </p>
               )}
             </div>
             <div>
               <label htmlFor="contact-email" className="sr-only">
-                Email
+                {t("contact.form.emailLabel")}
               </label>
               <input
                 id="contact-email"
                 type="email"
-                placeholder="Your email *"
+                placeholder={t("contact.form.emailPlaceholder")}
                 value={values.email}
                 onChange={(e) =>
                   setValues({ ...values, email: e.target.value })
@@ -101,19 +113,19 @@ export function ContactSection() {
                 }
                 className={fieldClassName}
               />
-              {errors.email && (
+              {emailErrorText && (
                 <p
                   id="contact-email-error"
                   className="mt-1 text-xs text-red-400"
                 >
-                  {errors.email}
+                  {emailErrorText}
                 </p>
               )}
             </div>
           </div>
           <div>
             <label htmlFor="contact-subject" className="sr-only">
-              Chủ đề liên hệ
+              {t("contact.form.subjectLabel")}
             </label>
             <select
               id="contact-subject"
@@ -123,20 +135,28 @@ export function ContactSection() {
               }
               className={`${fieldClassName} text-white/90 [&>option]:text-slate-900`}
             >
-              <option value="">Chọn dịch vụ quan tâm</option>
-              <option value="source-code">Mua source code</option>
-              <option value="services">Dịch vụ triển khai</option>
-              <option value="partnership">Hợp tác / CTV</option>
-              <option value="other">Khác</option>
+              <option value="">{t("contact.form.subjectPlaceholder")}</option>
+              <option value="source-code">
+                {t("contact.form.subjectOptionSourceCode")}
+              </option>
+              <option value="services">
+                {t("contact.form.subjectOptionServices")}
+              </option>
+              <option value="partnership">
+                {t("contact.form.subjectOptionPartnership")}
+              </option>
+              <option value="other">
+                {t("contact.form.subjectOptionOther")}
+              </option>
             </select>
           </div>
           <div>
             <label htmlFor="contact-message" className="sr-only">
-              Nội dung tin nhắn
+              {t("contact.form.messageLabel")}
             </label>
             <textarea
               id="contact-message"
-              placeholder="Message *"
+              placeholder={t("contact.form.messagePlaceholder")}
               rows={4}
               value={values.message}
               onChange={(e) =>
@@ -148,21 +168,21 @@ export function ContactSection() {
               }
               className={fieldClassName}
             />
-            {errors.message && (
+            {messageErrorText && (
               <p
                 id="contact-message-error"
                 className="mt-1 text-xs text-red-400"
               >
-                {errors.message}
+                {messageErrorText}
               </p>
             )}
           </div>
           <Button type="submit" variant="primary-blue">
-            Send Message →
+            {t("contact.form.submit")}
           </Button>
           {submitted && (
             <p className="text-sm text-accent">
-              Đã gửi! Cảm ơn bạn đã liên hệ.
+              {t("contact.form.successMessage")}
             </p>
           )}
         </form>

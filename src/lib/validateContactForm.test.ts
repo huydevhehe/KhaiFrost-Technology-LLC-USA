@@ -2,44 +2,44 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { validateContactForm } from "./validateContactForm";
 
-test("returns error when name is empty", () => {
+test("returns 'required' code when name is empty", () => {
   const errors = validateContactForm({
     name: "",
     email: "a@b.com",
     subject: "",
     message: "hi",
   });
-  assert.equal(errors.name, "Vui lòng nhập tên của bạn");
+  assert.equal(errors.name, "required");
 });
 
-test("returns error when email is missing", () => {
+test("returns 'required' code when email is missing", () => {
   const errors = validateContactForm({
     name: "A",
     email: "",
     subject: "",
     message: "hi",
   });
-  assert.equal(errors.email, "Vui lòng nhập email");
+  assert.equal(errors.email, "required");
 });
 
-test("returns error when email is invalid", () => {
+test("returns 'invalid' code when email is malformed", () => {
   const errors = validateContactForm({
     name: "A",
     email: "not-an-email",
     subject: "",
     message: "hi",
   });
-  assert.equal(errors.email, "Email không hợp lệ");
+  assert.equal(errors.email, "invalid");
 });
 
-test("returns error when message is empty", () => {
+test("returns 'required' code when message is empty", () => {
   const errors = validateContactForm({
     name: "A",
     email: "a@b.com",
     subject: "",
     message: "",
   });
-  assert.equal(errors.message, "Vui lòng nhập nội dung");
+  assert.equal(errors.message, "required");
 });
 
 test("returns no errors for valid input", () => {
