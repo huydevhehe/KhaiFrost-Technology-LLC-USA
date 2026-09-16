@@ -1,6 +1,7 @@
 import { HeroSection } from "@/sections/HeroSection";
 import { TestimonialWall } from "@/sections/TestimonialWall";
 import { FeaturedProjects } from "@/sections/FeaturedProjects";
+import { WhyChooseUs } from "@/sections/WhyChooseUs";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <HeroSection />
       <TestimonialWall />
       <FeaturedProjects />
+      <WhyChooseUs />
     </main>
   );
 }
