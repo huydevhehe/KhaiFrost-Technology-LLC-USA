@@ -1,11 +1,12 @@
 {
   "nav": {
     "home": "Home",
-    "projects": "Projects",
-    "about": "About",
-    "blog": "Blog",
+    "service": "Service",
+    "discover": "Discover",
+    "about": "About Us",
     "contact": "Contact",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "demo": "Demo"
   },
   "hero": {
     "eyebrow": "AI-Powered Development Solutions",
@@ -67,6 +68,51 @@
         "emailInvalid": "Invalid email address",
         "messageRequired": "Please enter your message"
       }
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "eyebrow": "Get In Touch",
+      "headline": "Let's Build Something Great Together",
+      "subtext": "Have a project in mind, a question, or just want to say hello? We'd love to hear from you. Our team is here to help."
+    },
+    "info": {
+      "eyebrow": "Get In Touch",
+      "heading": "Let's Build Something Great",
+      "paragraph": "Whether you're looking for a custom software solution, need technical consultation, or just want to learn more about our services — we're here to help.",
+      "emailLabel": "Email",
+      "phoneLabel": "Phone",
+      "officesLabel": "Our Offices"
+    },
+    "availability": {
+      "eyebrow": "Our Availability",
+      "heading": "We're Always Here for You",
+      "responseTitle": "Response Time",
+      "responseDesc": "We typically respond within 24 hours (often much faster).",
+      "hoursTitle": "Business Hours",
+      "hoursDesc": "Monday – Friday, 9:00 AM – 6:00 PM (GMT+7).",
+      "supportTitle": "Support Channels",
+      "supportDesc": "Email, phone, or social media. Choose what works best for you."
+    },
+    "reach": {
+      "eyebrow": "Our Reach",
+      "heading": "Serving Clients Worldwide",
+      "paragraph": "We work with businesses of all sizes, from local startups to global enterprises, delivering high-quality software solutions across the world.",
+      "statClients": "Global Clients",
+      "statCountries": "Countries",
+      "statSatisfaction": "Client Satisfaction"
+    },
+    "faq": {
+      "eyebrow": "Common Questions",
+      "heading": "Frequently Asked Questions",
+      "q1": "How do I get started with your services?",
+      "a1": "Just send us a message through the contact form or email us directly. We'll schedule a quick call to understand your needs and propose the best solution.",
+      "q2": "How long does it take to get a response?",
+      "a2": "We typically respond within 24 hours, often much faster during business hours.",
+      "q3": "What is your pricing model?",
+      "a3": "Pricing depends on the scope — we offer both fixed-price source code packages and custom project quotes after a short consultation.",
+      "q4": "Do you work with international clients?",
+      "a4": "Yes, we work with clients across the US, Vietnam, and worldwide, with flexible communication across time zones."
     }
   },
   "footer": {

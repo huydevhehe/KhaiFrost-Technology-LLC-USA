@@ -1,11 +1,12 @@
 {
   "nav": {
     "home": "Trang chủ",
-    "projects": "Dự án",
-    "about": "Giới thiệu",
-    "blog": "Blog",
+    "service": "Dịch vụ",
+    "discover": "Khám phá",
+    "about": "Về chúng tôi",
     "contact": "Liên hệ",
-    "getStarted": "Bắt đầu ngay"
+    "getStarted": "Bắt đầu ngay",
+    "demo": "Demo"
   },
   "hero": {
     "eyebrow": "Giải pháp phát triển phần mềm bằng AI",
@@ -67,6 +68,51 @@
         "emailInvalid": "Email không hợp lệ",
         "messageRequired": "Vui lòng nhập nội dung"
       }
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "eyebrow": "Liên Hệ",
+      "headline": "Cùng Nhau Xây Dựng Điều Tuyệt Vời",
+      "subtext": "Bạn có dự án, câu hỏi, hay chỉ đơn giản muốn chào hỏi? Chúng tôi rất muốn được lắng nghe. Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ."
+    },
+    "info": {
+      "eyebrow": "Liên Hệ",
+      "heading": "Cùng Xây Dựng Điều Tuyệt Vời",
+      "paragraph": "Dù bạn đang tìm giải pháp phần mềm tuỳ chỉnh, cần tư vấn kỹ thuật, hay chỉ muốn tìm hiểu thêm về dịch vụ của chúng tôi — chúng tôi luôn ở đây để hỗ trợ.",
+      "emailLabel": "Email",
+      "phoneLabel": "Điện thoại",
+      "officesLabel": "Văn phòng của chúng tôi"
+    },
+    "availability": {
+      "eyebrow": "Thời Gian Hỗ Trợ",
+      "heading": "Luôn Sẵn Sàng Hỗ Trợ Bạn",
+      "responseTitle": "Thời Gian Phản Hồi",
+      "responseDesc": "Chúng tôi thường phản hồi trong vòng 24 giờ (thường nhanh hơn).",
+      "hoursTitle": "Giờ Làm Việc",
+      "hoursDesc": "Thứ Hai – Thứ Sáu, 9:00 – 18:00 (GMT+7).",
+      "supportTitle": "Kênh Hỗ Trợ",
+      "supportDesc": "Email, điện thoại, hoặc mạng xã hội. Chọn cách phù hợp nhất với bạn."
+    },
+    "reach": {
+      "eyebrow": "Phạm Vi Hoạt Động",
+      "heading": "Phục Vụ Khách Hàng Toàn Cầu",
+      "paragraph": "Chúng tôi hợp tác với doanh nghiệp mọi quy mô, từ startup trong nước đến tập đoàn quốc tế, mang đến giải pháp phần mềm chất lượng cao trên toàn thế giới.",
+      "statClients": "Khách Hàng Toàn Cầu",
+      "statCountries": "Quốc Gia",
+      "statSatisfaction": "Đánh Giá Hài Lòng"
+    },
+    "faq": {
+      "eyebrow": "Câu Hỏi Thường Gặp",
+      "heading": "Giải Đáp Thắc Mắc",
+      "q1": "Làm sao để bắt đầu sử dụng dịch vụ?",
+      "a1": "Chỉ cần gửi tin nhắn qua form liên hệ hoặc email trực tiếp cho chúng tôi. Chúng tôi sẽ sắp xếp một cuộc gọi ngắn để hiểu nhu cầu và đề xuất giải pháp phù hợp nhất.",
+      "q2": "Mất bao lâu để nhận được phản hồi?",
+      "a2": "Chúng tôi thường phản hồi trong vòng 24 giờ, thường nhanh hơn trong giờ hành chính.",
+      "q3": "Mô hình tính giá như thế nào?",
+      "a3": "Giá phụ thuộc vào phạm vi dự án — chúng tôi có cả gói source code giá cố định và báo giá riêng cho dự án tuỳ chỉnh sau buổi tư vấn ngắn.",
+      "q4": "Có hỗ trợ khách hàng quốc tế không?",
+      "a4": "Có, chúng tôi làm việc với khách hàng tại Mỹ, Việt Nam và trên toàn thế giới, linh hoạt trao đổi qua nhiều múi giờ."
     }
   },
   "footer": {

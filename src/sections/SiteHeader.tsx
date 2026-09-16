@@ -20,9 +20,28 @@ export function SiteHeader() {
             KHAIFROST
           </span>
         </Link>
-        <nav className="hidden items-center gap-8 text-sm text-white/90 md:flex">
-          {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-white">
+        <nav className="hidden items-center gap-2 text-base font-medium text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] md:flex">
+          {navLinks.slice(0, 3).map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
+            >
+              {t(`nav.${link.key}`)}
+            </Link>
+          ))}
+          <Link
+            href="/demo"
+            className="rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-white shadow-md drop-shadow-none transition-all duration-300 ease-out hover:scale-105 hover:bg-accent/90"
+          >
+            {t("nav.demo")}
+          </Link>
+          {navLinks.slice(3).map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
+            >
               {t(`nav.${link.key}`)}
             </Link>
           ))}

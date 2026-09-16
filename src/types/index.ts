@@ -4,7 +4,7 @@ export interface LocalizedText {
 }
 
 export interface NavLink {
-  key: "home" | "projects" | "about" | "blog" | "contact";
+  key: "home" | "service" | "discover" | "about" | "contact";
   href: string;
 }
 
