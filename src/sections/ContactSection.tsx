@@ -9,6 +9,9 @@ import {
 } from "@/lib/validateContactForm";
 import { Button } from "@/components/ui/Button";
 
+const fieldClassName =
+  "w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50";
+
 const initialValues: ContactFormValues = {
   name: "",
   email: "",
@@ -23,6 +26,7 @@ export function ContactSection() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setSubmitted(false);
     const validationErrors = validateContactForm(values);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
@@ -55,55 +59,102 @@ export function ContactSection() {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
+              <label htmlFor="contact-name" className="sr-only">
+                Họ và tên
+              </label>
               <input
+                id="contact-name"
                 type="text"
                 placeholder="Your name *"
                 value={values.name}
                 onChange={(e) =>
                   setValues({ ...values, name: e.target.value })
                 }
-                className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "contact-name-error" : undefined}
+                className={fieldClassName}
               />
               {errors.name && (
-                <p className="mt-1 text-xs text-red-400">{errors.name}</p>
+                <p
+                  id="contact-name-error"
+                  className="mt-1 text-xs text-red-400"
+                >
+                  {errors.name}
+                </p>
               )}
             </div>
             <div>
+              <label htmlFor="contact-email" className="sr-only">
+                Email
+              </label>
               <input
+                id="contact-email"
                 type="email"
                 placeholder="Your email *"
                 value={values.email}
                 onChange={(e) =>
                   setValues({ ...values, email: e.target.value })
                 }
-                className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={
+                  errors.email ? "contact-email-error" : undefined
+                }
+                className={fieldClassName}
               />
               {errors.email && (
-                <p className="mt-1 text-xs text-red-400">{errors.email}</p>
+                <p
+                  id="contact-email-error"
+                  className="mt-1 text-xs text-red-400"
+                >
+                  {errors.email}
+                </p>
               )}
             </div>
           </div>
-          <input
-            type="text"
-            placeholder="Subject"
-            value={values.subject}
-            onChange={(e) =>
-              setValues({ ...values, subject: e.target.value })
-            }
-            className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50"
-          />
           <div>
+            <label htmlFor="contact-subject" className="sr-only">
+              Chủ đề liên hệ
+            </label>
+            <select
+              id="contact-subject"
+              value={values.subject}
+              onChange={(e) =>
+                setValues({ ...values, subject: e.target.value })
+              }
+              className={`${fieldClassName} text-white/90 [&>option]:text-slate-900`}
+            >
+              <option value="">Chọn dịch vụ quan tâm</option>
+              <option value="source-code">Mua source code</option>
+              <option value="services">Dịch vụ triển khai</option>
+              <option value="partnership">Hợp tác / CTV</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="contact-message" className="sr-only">
+              Nội dung tin nhắn
+            </label>
             <textarea
+              id="contact-message"
               placeholder="Message *"
               rows={4}
               value={values.message}
               onChange={(e) =>
                 setValues({ ...values, message: e.target.value })
               }
-              className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50"
+              aria-invalid={Boolean(errors.message)}
+              aria-describedby={
+                errors.message ? "contact-message-error" : undefined
+              }
+              className={fieldClassName}
             />
             {errors.message && (
-              <p className="mt-1 text-xs text-red-400">{errors.message}</p>
+              <p
+                id="contact-message-error"
+                className="mt-1 text-xs text-red-400"
+              >
+                {errors.message}
+              </p>
             )}
           </div>
           <Button type="submit" variant="primary-blue">
