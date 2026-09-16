@@ -1,8 +1,13 @@
-import { GitBranch, Users, X } from "lucide-react";
+import { GitBranch, Briefcase, X, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { siteConfig } from "@/content/siteConfig";
+import { SocialLink } from "@/types";
 
-const iconMap = { GitHub: GitBranch, LinkedIn: Users, X: X };
+const iconMap: Record<SocialLink["label"], LucideIcon> = {
+  GitHub: GitBranch,
+  LinkedIn: Briefcase,
+  X,
+};
 
 export function SocialIcons() {
   return (
