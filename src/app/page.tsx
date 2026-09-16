@@ -4,6 +4,7 @@ import { FeaturedProjects } from "@/sections/FeaturedProjects";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
 import { BlogPreview } from "@/sections/BlogPreview";
 import { ContactSection } from "@/sections/ContactSection";
+import { SiteFooter } from "@/sections/SiteFooter";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <WhyChooseUs />
       <BlogPreview />
       <ContactSection />
+      <SiteFooter />
     </main>
   );
 }
