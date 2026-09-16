@@ -1,1 +1,73 @@
-{}
+{
+  "nav": {
+    "home": "Trang chủ",
+    "projects": "Dự án",
+    "about": "Giới thiệu",
+    "blog": "Blog",
+    "contact": "Liên hệ",
+    "getStarted": "Bắt đầu ngay"
+  },
+  "hero": {
+    "eyebrow": "Giải pháp phát triển phần mềm bằng AI",
+    "headline": "Xây dựng thông minh hơn cùng KhaiFrost.",
+    "subtext": "Chúng tôi tạo ra các công cụ AI và giải pháp số giúp doanh nghiệp vận hành nhanh hơn, thông minh hơn và phát triển bền vững.",
+    "cta": "Xem demo 30 giây"
+  },
+  "services": {
+    "eyebrow": "Dịch vụ của chúng tôi",
+    "heading": "Dịch vụ"
+  },
+  "testimonials": {
+    "eyebrow": "Đánh giá",
+    "heading": "Khách hàng thật. Kết quả thật.",
+    "viewMore": "Xem thêm video →"
+  },
+  "featuredProjects": {
+    "eyebrow": "Dự án nổi bật",
+    "heading": "Sản phẩm mới nhất",
+    "viewAll": "Xem tất cả dự án →",
+    "viewDemo": "Xem demo đầy đủ →"
+  },
+  "whyChooseUs": {
+    "eyebrow": "Vì sao chọn KhaiFrost",
+    "heading": "Vì sao chọn KhaiFrost?",
+    "intro": "Chúng tôi kết hợp công nghệ tiên tiến với kinh nghiệm thực tế để mang lại giải pháp thực sự tạo khác biệt."
+  },
+  "blog": {
+    "eyebrow": "Kiến thức",
+    "heading": "Bài viết mới nhất",
+    "viewAll": "Xem tất cả bài viết →"
+  },
+  "contact": {
+    "eyebrow": "Liên hệ",
+    "heading": "Cùng xây dựng điều tuyệt vời",
+    "subtext": "Bạn có dự án cần triển khai? Hãy gửi tin nhắn cho chúng tôi, chúng tôi sẽ phản hồi sớm nhất.",
+    "form": {
+      "nameLabel": "Họ và tên",
+      "namePlaceholder": "Họ và tên *",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email của bạn *",
+      "subjectLabel": "Chủ đề liên hệ",
+      "subjectPlaceholder": "Chọn dịch vụ quan tâm",
+      "subjectOptionSourceCode": "Mua source code",
+      "subjectOptionServices": "Dịch vụ triển khai",
+      "subjectOptionPartnership": "Hợp tác / CTV",
+      "subjectOptionOther": "Khác",
+      "messageLabel": "Nội dung tin nhắn",
+      "messagePlaceholder": "Nội dung *",
+      "submit": "Gửi tin nhắn →",
+      "successMessage": "Đã gửi! Cảm ơn bạn đã liên hệ.",
+      "errors": {
+        "nameRequired": "Vui lòng nhập họ tên",
+        "emailRequired": "Vui lòng nhập email",
+        "emailInvalid": "Email không hợp lệ",
+        "messageRequired": "Vui lòng nhập nội dung"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 KhaiFrost Technology. Đã đăng ký bản quyền.",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản"
+  }
+}

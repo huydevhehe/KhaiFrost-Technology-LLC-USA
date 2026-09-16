@@ -1,1 +1,73 @@
-{}
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "blog": "Blog",
+    "contact": "Contact",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "eyebrow": "AI-Powered Development Solutions",
+    "headline": "Build Smarter with KhaiFrost.",
+    "subtext": "We create AI-powered tools and digital solutions that help businesses move faster, work smarter and grow sustainably.",
+    "cta": "Watch 30s Demo"
+  },
+  "services": {
+    "eyebrow": "What We Do",
+    "heading": "Our Services"
+  },
+  "testimonials": {
+    "eyebrow": "Testimonials",
+    "heading": "Real People. Real Results.",
+    "viewMore": "Watch more videos →"
+  },
+  "featuredProjects": {
+    "eyebrow": "Featured Projects",
+    "heading": "Our Latest Work",
+    "viewAll": "View all projects →",
+    "viewDemo": "View full demo →"
+  },
+  "whyChooseUs": {
+    "eyebrow": "Why KhaiFrost",
+    "heading": "Why Choose KhaiFrost?",
+    "intro": "We combine cutting-edge technology with real-world experience to deliver solutions that make a difference."
+  },
+  "blog": {
+    "eyebrow": "Insights",
+    "heading": "Latest From Our Blog",
+    "viewAll": "View all articles →"
+  },
+  "contact": {
+    "eyebrow": "Get In Touch",
+    "heading": "Let's Build Something Great",
+    "subtext": "Have a project in mind? We'd love to hear from you. Send us a message and we'll get back to you soon.",
+    "form": {
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name *",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Your email *",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Select a service",
+      "subjectOptionSourceCode": "Buy source code",
+      "subjectOptionServices": "Deployment service",
+      "subjectOptionPartnership": "Partnership / Affiliate",
+      "subjectOptionOther": "Other",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Message *",
+      "submit": "Send Message →",
+      "successMessage": "Sent! Thanks for reaching out.",
+      "errors": {
+        "nameRequired": "Please enter your name",
+        "emailRequired": "Please enter your email",
+        "emailInvalid": "Invalid email address",
+        "messageRequired": "Please enter your message"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 KhaiFrost Technology. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}
