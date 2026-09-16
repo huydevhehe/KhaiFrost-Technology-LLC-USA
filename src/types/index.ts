@@ -53,6 +53,17 @@ export interface WhyUsItem {
   description: LocalizedText;
 }
 
+export interface ClientLocation {
+  id: string;
+  name: string;
+  role: string;
+  country: string;
+  quote: LocalizedText;
+  avatar: string;
+  x: number;
+  y: number;
+}
+
 export interface SocialLink {
   label: "GitHub" | "LinkedIn" | "X";
   href: string;
