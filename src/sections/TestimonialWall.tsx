@@ -1,4 +1,5 @@
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
 import { testimonials } from "@/content/testimonials";
 
@@ -6,8 +7,11 @@ export function TestimonialWall() {
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-8 flex items-center justify-between">
-          <SectionEyebrow>Real People. Real Results.</SectionEyebrow>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <SectionEyebrow>Testimonials</SectionEyebrow>
+            <SectionHeading>Real People. Real Results.</SectionHeading>
+          </div>
           <a href="#" className="text-sm font-medium text-accent">
             Xem thêm video →
           </a>

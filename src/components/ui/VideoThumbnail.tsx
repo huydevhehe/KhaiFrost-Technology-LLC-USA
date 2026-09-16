@@ -20,7 +20,7 @@ export function VideoThumbnail({
         aspect === "video" ? "aspect-video" : "aspect-square"
       }`}
     >
-      <Image src={src} alt={alt} fill className="object-cover" />
+      <Image src={src} alt={alt} fill unoptimized className="object-cover" />
       {showVideoBadge && (
         <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-white">
           Video

@@ -8,14 +8,16 @@ import { SiteFooter } from "@/sections/SiteFooter";
 
 export default function Home() {
   return (
-    <main>
-      <HeroSection />
-      <TestimonialWall />
-      <FeaturedProjects />
-      <WhyChooseUs />
-      <BlogPreview />
-      <ContactSection />
+    <>
+      <main>
+        <HeroSection />
+        <TestimonialWall />
+        <FeaturedProjects />
+        <WhyChooseUs />
+        <BlogPreview />
+        <ContactSection />
+      </main>
       <SiteFooter />
-    </main>
+    </>
   );
 }

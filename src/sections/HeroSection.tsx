@@ -33,6 +33,7 @@ export function HeroSection() {
             src="/images/placeholders/hero-demo.svg"
             alt="KhaiFrost AI product demo"
             fill
+            unoptimized
             className="object-cover"
             priority
           />

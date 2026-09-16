@@ -38,7 +38,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "t6",
-    quote: "We best dev tool we've ever used",
+    quote: "The best dev tool we've ever used",
     name: "Engineer",
     role: "Remote",
     thumbnail: "/images/placeholders/testimonial-6.svg",

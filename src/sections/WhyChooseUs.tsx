@@ -5,7 +5,7 @@ import { whyUsItems } from "@/content/whyUsItems";
 
 export function WhyChooseUs() {
   return (
-    <section className="bg-slate-100 py-16">
+    <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
