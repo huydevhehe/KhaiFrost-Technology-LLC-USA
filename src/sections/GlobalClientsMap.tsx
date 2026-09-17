@@ -78,7 +78,7 @@ export function GlobalClientsMap() {
         <div className="relative mx-auto aspect-[2/1] w-full rounded-2xl bg-navy shadow-lg">
           <div className="absolute inset-0 overflow-hidden rounded-2xl">
             <Image
-              src="/images/map/global-reach.png"
+              src="/images/map/global-reach.jpg"
               alt="Global map showing KhaiFrost client locations around the world"
               fill
               sizes="(max-width: 1600px) 100vw, 1600px"

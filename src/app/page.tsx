@@ -7,18 +7,31 @@ import { BlogPreview } from "@/sections/BlogPreview";
 import { ContactSection } from "@/sections/ContactSection";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { PageTransition } from "@/components/PageTransition";
+import { Reveal } from "@/components/ui/Reveal";
 
 export default function Home() {
   return (
     <PageTransition>
       <main>
         <HeroSection />
-        <ServicesSection />
-        <FeaturedProjects />
-        <GlobalClientsMap />
-        <BlogPreview />
-        <WhyChooseUs />
-        <ContactSection />
+        <Reveal>
+          <ServicesSection />
+        </Reveal>
+        <Reveal>
+          <FeaturedProjects />
+        </Reveal>
+        <Reveal>
+          <GlobalClientsMap />
+        </Reveal>
+        <Reveal>
+          <BlogPreview />
+        </Reveal>
+        <Reveal>
+          <WhyChooseUs />
+        </Reveal>
+        <Reveal>
+          <ContactSection />
+        </Reveal>
       </main>
       <SiteFooter />
     </PageTransition>

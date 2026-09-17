@@ -20,7 +20,7 @@ function OfficeMap() {
       </p>
       <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg bg-navy">
         <Image
-          src="/images/map/global-reach.png"
+          src="/images/map/global-reach.jpg"
           alt="Global map showing KhaiFrost offices in Houston and Ho Chi Minh City"
           fill
           sizes="320px"

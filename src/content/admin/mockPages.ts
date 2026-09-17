@@ -78,7 +78,7 @@ export const mockPages: AdminPage[] = [
         heading: "Về KhaiFrost Technology",
         subheading: "Đội ngũ chuyên gia công nghệ toàn cầu",
         body: "KhaiFrost quy tụ đội ngũ kỹ sư và chuyên gia AI, Cloud giàu kinh nghiệm tại Houston và Việt Nam.",
-        image: "/images/about/hero.png",
+        image: "/images/about/hero.jpg",
       },
       {
         id: "about-team",
@@ -108,7 +108,7 @@ export const mockPages: AdminPage[] = [
         heading: "Phạm vi hoạt động toàn cầu",
         subheading: "Văn phòng và khách hàng trên khắp thế giới",
         body: "KhaiFrost hiện có văn phòng tại Houston (Mỹ) và TP. Hồ Chí Minh (Việt Nam).",
-        image: "/images/map/global-reach.png",
+        image: "/images/map/global-reach.jpg",
       },
     ],
   },

@@ -13,7 +13,7 @@ export function HeroSection() {
     <section className="relative flex min-h-screen flex-col overflow-hidden bg-navy text-white">
       <div className="absolute inset-0">
         <Image
-          src="/images/hero/banner-3.png"
+          src="/images/hero/banner-3.jpg"
           alt="KhaiFrost AI-powered development in action"
           fill
           sizes="100vw"

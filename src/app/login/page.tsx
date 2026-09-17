@@ -39,6 +39,9 @@ export default function LoginPage() {
           className="object-cover"
           sizes="50vw"
         />
+        <span className="absolute bottom-2 right-3 text-[10px] font-medium tracking-wide text-white/70">
+          Developed by Nguyen Quoc Huy
+        </span>
       </div>
 
       <div className="flex w-full flex-1 items-center justify-center bg-white p-8 lg:w-1/2">

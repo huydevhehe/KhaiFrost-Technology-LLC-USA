@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -44,15 +45,23 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col bg-navy text-white">
-      <div className="flex items-center gap-2 px-5 py-6">
+    <aside className="relative flex h-screen w-60 shrink-0 flex-col overflow-hidden text-white">
+      <Image
+        src="/images/admin/login-banner.png"
+        alt=""
+        fill
+        priority
+        className="object-cover"
+      />
+      <div className="absolute inset-0 bg-navy/85" />
+      <div className="relative flex items-center gap-2 px-5 py-6">
         <Snowflake className="text-accent" size={26} />
         <div>
           <p className="text-sm font-bold leading-tight tracking-wide">KHAIFROST</p>
           <p className="text-[10px] leading-tight text-white/50">TECHNOLOGY</p>
         </div>
       </div>
-      <nav className="flex-1 overflow-y-auto px-3 pb-6">
+      <nav className="relative flex-1 overflow-y-auto px-3 pb-6">
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => {
             const isActive =

@@ -23,7 +23,7 @@ export const mockSeoSettings: PageSeo[] = [
     title: "Về chúng tôi | KhaiFrost Technology LLC",
     metaDescription: "Tìm hiểu về đội ngũ và sứ mệnh của KhaiFrost Technology.",
     keywords: "KhaiFrost, đội ngũ, sứ mệnh, công nghệ",
-    ogImage: "/images/about/hero.png",
+    ogImage: "/images/about/hero.jpg",
   },
   {
     pageId: "dich-vu",
@@ -31,7 +31,7 @@ export const mockSeoSettings: PageSeo[] = [
     title: "Dịch vụ | KhaiFrost Technology LLC",
     metaDescription: "Khám phá các dịch vụ AI, Cloud, DevOps và phát triển phần mềm của KhaiFrost.",
     keywords: "dịch vụ AI, AWS, DevOps, phần mềm",
-    ogImage: "/images/services-overview/hero.png",
+    ogImage: "/images/services-overview/hero.jpg",
   },
   {
     pageId: "lien-he",
@@ -39,6 +39,6 @@ export const mockSeoSettings: PageSeo[] = [
     title: "Liên hệ | KhaiFrost Technology LLC",
     metaDescription: "Liên hệ với KhaiFrost Technology để được tư vấn giải pháp công nghệ phù hợp.",
     keywords: "liên hệ, tư vấn, KhaiFrost",
-    ogImage: "/images/map/global-reach.png",
+    ogImage: "/images/map/global-reach.jpg",
   },
 ];

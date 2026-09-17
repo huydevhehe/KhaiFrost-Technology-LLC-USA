@@ -11,7 +11,7 @@ export function ContactHero() {
     <section className="relative flex min-h-[65vh] flex-col overflow-hidden bg-navy text-white">
       <div className="absolute inset-0">
         <Image
-          src="/images/contact/office-banner.png"
+          src="/images/contact/office-banner.jpg"
           alt="KhaiFrost office and engineering team at work"
           fill
           sizes="100vw"

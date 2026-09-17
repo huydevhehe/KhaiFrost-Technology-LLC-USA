@@ -12,7 +12,7 @@ export function ProjectsHero() {
       <SiteHeader />
       <div className="absolute inset-0">
         <Image
-          src="/images/projects-page/hero.png"
+          src="/images/projects-page/hero.jpg"
           alt={t("projectsPage.hero.imageAlt")}
           fill
           sizes="100vw"

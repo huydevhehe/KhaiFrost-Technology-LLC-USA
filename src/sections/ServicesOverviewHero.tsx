@@ -13,7 +13,7 @@ export function ServicesOverviewHero() {
       <SiteHeader />
       <div className="absolute inset-0">
         <Image
-          src="/images/services-overview/hero.png"
+          src="/images/services-overview/hero.jpg"
           alt={t("servicesOverviewPage.hero.imageAlt")}
           fill
           sizes="100vw"
