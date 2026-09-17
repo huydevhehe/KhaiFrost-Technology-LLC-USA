@@ -11,36 +11,55 @@ import { ClientLocation } from "@/types";
 function ClientMarker({ client }: { client: ClientLocation }) {
   const quote = useLocalizedField(client.quote);
 
+  const horizontalAnchor =
+    client.x > 70 ? "right-0" : client.x < 20 ? "left-0" : "left-1/2 -translate-x-1/2";
+  const verticalAnchor =
+    client.y < 20 ? "top-full mt-3" : "bottom-full mb-3";
+
   return (
     <div
       className="group absolute z-10"
       style={{ left: `${client.x}%`, top: `${client.y}%` }}
     >
-      <span className="absolute -left-2.5 -top-2.5 h-5 w-5 animate-ping rounded-full bg-accent/70" />
-      <span className="relative block h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-accent shadow-[0_0_0_3px_rgba(11,17,32,0.4)]" />
+      <span className="absolute -left-1.5 -top-1.5 h-3 w-3 animate-ping rounded-full bg-accent/70" />
+      <span className="relative block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-accent shadow-[0_0_0_2px_rgba(11,17,32,0.5)]" />
 
-      <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 w-64 -translate-x-1/2 rounded-xl border border-slate-100 bg-white p-4 opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100">
-        <div className="flex items-center gap-3">
+      <div
+        className={`pointer-events-none absolute ${horizontalAnchor} ${verticalAnchor} z-20 w-72 overflow-hidden rounded-xl border border-slate-100 bg-white opacity-0 shadow-2xl transition-opacity duration-200 group-hover:opacity-100`}
+      >
+        <div className="relative h-28 w-full">
           <Image
-            src={client.avatar}
-            alt={client.name}
-            width={40}
-            height={40}
+            src={client.coverImage}
+            alt={`${client.role} in ${client.country}`}
+            fill
             unoptimized
-            className="rounded-full object-cover"
+            className="object-cover"
           />
-          <div>
-            <p className="text-sm font-semibold text-slate-900">
-              {client.name}
-            </p>
-            <p className="text-xs text-slate-500">
-              {client.role} · {client.country}
-            </p>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-slate-600">
-          &ldquo;{quote}&rdquo;
-        </p>
+        <div className="p-4">
+          <div className="flex items-center gap-3">
+            <Image
+              src={client.avatar}
+              alt={client.name}
+              width={40}
+              height={40}
+              unoptimized
+              className="rounded-full border-2 border-white object-cover shadow"
+            />
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {client.name}
+              </p>
+              <p className="text-xs text-slate-500">
+                {client.role} · {client.country}
+              </p>
+            </div>
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-slate-600">
+            &ldquo;{quote}&rdquo;
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -51,20 +70,22 @@ export function GlobalClientsMap() {
 
   return (
     <section className="bg-slate-50 py-16">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-[1600px] px-6">
         <div className="mb-10 text-center">
           <SectionEyebrow>{t("globalClients.eyebrow")}</SectionEyebrow>
           <SectionHeading>{t("globalClients.heading")}</SectionHeading>
         </div>
-        <div className="relative mx-auto aspect-[2/1] w-full overflow-hidden rounded-2xl shadow-lg">
-          <Image
-            src="/images/map/earth-blue-marble.jpg"
-            alt="Earth map showing KhaiFrost client locations around the world"
-            fill
-            sizes="(max-width: 1280px) 100vw, 1280px"
-            className="object-cover"
-            priority={false}
-          />
+        <div className="relative mx-auto aspect-[2/1] w-full rounded-2xl bg-navy shadow-lg">
+          <div className="absolute inset-0 overflow-hidden rounded-2xl">
+            <Image
+              src="/images/map/global-reach.png"
+              alt="Global map showing KhaiFrost client locations around the world"
+              fill
+              sizes="(max-width: 1600px) 100vw, 1600px"
+              className="object-cover"
+              priority={false}
+            />
+          </div>
           {clientLocations.map((client) => (
             <ClientMarker key={client.id} client={client} />
           ))}

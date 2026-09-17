@@ -6,6 +6,7 @@ interface VideoThumbnailProps {
   alt: string;
   aspect?: "video" | "square";
   showVideoBadge?: boolean;
+  duration?: string;
 }
 
 export function VideoThumbnail({
@@ -13,6 +14,7 @@ export function VideoThumbnail({
   alt,
   aspect = "video",
   showVideoBadge = false,
+  duration,
 }: VideoThumbnailProps) {
   return (
     <div
@@ -31,6 +33,11 @@ export function VideoThumbnail({
           <Play size={16} className="ml-0.5 text-slate-900" fill="currentColor" />
         </div>
       </div>
+      {duration && (
+        <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-[11px] font-medium text-white">
+          {duration}
+        </span>
+      )}
     </div>
   );
 }

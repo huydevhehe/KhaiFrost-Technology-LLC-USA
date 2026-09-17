@@ -10,16 +10,23 @@ import { BlogPost } from "@/types";
 
 function BlogCard({ post }: { post: BlogPost }) {
   const title = useLocalizedField(post.title);
+  const excerpt = useLocalizedField(post.excerpt);
 
   return (
-    <a href={post.href} className="block">
+    <a
+      href={post.href}
+      className="block rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+    >
       <VideoThumbnail
         src={post.thumbnail}
         alt={title}
         showVideoBadge={post.hasVideo}
       />
       <h3 className="mt-3 text-sm font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-xs text-slate-500">{post.date}</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+        {excerpt}
+      </p>
+      <p className="mt-2 text-xs font-medium text-slate-400">{post.date}</p>
     </a>
   );
 }

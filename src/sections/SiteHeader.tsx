@@ -10,7 +10,10 @@ export function SiteHeader() {
   const { t } = useTranslation();
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header
+      className="absolute inset-x-0 top-0 z-50"
+      style={{ viewTransitionName: "site-header" }}
+    >
       <div className="mx-auto flex max-w-[1800px] items-center justify-between px-8 py-6 md:px-12">
         <Link href="/" className="flex items-center gap-2 text-white">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-slate-900">
@@ -25,6 +28,7 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
+              transitionTypes={["nav-forward"]}
               className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
             >
               {t(`nav.${link.key}`)}
@@ -32,6 +36,7 @@ export function SiteHeader() {
           ))}
           <Link
             href="/demo"
+            transitionTypes={["nav-forward"]}
             className="rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-white shadow-md drop-shadow-none transition-all duration-300 ease-out hover:scale-105 hover:bg-accent/90"
           >
             {t("nav.demo")}
@@ -40,6 +45,7 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
+              transitionTypes={["nav-forward"]}
               className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
             >
               {t(`nav.${link.key}`)}
@@ -48,7 +54,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-4">
           <LanguageToggle />
-          <Button href="/contact" variant="primary-pill-light">
+          <Button href="/login" variant="primary-pill-light">
             {t("nav.getStarted")} →
           </Button>
         </div>

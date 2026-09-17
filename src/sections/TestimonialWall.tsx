@@ -12,7 +12,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   const quote = useLocalizedField(testimonial.quote);
 
   return (
-    <div>
+    <div className="group rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <VideoThumbnail
         src={testimonial.thumbnail}
         alt={testimonial.name}

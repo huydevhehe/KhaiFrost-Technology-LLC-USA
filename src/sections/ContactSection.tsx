@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/Button";
 
 const fieldClassName =
-  "w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50";
+  "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400";
 
 const initialValues: ContactFormValues = {
   name: "",
@@ -51,15 +51,15 @@ export function ContactSection() {
     : undefined;
 
   return (
-    <section className="bg-navy py-16 text-white">
+    <section className="border-t border-slate-100 bg-white py-16 text-slate-900">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-2">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
             {t("contact.eyebrow")}
           </p>
-          <h2 className="text-3xl font-bold">{t("contact.heading")}</h2>
-          <p className="mt-4 text-white/70">{t("contact.subtext")}</p>
-          <div className="mt-6 space-y-2 text-sm text-white/80">
+          <h2 className="text-3xl font-bold text-slate-900">{t("contact.heading")}</h2>
+          <p className="mt-4 text-slate-500">{t("contact.subtext")}</p>
+          <div className="mt-6 space-y-2 text-sm text-slate-600">
             <p>{siteConfig.email}</p>
             <p>{siteConfig.phone}</p>
             <p>{siteConfig.address}</p>
@@ -67,7 +67,7 @@ export function ContactSection() {
         </div>
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-xl bg-white/5 p-6 backdrop-blur"
+          className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6"
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -89,7 +89,7 @@ export function ContactSection() {
               {nameErrorText && (
                 <p
                   id="contact-name-error"
-                  className="mt-1 text-xs text-red-400"
+                  className="mt-1 text-xs text-red-500"
                 >
                   {nameErrorText}
                 </p>
@@ -116,7 +116,7 @@ export function ContactSection() {
               {emailErrorText && (
                 <p
                   id="contact-email-error"
-                  className="mt-1 text-xs text-red-400"
+                  className="mt-1 text-xs text-red-500"
                 >
                   {emailErrorText}
                 </p>
@@ -133,7 +133,7 @@ export function ContactSection() {
               onChange={(e) =>
                 setValues({ ...values, subject: e.target.value })
               }
-              className={`${fieldClassName} text-white/90 [&>option]:text-slate-900`}
+              className={fieldClassName}
             >
               <option value="">{t("contact.form.subjectPlaceholder")}</option>
               <option value="source-code">
@@ -171,7 +171,7 @@ export function ContactSection() {
             {messageErrorText && (
               <p
                 id="contact-message-error"
-                className="mt-1 text-xs text-red-400"
+                className="mt-1 text-xs text-red-500"
               >
                 {messageErrorText}
               </p>

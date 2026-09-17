@@ -36,7 +36,8 @@
   "whyChooseUs": {
     "eyebrow": "Why KhaiFrost",
     "heading": "Why Choose KhaiFrost?",
-    "intro": "We combine cutting-edge technology with real-world experience to deliver solutions that make a difference."
+    "intro": "We combine cutting-edge technology with real-world experience to deliver solutions that make a difference.",
+    "paragraph": "We combine the latest AI technology with real-world experience to build solutions that truly make a difference. Your data and systems are always protected with enterprise-grade security standards. The KhaiFrost team brings together deep technical expertise and hands-on product experience, staying by your side well beyond launch day — because your success is how we measure our own."
   },
   "blog": {
     "eyebrow": "Insights",
@@ -115,8 +116,160 @@
       "a4": "Yes, we work with clients across the US, Vietnam, and worldwide, with flexible communication across time zones."
     }
   },
+  "serviceCategoryPage": {
+    "breadcrumb": {
+      "home": "Home",
+      "service": "Service"
+    },
+    "hero": {
+      "eyebrow": "Service Category",
+      "ctaDemo": "Watch demo",
+      "ctaContact": "Talk to us"
+    },
+    "products": {
+      "viewDetails": "View details →"
+    },
+    "process": {
+      "eyebrow": "Our Process",
+      "heading": "With You From Idea To Success"
+    },
+    "whyUs": {
+      "eyebrow": "Why KhaiFrost",
+      "heading": "Why Choose KhaiFrost for {{category}}?"
+    },
+    "caseStudies": {
+      "eyebrow": "Featured Projects",
+      "heading": "Notable {{category}} Projects",
+      "viewAll": "View all projects →"
+    },
+    "testimonials": {
+      "eyebrow": "What Our Clients Say",
+      "heading": "Real Success Stories From Our Clients"
+    },
+    "faq": {
+      "eyebrow": "Frequently Asked Questions",
+      "heading": "Questions About {{category}}",
+      "cta": {
+        "eyebrow": "Need More Advice?",
+        "heading": "Talk To Us Right Away",
+        "text": "The KhaiFrost team is always ready to advise and propose the best-fit solution for your business.",
+        "primaryCta": "Book a Free Consultation →",
+        "secondaryCta": "Contact Us"
+      }
+    }
+  },
+  "servicesOverviewPage": {
+    "breadcrumb": {
+      "current": "Service"
+    },
+    "hero": {
+      "eyebrow": "Our Services",
+      "headlineLine1": "Comprehensive Technology",
+      "headlineLine2": "Solutions For Your Business",
+      "description": "KhaiFrost Technology provides AI, Cloud and automation solutions that help businesses optimize operations, grow sustainably and lead in the digital era.",
+      "ctaDemo": "Watch demo",
+      "ctaContact": "Talk to us",
+      "imageAlt": "KhaiFrost engineers working with AI and technology infrastructure"
+    },
+    "services": {
+      "eyebrow": "Our Core Services",
+      "heading": "We Deliver 4 Core Solution Groups",
+      "cta": "Explore service →"
+    },
+    "process": {
+      "eyebrow": "How We Work",
+      "heading": "Simple. Transparent. Effective."
+    },
+    "whyUs": {
+      "eyebrow": "Why KhaiFrost",
+      "heading": "We don't just deliver technology — we grow alongside your business.",
+      "paragraph": "With hands-on experience, a talented engineering team and a professional process, KhaiFrost is committed to delivering the technology solutions best suited to your industry, helping your business optimize operations, grow sustainably and stay ready for the future."
+    },
+    "projects": {
+      "eyebrow": "Featured Projects",
+      "heading": "Our Flagship Projects",
+      "viewAll": "View all projects →"
+    },
+    "cta": {
+      "eyebrow": "Ready To Get Started?",
+      "heading": "Talk to us for the right solution for your business",
+      "description": "The KhaiFrost expert team is always ready to support you 24/7.",
+      "button": "Get a Free Consultation →"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": {
+      "current": "About Us"
+    },
+    "hero": {
+      "eyebrow": "About Us",
+      "headlineLine1": "Building Technology,",
+      "headlineLine2": "Partnering With Your Business",
+      "description": "KhaiFrost Technology LLC is a software development company delivering AI, Cloud and automation solutions that help businesses optimize operations and grow sustainably in the digital era.",
+      "imageAlt": "KhaiFrost engineering team working at the office"
+    },
+    "story": {
+      "eyebrow": "Our Story",
+      "headlineLine1": "From A Passion For Technology",
+      "headlineLine2": "To A Mission Of Creating Value",
+      "imageAlt": "KhaiFrost Technology office workspace"
+    },
+    "visionMission": {
+      "visionTitle": "Vision",
+      "missionTitle": "Mission",
+      "visionImageAlt": "KhaiFrost's vision",
+      "missionImageAlt": "KhaiFrost's mission"
+    },
+    "values": {
+      "eyebrow": "Core Values",
+      "heading": "The Values That Define KhaiFrost"
+    },
+    "team": {
+      "eyebrow": "Our Team",
+      "heading": "The People Who Make The Difference",
+      "intro": "The KhaiFrost team blends experience, creativity and a spirit of collaboration. We're not just technology engineers — we're partners who walk alongside our clients on their digital transformation journey.",
+      "cta": "Meet the team →"
+    },
+    "offices": {
+      "eyebrow": "Global Offices",
+      "heading": "2 Offices – 1 Mission",
+      "intro": "Connecting from Texas to Vietnam, we're always ready to support you wherever you are."
+    },
+    "cta": {
+      "eyebrow": "Start Your Journey With KhaiFrost",
+      "heading": "Looking for a technology partner you can trust?",
+      "description": "Get in touch with us to discuss and build the right solution for your business.",
+      "button": "Contact Us →"
+    }
+  },
+  "projectsPage": {
+    "breadcrumb": {
+      "current": "Projects"
+    },
+    "hero": {
+      "eyebrow": "Our Projects",
+      "headlineLine1": "Real Products,",
+      "headlineLine2": "Real Results",
+      "description": "Explore the flagship projects KhaiFrost Technology has delivered for clients around the world. We're proud to bring technology solutions that help businesses grow and optimize operations.",
+      "imageAlt": "KhaiFrost engineering team working at the technology office"
+    },
+    "filters": {
+      "all": "All"
+    },
+    "cta": {
+      "eyebrow": "Have A Project In Mind?",
+      "heading": "Let KhaiFrost Be Your Partner!",
+      "description": "We're always ready to listen, advise and build the technology solution best suited to your business needs.",
+      "button": "Start Your Project →"
+    }
+  },
   "footer": {
-    "copyright": "© 2025 KhaiFrost Technology. All rights reserved.",
+    "description": "KhaiFrost Technology LLC builds AI-powered software, cloud infrastructure and automation tools for businesses in the USA and worldwide.",
+    "quickLinks": "Quick Links",
+    "ourServices": "Our Services",
+    "contactUs": "Contact Us",
+    "ourOffices": "Our Offices",
+    "copyright": "© 2025 KhaiFrost Technology LLC. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms"
   }

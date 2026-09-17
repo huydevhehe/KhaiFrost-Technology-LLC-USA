@@ -3,6 +3,7 @@ import { ServiceItem } from "@/types";
 export const services: ServiceItem[] = [
   {
     id: "s1",
+    slug: "ai-automation",
     icon: "ai",
     title: { en: "AI & Automation", vi: "AI & Tự động hoá" },
     description: {
@@ -13,6 +14,7 @@ export const services: ServiceItem[] = [
   },
   {
     id: "s2",
+    slug: "aws-cloud-devops",
     icon: "cloud",
     title: { en: "AWS Cloud & DevOps", vi: "AWS Cloud & DevOps" },
     description: {
@@ -23,6 +25,7 @@ export const services: ServiceItem[] = [
   },
   {
     id: "s3",
+    slug: "cybersecurity",
     icon: "security",
     title: {
       en: "Managed Infrastructure & Cybersecurity",
@@ -36,6 +39,7 @@ export const services: ServiceItem[] = [
   },
   {
     id: "s4",
+    slug: "software-api-development",
     icon: "code",
     title: { en: "Software & API Development", vi: "Phát triển phần mềm & API" },
     description: {

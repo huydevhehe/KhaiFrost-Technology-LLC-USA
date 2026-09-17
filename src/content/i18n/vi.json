@@ -36,7 +36,8 @@
   "whyChooseUs": {
     "eyebrow": "Vì sao chọn KhaiFrost",
     "heading": "Vì sao chọn KhaiFrost?",
-    "intro": "Chúng tôi kết hợp công nghệ tiên tiến với kinh nghiệm thực tế để mang lại giải pháp thực sự tạo khác biệt."
+    "intro": "Chúng tôi kết hợp công nghệ tiên tiến với kinh nghiệm thực tế để mang lại giải pháp thực sự tạo khác biệt.",
+    "paragraph": "Chúng tôi kết hợp công nghệ AI mới nhất với kinh nghiệm thực chiến để xây dựng những giải pháp thực sự tạo ra khác biệt. Dữ liệu và hệ thống của bạn luôn được bảo vệ với tiêu chuẩn bảo mật cấp doanh nghiệp. Đội ngũ KhaiFrost hội tụ chuyên môn kỹ thuật sâu cùng kinh nghiệm sản phẩm thực tế, sẵn sàng đồng hành cùng bạn không chỉ đến ngày bàn giao mà xuyên suốt hành trình phát triển — vì thành công của bạn chính là thước đo thành công của chúng tôi."
   },
   "blog": {
     "eyebrow": "Kiến thức",
@@ -115,8 +116,160 @@
       "a4": "Có, chúng tôi làm việc với khách hàng tại Mỹ, Việt Nam và trên toàn thế giới, linh hoạt trao đổi qua nhiều múi giờ."
     }
   },
+  "serviceCategoryPage": {
+    "breadcrumb": {
+      "home": "Trang chủ",
+      "service": "Dịch vụ"
+    },
+    "hero": {
+      "eyebrow": "Danh mục dịch vụ",
+      "ctaDemo": "Xem demo",
+      "ctaContact": "Liên hệ tư vấn"
+    },
+    "products": {
+      "viewDetails": "Xem chi tiết →"
+    },
+    "process": {
+      "eyebrow": "Quy trình triển khai",
+      "heading": "Đồng hành cùng bạn từ ý tưởng đến thành công"
+    },
+    "whyUs": {
+      "eyebrow": "Vì sao chọn KhaiFrost",
+      "heading": "Tại sao nên chọn KhaiFrost cho {{category}}?"
+    },
+    "caseStudies": {
+      "eyebrow": "Dự án nổi bật",
+      "heading": "Những dự án {{category}} tiêu biểu",
+      "viewAll": "Xem tất cả dự án →"
+    },
+    "testimonials": {
+      "eyebrow": "Khách hàng nói gì về chúng tôi",
+      "heading": "Câu chuyện thành công từ khách hàng"
+    },
+    "faq": {
+      "eyebrow": "Câu hỏi thường gặp",
+      "heading": "Câu hỏi thường gặp về {{category}}",
+      "cta": {
+        "eyebrow": "Cần tư vấn thêm?",
+        "heading": "Liên hệ ngay với chúng tôi",
+        "text": "Đội ngũ chuyên gia của KhaiFrost luôn sẵn sàng tư vấn và đề xuất giải pháp phù hợp nhất cho doanh nghiệp của bạn.",
+        "primaryCta": "Đặt lịch tư vấn miễn phí →",
+        "secondaryCta": "Liên hệ ngay"
+      }
+    }
+  },
+  "servicesOverviewPage": {
+    "breadcrumb": {
+      "current": "Dịch vụ"
+    },
+    "hero": {
+      "eyebrow": "Dịch vụ của chúng tôi",
+      "headlineLine1": "Giải pháp công nghệ",
+      "headlineLine2": "toàn diện cho doanh nghiệp",
+      "description": "KhaiFrost Technology cung cấp các giải pháp AI, Cloud và tự động hoá giúp doanh nghiệp tối ưu vận hành, tăng trưởng bền vững và dẫn đầu trong kỷ nguyên số.",
+      "ctaDemo": "Xem demo",
+      "ctaContact": "Liên hệ tư vấn",
+      "imageAlt": "Đội ngũ kỹ sư KhaiFrost làm việc với AI và hạ tầng công nghệ"
+    },
+    "services": {
+      "eyebrow": "Các dịch vụ chính",
+      "heading": "Chúng tôi cung cấp 4 nhóm giải pháp cốt lõi",
+      "cta": "Khám phá dịch vụ →"
+    },
+    "process": {
+      "eyebrow": "Quy trình làm việc",
+      "heading": "Đơn giản. Minh bạch. Hiệu quả."
+    },
+    "whyUs": {
+      "eyebrow": "Vì sao chọn KhaiFrost",
+      "heading": "Chúng tôi không chỉ cung cấp công nghệ mà còn đồng hành cùng sự phát triển của bạn.",
+      "paragraph": "Với kinh nghiệm thực chiến, đội ngũ kỹ sư tài năng và quy trình chuyên nghiệp, KhaiFrost cam kết mang đến những giải pháp công nghệ phù hợp nhất với từng ngành nghề, giúp doanh nghiệp tối ưu vận hành, tăng trưởng bền vững và sẵn sàng cho tương lai."
+    },
+    "projects": {
+      "eyebrow": "Dự án nổi bật",
+      "heading": "Các dự án tiêu biểu",
+      "viewAll": "Xem tất cả dự án →"
+    },
+    "cta": {
+      "eyebrow": "Sẵn sàng bắt đầu?",
+      "heading": "Liên hệ với chúng tôi để được tư vấn giải pháp phù hợp nhất",
+      "description": "Đội ngũ chuyên gia của KhaiFrost luôn sẵn sàng hỗ trợ bạn 24/7.",
+      "button": "Liên hệ tư vấn miễn phí →"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": {
+      "current": "Về chúng tôi"
+    },
+    "hero": {
+      "eyebrow": "Về chúng tôi",
+      "headlineLine1": "Xây dựng công nghệ,",
+      "headlineLine2": "đồng hành cùng doanh nghiệp",
+      "description": "KhaiFrost Technology LLC là công ty phát triển phần mềm chuyên cung cấp giải pháp AI, Cloud và tự động hoá, giúp doanh nghiệp tối ưu vận hành, tăng trưởng bền vững trong kỷ nguyên số.",
+      "imageAlt": "Đội ngũ kỹ sư KhaiFrost làm việc tại văn phòng"
+    },
+    "story": {
+      "eyebrow": "Câu chuyện công ty",
+      "headlineLine1": "Từ đam mê công nghệ",
+      "headlineLine2": "đến sứ mệnh kiến tạo giá trị",
+      "imageAlt": "Văn phòng làm việc của KhaiFrost Technology"
+    },
+    "visionMission": {
+      "visionTitle": "Tầm nhìn",
+      "missionTitle": "Sứ mệnh",
+      "visionImageAlt": "Tầm nhìn của KhaiFrost",
+      "missionImageAlt": "Sứ mệnh của KhaiFrost"
+    },
+    "values": {
+      "eyebrow": "Giá trị cốt lõi",
+      "heading": "Những giá trị làm nên KhaiFrost"
+    },
+    "team": {
+      "eyebrow": "Đội ngũ của chúng tôi",
+      "heading": "Những con người tạo nên khác biệt",
+      "intro": "Đội ngũ KhaiFrost là sự kết hợp giữa kinh nghiệm, sáng tạo và tinh thần hợp tác. Chúng tôi không chỉ là những kỹ sư công nghệ, mà còn là những người đồng hành cùng khách hàng trên hành trình chuyển đổi số.",
+      "cta": "Khám phá đội ngũ →"
+    },
+    "offices": {
+      "eyebrow": "Văn phòng toàn cầu",
+      "heading": "2 văn phòng – 1 sứ mệnh",
+      "intro": "Kết nối từ Texas đến Việt Nam, chúng tôi luôn sẵn sàng đồng hành cùng bạn ở bất cứ đâu."
+    },
+    "cta": {
+      "eyebrow": "Bắt đầu hành trình cùng KhaiFrost",
+      "heading": "Bạn đang tìm kiếm đối tác công nghệ đáng tin cậy?",
+      "description": "Hãy liên hệ với chúng tôi để cùng trao đổi và xây dựng giải pháp phù hợp nhất cho doanh nghiệp của bạn.",
+      "button": "Liên hệ với chúng tôi →"
+    }
+  },
+  "projectsPage": {
+    "breadcrumb": {
+      "current": "Dự án"
+    },
+    "hero": {
+      "eyebrow": "Dự án của chúng tôi",
+      "headlineLine1": "Sản phẩm thực tế,",
+      "headlineLine2": "kết quả thực tế",
+      "description": "Khám phá những dự án tiêu biểu mà KhaiFrost Technology đã triển khai cho khách hàng trên toàn cầu. Chúng tôi tự hào mang đến các giải pháp công nghệ giúp doanh nghiệp tăng trưởng và tối ưu vận hành.",
+      "imageAlt": "Đội ngũ kỹ sư KhaiFrost làm việc tại văn phòng công nghệ"
+    },
+    "filters": {
+      "all": "Tất cả"
+    },
+    "cta": {
+      "eyebrow": "Bạn có ý tưởng dự án?",
+      "heading": "Hãy để KhaiFrost đồng hành cùng bạn!",
+      "description": "Chúng tôi luôn sẵn sàng lắng nghe, tư vấn và xây dựng giải pháp công nghệ phù hợp nhất với nhu cầu của doanh nghiệp bạn.",
+      "button": "Bắt đầu dự án của bạn →"
+    }
+  },
   "footer": {
-    "copyright": "© 2025 KhaiFrost Technology. Đã đăng ký bản quyền.",
+    "description": "KhaiFrost Technology LLC xây dựng phần mềm AI, hạ tầng cloud và công cụ tự động hoá cho doanh nghiệp tại Mỹ và trên toàn thế giới.",
+    "quickLinks": "Liên kết nhanh",
+    "ourServices": "Dịch vụ",
+    "contactUs": "Liên hệ",
+    "ourOffices": "Văn phòng",
+    "copyright": "© 2025 KhaiFrost Technology LLC. Đã đăng ký bản quyền.",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản"
   }

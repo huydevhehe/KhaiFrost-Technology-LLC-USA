@@ -48,3 +48,9 @@ next-env.d.ts
 *.pdf
 *.md
 /*.png
+/*.jpg
+/*.jpeg
+/*.webp
+/*.avif
+/*.jfif
+/design đã dev/

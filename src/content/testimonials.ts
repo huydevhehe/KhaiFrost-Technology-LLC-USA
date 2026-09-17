@@ -9,7 +9,7 @@ export const testimonials: Testimonial[] = [
     },
     name: "Tech Startup",
     role: "Vietnam",
-    thumbnail: "/images/placeholders/testimonial-1.svg",
+    thumbnail: "/images/placeholders/testimonial-1.jpg",
   },
   {
     id: "t2",
@@ -19,7 +19,7 @@ export const testimonials: Testimonial[] = [
     },
     name: "Product Team",
     role: "HCMC",
-    thumbnail: "/images/placeholders/testimonial-2.svg",
+    thumbnail: "/images/placeholders/testimonial-2.jpg",
   },
   {
     id: "t3",
@@ -29,7 +29,7 @@ export const testimonials: Testimonial[] = [
     },
     name: "Developer",
     role: "Remote",
-    thumbnail: "/images/placeholders/testimonial-3.svg",
+    thumbnail: "/images/placeholders/testimonial-3.jpg",
   },
   {
     id: "t4",
@@ -39,7 +39,7 @@ export const testimonials: Testimonial[] = [
     },
     name: "Business Owner",
     role: "Vietnam",
-    thumbnail: "/images/placeholders/testimonial-4.svg",
+    thumbnail: "/images/placeholders/testimonial-4.jpg",
   },
   {
     id: "t5",
@@ -49,7 +49,7 @@ export const testimonials: Testimonial[] = [
     },
     name: "CEO",
     role: "Saigon",
-    thumbnail: "/images/placeholders/testimonial-5.svg",
+    thumbnail: "/images/placeholders/testimonial-5.jpg",
   },
   {
     id: "t6",
@@ -59,6 +59,6 @@ export const testimonials: Testimonial[] = [
     },
     name: "Engineer",
     role: "Remote",
-    thumbnail: "/images/placeholders/testimonial-6.svg",
+    thumbnail: "/images/placeholders/testimonial-6.jpg",
   },
 ];

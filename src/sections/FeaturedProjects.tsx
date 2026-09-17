@@ -15,7 +15,7 @@ function ProjectCard({ project }: { project: Project }) {
   const description = useLocalizedField(project.description);
 
   return (
-    <div className="rounded-xl bg-white p-4 shadow-sm">
+    <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <VideoThumbnail src={project.thumbnail} alt={title} />
       <h3 className="mt-4 font-semibold text-slate-900">{title}</h3>
       <p className="mt-1 text-sm text-slate-500">{description}</p>

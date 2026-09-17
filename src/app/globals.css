@@ -17,3 +17,62 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Page transitions (View Transitions API) */
+::view-transition {
+  pointer-events: none;
+}
+
+/* The browser's default UA stylesheet sets mix-blend-mode: plus-lighter
+   on every ::view-transition-old/new pair, which additively brightens
+   the overlap during a crossfade — that's the "flash" effect. Force
+   normal blending everywhere so only opacity crossfades, no flash. */
+::view-transition-old(*),
+::view-transition-new(*) {
+  mix-blend-mode: normal;
+}
+
+/* Disable the browser's default full-page crossfade so only our
+   named nav-forward/nav-back animation plays. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-old(.nav-forward),
+::view-transition-old(.nav-back) {
+  animation: 60ms ease-out both fade reverse;
+}
+::view-transition-new(.nav-forward),
+::view-transition-new(.nav-back) {
+  animation: 80ms ease-in 60ms both fade;
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
