@@ -14,6 +14,9 @@ export class MediaAsset extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   originalName!: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  displayName!: string | null;
+
   @Index({ unique: true })
   @Column({ type: 'varchar', length: 500 })
   storageKey!: string;
