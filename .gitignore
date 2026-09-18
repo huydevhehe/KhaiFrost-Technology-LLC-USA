@@ -1,8 +1,10 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ---------------------------------------------------------------------------
+# Repository layout: frontend/ (Next.js)  backend/ (NestJS)  + local-only reference material at root
+# ---------------------------------------------------------------------------
 
-# dependencies
-/node_modules
-/.pnp
+# dependencies (any depth: root, frontend/, backend/)
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -11,17 +13,21 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage/
 
-# next.js
-/.next/
-/out/
+# next.js (frontend)
+.next/
+out/
+
+# nest build output (backend)
+dist/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -30,8 +36,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files: never commit real secrets, only the .env.example templates
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,17 +47,35 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# playwright debug scratch (from browser-based verification)
-.playwright-mcp/
+# backend runtime data (uploaded media, logs)
+backend/uploads/
+backend/logs/
+*.log
 
-# local reference materials only — never pushed (business docs, design mockups, docs/plans)
-*.docx
-*.pdf
+# playwright / tooling scratch
+.playwright-mcp/
+.superpowers/
+
+# ---------------------------------------------------------------------------
+# NEVER PUSHED: Markdown and Word files (any folder, any letter case)
+# ---------------------------------------------------------------------------
 *.md
+*.MD
+*.markdown
+*.doc
+*.DOC
+*.docx
+*.DOCX
+*.dotx
+*.rtf
+
+# local reference materials only (business docs, design mockups, planning docs)
+*.pdf
+/docs/
+/design*/
 /*.png
 /*.jpg
 /*.jpeg
 /*.webp
 /*.avif
 /*.jfif
-/design đã dev/
