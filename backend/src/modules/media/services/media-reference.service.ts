@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
@@ -6,12 +6,23 @@ import { In, Repository } from 'typeorm';
 import { validationFailed } from '../../../common/exceptions/exception.factories';
 import { storageConfig } from '../../../config/storage.config';
 import { MediaAsset } from '../entities/media-asset.entity';
+import { StorageProvider, STORAGE_PROVIDER } from '../storage/storage-provider.interface';
+
+export interface ResolvedMediaAsset {
+  url: string;
+  thumbnailUrl: string;
+  width: number | null;
+  height: number | null;
+  mimeType: string;
+}
 
 @Injectable()
 export class MediaReferenceService {
   constructor(
     @InjectRepository(MediaAsset) private readonly mediaAssets: Repository<MediaAsset>,
     @Inject(storageConfig.KEY) private readonly storage: ConfigType<typeof storageConfig>,
+    // Optional so feature modules can provide this service alone in their own tests
+    @Optional() @Inject(STORAGE_PROVIDER) private readonly storageProvider?: StorageProvider,
   ) {}
 
   async assertAllExist(ids: string[]): Promise<void> {
@@ -40,10 +51,33 @@ export class MediaReferenceService {
       select: { id: true, storageKey: true },
       where: { id: In(validIds) },
     });
-    for (const asset of assets) {
-      const encodedKey = asset.storageKey.split('/').map(encodeURIComponent).join('/');
-      urls.set(asset.id, `${this.storage.publicBaseUrl}/${encodedKey}`);
-    }
+    for (const asset of assets) urls.set(asset.id, this.toUrl(asset.storageKey));
     return urls;
+  }
+
+  async resolveAssets(ids: string[]): Promise<Map<string, ResolvedMediaAsset>> {
+    const validIds = [...new Set(ids)].filter((id) => isUUID(id));
+    const resolved = new Map<string, ResolvedMediaAsset>();
+    if (validIds.length === 0) return resolved;
+
+    const assets = await this.mediaAssets.find({ where: { id: In(validIds) } });
+    for (const asset of assets) {
+      const url = this.toUrl(asset.storageKey);
+      const thumbnail = asset.variants?.thumb;
+      resolved.set(asset.id, {
+        url,
+        thumbnailUrl: thumbnail ? this.toUrl(thumbnail.storageKey) : url,
+        width: asset.width,
+        height: asset.height,
+        mimeType: asset.mimeType,
+      });
+    }
+    return resolved;
+  }
+
+  private toUrl(storageKey: string): string {
+    if (this.storageProvider) return this.storageProvider.toPublicUrl(storageKey);
+    const encodedKey = storageKey.split('/').map(encodeURIComponent).join('/');
+    return `${this.storage.publicBaseUrl}/${encodedKey}`;
   }
 }
