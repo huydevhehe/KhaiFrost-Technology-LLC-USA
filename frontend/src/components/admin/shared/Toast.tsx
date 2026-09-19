@@ -162,8 +162,14 @@ export interface ApiActionOptions {
 }
 
 export interface ApiAction {
-  /** Runs the call; resolves with its result, or `undefined` when it failed. */
-  run: <T>(action: () => Promise<T>, options?: ApiActionOptions) => Promise<T | undefined>;
+  /**
+   * Runs the call; resolves with its result, or `undefined` when it failed.
+   * A call that succeeds with no body (204) resolves to `true`, so `!== undefined` always means success.
+   */
+  run: <T>(
+    action: () => Promise<T>,
+    options?: ApiActionOptions,
+  ) => Promise<(T extends void ? true : T) | undefined>;
   pending: boolean;
   /** Vietnamese message of the last failure, or null. */
   error: string | null;
@@ -190,7 +196,10 @@ export function useApiAction(defaults: ApiActionOptions = {}): ApiAction {
   }, []);
 
   const run = useCallback(
-    async <T,>(action: () => Promise<T>, options?: ApiActionOptions): Promise<T | undefined> => {
+    async <T,>(
+      action: () => Promise<T>,
+      options?: ApiActionOptions,
+    ): Promise<(T extends void ? true : T) | undefined> => {
       const merged = { ...defaultsRef.current, ...options };
       setPending(true);
       setError(null);
@@ -198,7 +207,7 @@ export function useApiAction(defaults: ApiActionOptions = {}): ApiAction {
         const result = await action();
         if (merged.successMessage) toast.success(merged.successMessage);
         merged.onSuccess?.();
-        return result;
+        return (result === undefined ? true : result) as T extends void ? true : T;
       } catch (caught) {
         const message = describeApiError(caught, merged.errorContext);
         if (alive.current) setError(message);
