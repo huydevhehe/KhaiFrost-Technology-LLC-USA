@@ -425,6 +425,18 @@ export function PostEditor({
               {scheduled ? "Lên lịch" : "Xuất bản"}
             </ActionButton>
           )}
+          {!isNew && canPublish && status === "in_review" && (
+            <ActionButton
+              variant="secondary"
+              icon={<Undo2 size={15} />}
+              pending={busy}
+              onClick={() =>
+                void runWorkflow(postsApi.reject, "Đã trả bài về bản nháp.", { saveFirst: false })
+              }
+            >
+              Từ chối duyệt
+            </ActionButton>
+          )}
           {!isNew && canPublish && status === "published" && (
             <ActionButton
               variant="secondary"

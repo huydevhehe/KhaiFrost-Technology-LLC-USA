@@ -178,6 +178,9 @@ export const postsApi = {
     api.post<AdminPostDetail>(path(id, "/publish"), publishedAt ? { publishedAt } : {}),
   unpublish: (id: string): Promise<AdminPostDetail> =>
     api.post<AdminPostDetail>(path(id, "/unpublish")),
+  /** Sends a post in review back to draft. */
+  reject: (id: string): Promise<AdminPostDetail> =>
+    api.post<AdminPostDetail>(path(id, "/reject")),
   archive: (id: string): Promise<AdminPostDetail> =>
     api.post<AdminPostDetail>(path(id, "/archive")),
   restore: (id: string): Promise<AdminPostDetail> =>
