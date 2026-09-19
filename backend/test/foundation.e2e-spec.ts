@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { RequestContextService } from '../src/common/context/request-context.service';
 import { MediaAsset } from '../src/modules/media/entities/media-asset.entity';
 import { MediaReferenceService } from '../src/modules/media/services/media-reference.service';
-import { createTestingApp, TestingApp } from './support';
+import { createTestingApp, TestingApp } from './support/create-testing-app';
 
 describe('Foundation (e2e)', () => {
   let testing: TestingApp;

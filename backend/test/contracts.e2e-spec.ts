@@ -5,7 +5,7 @@ import { PublicController } from '../src/common/decorators/public-controller.dec
 import { PaginatedResponseDto } from '../src/common/dto/paginated-response.dto';
 import { PaginationQueryDto } from '../src/common/dto/pagination-query.dto';
 import { notFound } from '../src/common/exceptions/exception.factories';
-import { createTestingApp, TestingApp } from './support';
+import { createTestingApp, TestingApp } from './support/create-testing-app';
 
 class EchoDto {
   @IsString()

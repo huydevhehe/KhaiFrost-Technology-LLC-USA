@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { createTestingApp, TestingApp } from './support';
+import { createTestingApp, TestingApp } from './support/create-testing-app';
 
 describe('Health (e2e)', () => {
   let testing: TestingApp;
