@@ -1,142 +1,270 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Search, UploadCloud } from "lucide-react";
-import { Panel, Field, Input, Select, Textarea, FakeToolbar, PrimaryButton, SecondaryButton } from "@/components/admin/ui";
-import { StatusBadge } from "@/components/admin/StatusBadge";
-import { mockServices, serviceCategories, type AdminService } from "@/content/admin/mockServices";
+import Link from "next/link";
+import { ArrowDown, ArrowUp, LayoutList, Pencil, Plus, Search, Trash2, Wrench } from "lucide-react";
+import {
+  EmptyState,
+  ErrorState,
+  ImageThumb,
+  PublicationBadge,
+  TableSkeleton,
+  formatDateTime,
+  useApiAction,
+  useApiList,
+  useConfirm,
+  useFilters,
+  useToast,
+} from "@/components/admin/shared";
+import {
+  ActionButton,
+  Pager,
+  RowIconButton,
+  describeContentError,
+} from "@/components/admin/content";
+import { Input, Panel, Select } from "@/components/admin/ui";
+import { PERMISSIONS } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth";
+import {
+  SERVICE_ICON_LABELS,
+  serviceCatalogApi,
+  type ServiceCategoryListItem,
+  type ServiceIconKey,
+} from "@/lib/api/admin/serviceCatalog";
+
+const STATUS_OPTIONS = [
+  { value: "", label: "Mọi trạng thái" },
+  { value: "draft", label: "Bản nháp" },
+  { value: "in_review", label: "Chờ duyệt" },
+  { value: "published", label: "Đã xuất bản" },
+  { value: "archived", label: "Lưu trữ" },
+];
 
 export default function AdminServicesPage() {
-  const [services, setServices] = useState<AdminService[]>(mockServices);
-  const [selectedId, setSelectedId] = useState<string>(mockServices[0].id);
-  const [query, setQuery] = useState("");
-  const selected = services.find((s) => s.id === selectedId) ?? services[0];
+  const toast = useToast();
+  const confirm = useConfirm();
+  const { hasPermission } = useAuth();
+  const action = useApiAction({ showErrorToast: false });
 
-  const [name, setName] = useState(selected.name);
-  const [category, setCategory] = useState(selected.category);
-  const [description, setDescription] = useState(selected.description);
-  const [coverImage, setCoverImage] = useState(selected.coverImage);
+  const [status, setStatus] = useState("");
+  const filters = useFilters({
+    status: status || undefined,
+    sortBy: "sortOrder",
+    sortOrder: "ASC",
+  });
+  const list = useApiList<ServiceCategoryListItem>("/admin/services", {
+    filters,
+    pageSize: 50,
+  });
 
-  function selectService(service: AdminService) {
-    setSelectedId(service.id);
-    setName(service.name);
-    setCategory(service.category);
-    setDescription(service.description);
-    setCoverImage(service.coverImage);
-  }
+  const canCreate = hasPermission(PERMISSIONS.SERVICE_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.SERVICE_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.SERVICE_DELETE);
+  const canReorder =
+    canUpdate && !status && list.search.trim() === "" && list.meta.totalPages <= 1;
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setServices((prev) => prev.map((s) => (s.id === selectedId ? { ...s, name, category, description, coverImage } : s)));
-    console.log("Service saved (mock)", { id: selectedId, name, category, description });
-  }
+  const remove = async (service: ServiceCategoryListItem) => {
+    const title = service.titles.vi || service.titles.en || service.slug;
+    const ok = await confirm({
+      title: "Xoá dịch vụ?",
+      message: `“${title}” sẽ bị xoá khỏi trang công khai.`,
+      confirmLabel: "Xoá dịch vụ",
+      danger: true,
+    });
+    if (!ok) return;
+    const done = await action.run(() => serviceCatalogApi.remove(service.id), {
+      onError: (error) => toast.error(describeContentError(error)),
+    });
+    if (done !== undefined) {
+      toast.success("Đã xoá dịch vụ.");
+      list.refetch();
+    }
+  };
 
-  const filtered = services.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+  const move = async (index: number, delta: number) => {
+    const target = index + delta;
+    if (target < 0 || target >= list.items.length) return;
+    const ids = list.items.map((item) => item.id);
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    const done = await action.run(() => serviceCatalogApi.reorder(ids), {
+      onError: (error) => toast.error(describeContentError(error)),
+    });
+    if (done !== undefined) list.refetch();
+  };
+
+  const createButton = (
+    <Link href="/admin/services/new">
+      <ActionButton variant="primary" icon={<Plus size={16} />}>
+        Tạo dịch vụ
+      </ActionButton>
+    </Link>
+  );
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-slate-900">Quản lý dịch vụ</h1>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Panel className="lg:col-span-2">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input placeholder="Tìm dịch vụ..." className="pl-9" value={query} onChange={(e) => setQuery(e.target.value)} />
-            </div>
-            <Select className="w-48" defaultValue="all">
-              <option value="all">Tất cả danh mục</option>
-              {serviceCategories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
-          </div>
-
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400">
-                <th className="py-3 pr-4 font-medium">Tên dịch vụ</th>
-                <th className="py-3 pr-4 font-medium">Danh mục</th>
-                <th className="py-3 pr-4 font-medium">Trạng thái</th>
-                <th className="py-3 pr-4 font-medium text-right">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((service) => (
-                <tr
-                  key={service.id}
-                  className={`cursor-pointer text-slate-700 ${service.id === selectedId ? "bg-accent/5" : ""}`}
-                  onClick={() => selectService(service)}
-                >
-                  <td className="py-3 pr-4 font-medium text-slate-900">{service.name}</td>
-                  <td className="py-3 pr-4 text-slate-500">{service.category}</td>
-                  <td className="py-3 pr-4">
-                    <StatusBadge status={service.status} />
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selectService(service);
-                      }}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                    >
-                      <Pencil size={15} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
-
-        <Panel title="Chỉnh sửa dịch vụ">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="Tên dịch vụ" htmlFor="serviceName" required>
-              <Input id="serviceName" value={name} onChange={(e) => setName(e.target.value)} required />
-            </Field>
-            <Field label="Danh mục" htmlFor="serviceCategory">
-              <Select id="serviceCategory" value={category} onChange={(e) => setCategory(e.target.value)}>
-                {serviceCategories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Mô tả">
-              <FakeToolbar />
-              <Textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Mô tả dịch vụ" />
-            </Field>
-            <Field label="Ảnh bìa / Icon">
-              <div className="flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element -- may be a blob: object URL from local upload mock */}
-                <img src={coverImage} alt="" className="h-16 w-16 shrink-0 rounded-lg bg-slate-100 object-cover" />
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                  <UploadCloud size={15} />
-                  Tải ảnh lên
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setCoverImage(URL.createObjectURL(file));
-                    }}
-                  />
-                </label>
-              </div>
-            </Field>
-            <div className="flex gap-3">
-              <PrimaryButton type="submit">Lưu</PrimaryButton>
-              <SecondaryButton onClick={() => selectService(selected)}>Huỷ thay đổi</SecondaryButton>
-            </div>
-          </form>
-        </Panel>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-slate-900">Quản lý dịch vụ</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/admin/services/overview">
+            <ActionButton variant="secondary" icon={<LayoutList size={16} />}>
+              Trang tổng quan dịch vụ
+            </ActionButton>
+          </Link>
+          {canCreate && createButton}
+        </div>
       </div>
+
+      <Panel>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative min-w-55 flex-1">
+            <Search
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+            />
+            <Input
+              placeholder="Tìm theo tên dịch vụ hoặc đường dẫn…"
+              aria-label="Tìm dịch vụ"
+              className="pl-9"
+              value={list.search}
+              onChange={(event) => list.setSearch(event.target.value)}
+            />
+          </div>
+          <Select
+            aria-label="Lọc theo trạng thái"
+            className="w-44"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        {list.loading && list.items.length === 0 ? (
+          <TableSkeleton rows={5} columns={4} />
+        ) : list.error ? (
+          <ErrorState error={list.error} onRetry={list.refetch} />
+        ) : list.items.length === 0 ? (
+          <EmptyState
+            title="Chưa có dịch vụ nào"
+            description="Tạo dịch vụ đầu tiên hoặc đổi lại bộ lọc phía trên."
+            icon={<Wrench size={28} />}
+            action={canCreate ? createButton : undefined}
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Danh sách dịch vụ</caption>
+              <thead>
+                <tr className="border-b border-slate-100 text-xs tracking-wide text-slate-400 uppercase">
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Dịch vụ
+                  </th>
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Trạng thái
+                  </th>
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Cập nhật
+                  </th>
+                  <th scope="col" className="py-3 pr-4 text-right font-medium">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {list.items.map((service, index) => {
+                  const missing = (["vi", "en"] as const).filter((code) => !service.titles[code]);
+                  return (
+                    <tr key={service.id} className="text-slate-700">
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center gap-3">
+                          <ImageThumb
+                            src={service.coverImageUrl}
+                            alt=""
+                            width={64}
+                            height={48}
+                            rounded="md"
+                          />
+                          <div className="min-w-0">
+                            <Link
+                              href={`/admin/services/${service.id}`}
+                              className="font-medium text-slate-900 hover:text-accent"
+                            >
+                              {service.titles.vi || service.titles.en || "(Chưa có tên)"}
+                            </Link>
+                            <p className="truncate text-xs text-slate-400">
+                              {SERVICE_ICON_LABELS[service.iconKey as ServiceIconKey] ??
+                                service.iconKey}{" "}
+                              · /{service.slug}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <PublicationBadge status={service.status} publishedAt={service.publishedAt} />
+                          {missing.length > 0 && (
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                              Thiếu {missing.map((code) => code.toUpperCase()).join(", ")}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-500">
+                        {formatDateTime(service.updatedAt)}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center justify-end gap-1">
+                          {canReorder && (
+                            <>
+                              <RowIconButton
+                                title="Chuyển lên"
+                                disabled={index === 0 || action.pending}
+                                onClick={() => void move(index, -1)}
+                              >
+                                <ArrowUp size={15} />
+                              </RowIconButton>
+                              <RowIconButton
+                                title="Chuyển xuống"
+                                disabled={index === list.items.length - 1 || action.pending}
+                                onClick={() => void move(index, 1)}
+                              >
+                                <ArrowDown size={15} />
+                              </RowIconButton>
+                            </>
+                          )}
+                          <Link href={`/admin/services/${service.id}`}>
+                            <RowIconButton title="Chỉnh sửa">
+                              <Pencil size={15} />
+                            </RowIconButton>
+                          </Link>
+                          {canDelete && (
+                            <RowIconButton
+                              title="Xoá dịch vụ"
+                              tone="danger"
+                              disabled={action.pending}
+                              onClick={() => void remove(service)}
+                            >
+                              <Trash2 size={15} />
+                            </RowIconButton>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {list.items.length > 0 && (
+          <Pager meta={list.meta} onChange={list.setPage} noun="dịch vụ" disabled={list.loading} />
+        )}
+      </Panel>
     </div>
   );
 }
