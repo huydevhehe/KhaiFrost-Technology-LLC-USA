@@ -5,7 +5,8 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { testimonials } from "@/content/testimonials";
+import { useTestimonials } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { Testimonial } from "@/types";
 
 function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
@@ -30,14 +31,16 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 
 export function TestimonialWall() {
   const { t } = useTranslation();
+  const testimonials = useTestimonials();
+  const section = useSectionText("/", "testimonials");
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <SectionEyebrow>{t("testimonials.eyebrow")}</SectionEyebrow>
-            <SectionHeading>{t("testimonials.heading")}</SectionHeading>
+            <SectionEyebrow>{section("eyebrow", t("testimonials.eyebrow"))}</SectionEyebrow>
+            <SectionHeading>{section("heading", t("testimonials.heading"))}</SectionHeading>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
             {t("testimonials.viewMore")}
