@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, In, Repository } from 'typeorm';
+import { visibleBackOfficeRoles } from '../../../common/constants/owner-visibility';
 import { Permission } from '../../../common/constants/permissions';
 import { roleHasPermission } from '../../../common/constants/role-permissions';
 import { paginate, resolveSort } from '../../../common/dto/paginate';
@@ -12,7 +13,7 @@ import { assertVersionMatches } from '../../../common/utils/assert-version-match
 import { MediaReferenceService } from '../../media/services/media-reference.service';
 import { applyUserSearch } from '../utils/apply-user-search';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { ListUsersQueryDto, STAFF_ROLES, USER_SORT_FIELDS } from '../dto/list-users-query.dto';
+import { ListUsersQueryDto, USER_SORT_FIELDS } from '../dto/list-users-query.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto, UserWithTemporaryPasswordDto } from '../dto/user-response.dto';
 import { User } from '../entities/user.entity';
@@ -24,7 +25,6 @@ import {
   creatableRoles,
   assertNotLastActiveOwner,
   assertNotSelf,
-  isBackOfficeRole,
 } from '../policies/user-management.policy';
 import { generateTemporaryPassword } from './temporary-password';
 import { UsersService } from './users.service';
@@ -40,10 +40,16 @@ export class StaffUsersService {
     private readonly mediaReferences: MediaReferenceService,
   ) {}
 
-  async list(query: ListUsersQueryDto): Promise<PaginatedResponseDto<UserResponseDto>> {
+  async list(
+    actor: Actor,
+    query: ListUsersQueryDto,
+  ): Promise<PaginatedResponseDto<UserResponseDto>> {
+    // Owners are invisible to everyone but owners, so their rows never reach a list or its totals
+    const visible = visibleBackOfficeRoles(actor.role);
+    const roles = query.role ? visible.filter((role) => role === query.role) : visible;
     const builder = this.users
       .createQueryBuilder('user')
-      .where('user.role IN (:...roles)', { roles: query.role ? [query.role] : [...STAFF_ROLES] });
+      .where(roles.length ? 'user.role IN (:...roles)' : '1 = 0', { roles });
     if (query.status) builder.andWhere('user.status = :status', { status: query.status });
     if (query.search) applyUserSearch(builder, query.search);
     const sort = resolveSort(query, USER_SORT_FIELDS, 'createdAt');
@@ -54,8 +60,8 @@ export class StaffUsersService {
     return new PaginatedResponseDto(items, page.meta);
   }
 
-  async get(id: string): Promise<UserResponseDto> {
-    return this.usersService.toResponse(await this.getBackOfficeUser(id));
+  async get(actor: Actor, id: string): Promise<UserResponseDto> {
+    return this.usersService.toResponse(await this.getBackOfficeUser(actor, id));
   }
 
   async create(actor: Actor, dto: CreateUserDto): Promise<UserWithTemporaryPasswordDto> {
@@ -79,7 +85,7 @@ export class StaffUsersService {
     let roleChanged = false;
 
     const saved = await this.dataSource.transaction(async (manager) => {
-      const user = await this.lockBackOfficeUser(manager, id);
+      const user = await this.lockBackOfficeUser(manager, actor, id);
       assertVersionMatches(user.version, dto.version);
       assertCanManageTarget(actor, user);
 
@@ -125,7 +131,7 @@ export class StaffUsersService {
 
   async lock(actor: Actor, id: string): Promise<UserResponseDto> {
     await this.dataSource.transaction(async (manager) => {
-      const user = await this.lockBackOfficeUser(manager, id);
+      const user = await this.lockBackOfficeUser(manager, actor, id);
       assertCanManageTarget(actor, user);
       assertNotSelf(actor.id, user.id, 'lock');
       if (user.role === Role.OWNER) {
@@ -134,18 +140,18 @@ export class StaffUsersService {
       await this.usersService.setStatus(id, UserStatus.LOCKED, manager);
     });
     await this.usersService.revokeSessions(id, 'account-locked');
-    return this.usersService.toResponse(await this.getBackOfficeUser(id));
+    return this.usersService.toResponse(await this.getBackOfficeUser(actor, id));
   }
 
   async unlock(actor: Actor, id: string): Promise<UserResponseDto> {
-    const user = await this.getBackOfficeUser(id);
+    const user = await this.getBackOfficeUser(actor, id);
     assertCanManageTarget(actor, user);
     await this.usersService.setStatus(id, UserStatus.ACTIVE);
-    return this.usersService.toResponse(await this.getBackOfficeUser(id));
+    return this.usersService.toResponse(await this.getBackOfficeUser(actor, id));
   }
 
   async resetPassword(actor: Actor, id: string): Promise<UserWithTemporaryPasswordDto> {
-    const user = await this.getBackOfficeUser(id);
+    const user = await this.getBackOfficeUser(actor, id);
     assertCanManageTarget(actor, user);
     assertNotSelf(actor.id, user.id, 'reset the password of');
 
@@ -153,14 +159,14 @@ export class StaffUsersService {
     await this.usersService.setPassword(id, temporaryPassword, { mustChangePassword: true });
     await this.usersService.revokeSessions(id, 'password-reset-by-admin');
     return {
-      ...(await this.usersService.toResponse(await this.getBackOfficeUser(id))),
+      ...(await this.usersService.toResponse(await this.getBackOfficeUser(actor, id))),
       temporaryPassword,
     };
   }
 
   async remove(actor: Actor, id: string): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
-      const user = await this.lockBackOfficeUser(manager, id);
+      const user = await this.lockBackOfficeUser(manager, actor, id);
       assertCanManageTarget(actor, user);
       assertNotSelf(actor.id, user.id, 'delete');
       if (user.role === Role.OWNER) {
@@ -171,15 +177,20 @@ export class StaffUsersService {
     await this.usersService.purgeCredentials(id, 'user-deleted');
   }
 
-  private async getBackOfficeUser(id: string): Promise<User> {
+  private async getBackOfficeUser(actor: Actor, id: string): Promise<User> {
     const user = await this.usersService.findById(id);
-    if (!user || !isBackOfficeRole(user.role)) throw notFound('User');
+    if (!user || !visibleBackOfficeRoles(actor.role).includes(user.role)) throw notFound('User');
     return user;
   }
 
-  private async lockBackOfficeUser(manager: EntityManager, id: string): Promise<User> {
+  // A target the actor may not even know about (an owner, for anyone but an owner) does not exist
+  private async lockBackOfficeUser(
+    manager: EntityManager,
+    actor: Actor,
+    id: string,
+  ): Promise<User> {
     const user = await manager.getRepository(User).findOne({
-      where: { id, role: In([...STAFF_ROLES]) },
+      where: { id, role: In(visibleBackOfficeRoles(actor.role)) },
       lock: { mode: 'pessimistic_write' },
     });
     if (!user) throw notFound('User');

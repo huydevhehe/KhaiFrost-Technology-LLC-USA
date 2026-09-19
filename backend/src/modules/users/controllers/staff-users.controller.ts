@@ -31,15 +31,21 @@ export class StaffUsersController {
   @Get()
   @RequirePermissions(Permission.USER_READ)
   @ApiOperation({ summary: 'List back office users' })
-  list(@Query() query: ListUsersQueryDto): Promise<PaginatedResponseDto<UserResponseDto>> {
-    return this.staffUsers.list(query);
+  list(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Query() query: ListUsersQueryDto,
+  ): Promise<PaginatedResponseDto<UserResponseDto>> {
+    return this.staffUsers.list(actor, query);
   }
 
   @Get(':id')
   @RequirePermissions(Permission.USER_READ)
   @ApiOperation({ summary: 'Get a back office user' })
-  get(@Param('id', ParseUUIDPipe) id: string): Promise<UserResponseDto> {
-    return this.staffUsers.get(id);
+  get(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<UserResponseDto> {
+    return this.staffUsers.get(actor, id);
   }
 
   @Post()
