@@ -6,6 +6,7 @@ export const DomainEvent = {
   CONTACT_CREATED: 'contact.created',
   POST_SUBMITTED_FOR_REVIEW: 'post.submitted-for-review',
   PRODUCT_SUBMITTED_FOR_REVIEW: 'product.submitted-for-review',
+  PROJECT_SUBMITTED_FOR_REVIEW: 'project.submitted-for-review',
   // Reserved for a later phase
   ORDER_CREATED: 'order.created',
 } as const;
@@ -47,6 +48,12 @@ export interface ProductSubmittedForReviewEvent {
   authorId: string | null;
 }
 
+export interface ProjectSubmittedForReviewEvent {
+  projectId: string;
+  title: string;
+  authorId: string | null;
+}
+
 export interface OrderCreatedEvent {
   orderId: string;
   customerId: string;
@@ -58,5 +65,6 @@ export interface DomainEventPayloads {
   [DomainEvent.CONTACT_CREATED]: ContactCreatedEvent;
   [DomainEvent.POST_SUBMITTED_FOR_REVIEW]: PostSubmittedForReviewEvent;
   [DomainEvent.PRODUCT_SUBMITTED_FOR_REVIEW]: ProductSubmittedForReviewEvent;
+  [DomainEvent.PROJECT_SUBMITTED_FOR_REVIEW]: ProjectSubmittedForReviewEvent;
   [DomainEvent.ORDER_CREATED]: OrderCreatedEvent;
 }
