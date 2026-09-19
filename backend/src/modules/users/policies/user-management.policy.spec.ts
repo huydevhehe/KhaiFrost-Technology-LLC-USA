@@ -4,10 +4,12 @@ import { UserStatus } from '../enums/user-status.enum';
 import {
   LAST_OWNER_ERROR_CODE,
   assertCanAssignRole,
+  assertCanCreateRole,
   assertCanManageTarget,
   assertNotLastActiveOwner,
   assertNotSelf,
   canManageRole,
+  creatableRoles,
 } from './user-management.policy';
 
 function catchError(action: () => void): ApplicationException {
@@ -21,10 +23,10 @@ function catchError(action: () => void): ApplicationException {
 
 describe('user management policy', () => {
   describe('canManageRole', () => {
-    it('lets the owner manage every back office role', () => {
-      for (const role of [Role.OWNER, Role.ADMIN, Role.STAFF]) {
-        expect(canManageRole(Role.OWNER, role)).toBe(true);
-      }
+    it('lets the owner manage admins and staff but never another owner', () => {
+      expect(canManageRole(Role.OWNER, Role.ADMIN)).toBe(true);
+      expect(canManageRole(Role.OWNER, Role.STAFF)).toBe(true);
+      expect(canManageRole(Role.OWNER, Role.OWNER)).toBe(false);
     });
 
     it('lets an admin manage staff only', () => {
@@ -57,7 +59,29 @@ describe('user management policy', () => {
     expect(() => assertCanAssignRole(Role.ADMIN, Role.STAFF)).not.toThrow();
     expect(() => assertCanAssignRole(Role.ADMIN, Role.ADMIN)).toThrow();
     expect(() => assertCanAssignRole(Role.ADMIN, Role.OWNER)).toThrow();
-    expect(() => assertCanAssignRole(Role.OWNER, Role.OWNER)).not.toThrow();
+    expect(() => assertCanAssignRole(Role.OWNER, Role.ADMIN)).not.toThrow();
+    expect(() => assertCanAssignRole(Role.OWNER, Role.STAFF)).not.toThrow();
+  });
+
+  it('nobody can assign the owner role', () => {
+    for (const role of [Role.OWNER, Role.ADMIN, Role.STAFF, Role.CUSTOMER]) {
+      expect(() => assertCanAssignRole(role, Role.OWNER)).toThrow();
+      expect(() => assertCanCreateRole(role, Role.OWNER)).toThrow();
+    }
+  });
+
+  describe('account creation', () => {
+    it('lets the owner create admins and staff and admins create staff only', () => {
+      expect(creatableRoles(Role.OWNER)).toEqual([Role.ADMIN, Role.STAFF]);
+      expect(creatableRoles(Role.ADMIN)).toEqual([Role.STAFF]);
+      expect(creatableRoles(Role.STAFF)).toEqual([]);
+      expect(creatableRoles(Role.CUSTOMER)).toEqual([]);
+      expect(() => assertCanCreateRole(Role.OWNER, Role.ADMIN)).not.toThrow();
+      expect(() => assertCanCreateRole(Role.OWNER, Role.STAFF)).not.toThrow();
+      expect(() => assertCanCreateRole(Role.ADMIN, Role.STAFF)).not.toThrow();
+      expect(() => assertCanCreateRole(Role.ADMIN, Role.ADMIN)).toThrow();
+      expect(() => assertCanCreateRole(Role.STAFF, Role.CUSTOMER)).toThrow();
+    });
   });
 
   it('assertNotSelf rejects self targeting only', () => {

@@ -19,7 +19,9 @@ import { User } from '../entities/user.entity';
 import { UserStatus } from '../enums/user-status.enum';
 import {
   assertCanAssignRole,
+  assertCanCreateRole,
   assertCanManageTarget,
+  creatableRoles,
   assertNotLastActiveOwner,
   assertNotSelf,
   isBackOfficeRole,
@@ -57,13 +59,15 @@ export class StaffUsersService {
   }
 
   async create(actor: Actor, dto: CreateUserDto): Promise<UserWithTemporaryPasswordDto> {
-    assertCanAssignRole(actor.role, dto.role);
+    const role = dto.role ?? creatableRoles(actor.role)[0];
+    if (!role) throw forbidden(`A ${actor.role} cannot create back office accounts`);
+    assertCanCreateRole(actor.role, role);
     const generated = dto.password ? undefined : generateTemporaryPassword();
     const user = await this.usersService.create({
       fullName: dto.fullName,
       email: dto.email,
       phone: dto.phone,
-      role: dto.role,
+      role,
       password: dto.password ?? (generated as string),
       mustChangePassword: generated !== undefined,
     });

@@ -37,9 +37,13 @@ export class CreateUserDto {
   @IsNormalizablePhone()
   phone!: string;
 
-  @ApiProperty({ enum: STAFF_ROLES })
+  @ApiPropertyOptional({
+    enum: STAFF_ROLES,
+    description: 'Optional: owners create admins (default) or staff, admins only staff',
+  })
+  @IsOptional()
   @IsIn(STAFF_ROLES)
-  role!: StaffRole;
+  role?: StaffRole;
 
   @ApiPropertyOptional({
     minLength: 10,

@@ -57,16 +57,6 @@ describe('staff users admin API', () => {
     return users.findOneByOrFail({ id: user.id });
   }
 
-  // The seeded owners are unique per test file run; extra owners keep "last owner" scenarios explicit
-  async function retireOtherOwners(keep: User) {
-    await users
-      .createQueryBuilder()
-      .update(User)
-      .set({ status: UserStatus.LOCKED })
-      .where('role = :role AND id <> :id', { role: Role.OWNER, id: keep.id })
-      .execute();
-  }
-
   describe('permission matrix', () => {
     it('rejects anonymous, customer and staff callers, and allows admin and owner', async () => {
       const staff = await makeUser(Role.STAFF);
@@ -210,6 +200,12 @@ describe('staff users admin API', () => {
       };
     };
 
+    const noRole = ({ fullName, email, phone }: ReturnType<typeof body>) => ({
+      fullName,
+      email,
+      phone,
+    });
+
     it('generates a temporary password returned once and forces a change', async () => {
       const owner = await makeUser(Role.OWNER);
       const response = await request(server())
@@ -287,6 +283,50 @@ describe('staff users admin API', () => {
       expect(clash.body.error.details.map((detail: { field: string }) => detail.field)).toEqual([
         'email',
       ]);
+    });
+
+    it('lets the owner create admins (default) and staff but never an owner', async () => {
+      const owner = await makeUser(Role.OWNER);
+      const withoutRole = noRole(body());
+      const defaulted = await request(server())
+        .post('/api/v1/admin/users')
+        .set(as(owner))
+        .send(withoutRole)
+        .expect(201);
+      expect(defaulted.body.data.role).toBe('admin');
+      const admin = await request(server())
+        .post('/api/v1/admin/users')
+        .set(as(owner))
+        .send({ ...body(), role: 'admin' })
+        .expect(201);
+      expect(admin.body.data.role).toBe('admin');
+      await request(server())
+        .post('/api/v1/admin/users')
+        .set(as(owner))
+        .send({ ...body(), role: 'owner' })
+        .expect(403);
+    });
+
+    it('creates staff by default when an admin sends no role', async () => {
+      const admin = await makeUser(Role.ADMIN);
+      const withoutRole = noRole(body());
+      const response = await request(server())
+        .post('/api/v1/admin/users')
+        .set(as(admin))
+        .send(withoutRole)
+        .expect(201);
+      expect(response.body.data.role).toBe('staff');
+    });
+
+    it('rejects creation by staff and customers', async () => {
+      const staff = await makeUser(Role.STAFF);
+      const customer = await makeUser(Role.CUSTOMER);
+      await request(server()).post('/api/v1/admin/users').set(as(staff)).send(body()).expect(403);
+      await request(server())
+        .post('/api/v1/admin/users')
+        .set(as(customer))
+        .send(body())
+        .expect(403);
     });
 
     it('lets an admin create staff only', async () => {
@@ -470,6 +510,28 @@ describe('staff users admin API', () => {
         expect(revocations).toHaveLength(0);
       });
 
+      it('never lets an owner edit, promote to or assign the owner role', async () => {
+        const owner = await makeUser(Role.OWNER);
+        const otherOwner = await makeUser(Role.OWNER);
+        const admin = await makeUser(Role.ADMIN);
+        await request(server())
+          .patch(`/api/v1/admin/users/${otherOwner.id}`)
+          .set(as(owner))
+          .send({ version: otherOwner.version, fullName: 'No' })
+          .expect(403);
+        await request(server())
+          .patch(`/api/v1/admin/users/${admin.id}`)
+          .set(as(owner))
+          .send({ version: admin.version, role: 'owner' })
+          .expect(403);
+        const changed = await request(server())
+          .patch(`/api/v1/admin/users/${admin.id}`)
+          .set(as(owner))
+          .send({ version: admin.version, role: 'staff' })
+          .expect(200);
+        expect(changed.body.data.role).toBe('staff');
+      });
+
       it('never lets anyone change their own role', async () => {
         const owner = await makeUser(Role.OWNER);
         await makeUser(Role.OWNER);
@@ -480,27 +542,14 @@ describe('staff users admin API', () => {
         expect(response.status).toBe(403);
       });
 
-      it('protects the last active owner from demotion but not when another owner exists', async () => {
-        const soleOwner = await makeUser(Role.OWNER);
-        await retireOtherOwners(soleOwner);
-        const admin = await makeUser(Role.ADMIN);
-        // Only an owner may touch an owner; a second owner demoting the sole owner is the guarded case
-        const second = await makeUser(Role.OWNER);
-        await users.update({ id: second.id }, { status: UserStatus.LOCKED });
-        const blocked = await request(server())
-          .patch(`/api/v1/admin/users/${soleOwner.id}`)
-          .set(asTestUser({ id: second.id, role: Role.OWNER }))
-          .send({ version: soleOwner.version, role: 'admin' });
-        expect(blocked.status).toBe(409);
-        expect(blocked.body.error.code).toBe('LAST_OWNER_PROTECTED');
-
-        await users.update({ id: second.id }, { status: UserStatus.ACTIVE });
-        const allowed = await request(server())
-          .patch(`/api/v1/admin/users/${soleOwner.id}`)
-          .set(asTestUser({ id: second.id, role: Role.OWNER }))
-          .send({ version: soleOwner.version, role: 'admin' });
-        expect(allowed.status).toBe(200);
-        expect(admin.id).toBeDefined();
+      it('keeps owners untouchable, even for another owner', async () => {
+        const owner = await makeUser(Role.OWNER);
+        const other = await makeUser(Role.OWNER);
+        const response = await request(server())
+          .patch(`/api/v1/admin/users/${other.id}`)
+          .set(as(owner))
+          .send({ version: other.version, role: 'admin' });
+        expect(response.status).toBe(403);
       });
     });
   });
@@ -567,16 +616,17 @@ describe('staff users admin API', () => {
         .expect(403);
     });
 
-    it('protects the last active owner from being locked', async () => {
-      const sole = await makeUser(Role.OWNER);
-      await retireOtherOwners(sole);
+    it('does not let an owner lock or unlock another owner', async () => {
+      const owner = await makeUser(Role.OWNER);
       const other = await makeUser(Role.OWNER);
-      await users.update({ id: other.id }, { status: UserStatus.LOCKED });
-      const blocked = await request(server())
-        .post(`/api/v1/admin/users/${sole.id}/lock`)
-        .set(asTestUser({ id: other.id, role: Role.OWNER }));
-      expect(blocked.status).toBe(409);
-      expect(blocked.body.error.code).toBe('LAST_OWNER_PROTECTED');
+      await request(server())
+        .post(`/api/v1/admin/users/${other.id}/lock`)
+        .set(as(owner))
+        .expect(403);
+      await request(server())
+        .post(`/api/v1/admin/users/${other.id}/unlock`)
+        .set(as(owner))
+        .expect(403);
     });
 
     it('returns 404 for unknown users', async () => {
@@ -667,14 +717,11 @@ describe('staff users admin API', () => {
       await request(server()).delete(`/api/v1/admin/users/${staff.id}`).set(as(staff)).expect(403);
       await request(server()).delete(`/api/v1/admin/users/${owner.id}`).set(as(owner)).expect(403);
 
-      await retireOtherOwners(owner);
-      const helper = await makeUser(Role.OWNER);
-      await users.update({ id: helper.id }, { status: UserStatus.LOCKED });
-      const blocked = await request(server())
-        .delete(`/api/v1/admin/users/${owner.id}`)
-        .set(asTestUser({ id: helper.id, role: Role.OWNER }));
-      expect(blocked.status).toBe(409);
-      expect(blocked.body.error.code).toBe('LAST_OWNER_PROTECTED');
+      const otherOwner = await makeUser(Role.OWNER);
+      await request(server())
+        .delete(`/api/v1/admin/users/${otherOwner.id}`)
+        .set(as(owner))
+        .expect(403);
       await request(server())
         .delete('/api/v1/admin/users/00000000-0000-4000-8000-000000000000')
         .set(as(admin))

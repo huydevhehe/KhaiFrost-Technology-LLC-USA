@@ -21,11 +21,19 @@ export function isBackOfficeRole(role: Role): boolean {
   return BACK_OFFICE_ROLES.includes(role);
 }
 
-// Owner manages everyone in the back office, admin only staff, everyone else nobody
+// Owner manages admins and staff (never another owner), admin only staff, everyone else nobody
 export function canManageRole(actorRole: Role, targetRole: Role): boolean {
-  if (actorRole === Role.OWNER) return isBackOfficeRole(targetRole);
+  if (actorRole === Role.OWNER) return targetRole === Role.ADMIN || targetRole === Role.STAFF;
   if (actorRole === Role.ADMIN) return targetRole === Role.STAFF;
   return false;
+}
+
+// Back office roles each actor may create (the first one is the default): owner -> admin or
+// staff, admin -> staff. Nobody can ever create an owner.
+export function creatableRoles(actorRole: Role): readonly Role[] {
+  if (actorRole === Role.OWNER) return [Role.ADMIN, Role.STAFF];
+  if (actorRole === Role.ADMIN) return [Role.STAFF];
+  return [];
 }
 
 export function assertCanManageTarget(
@@ -37,9 +45,16 @@ export function assertCanManageTarget(
   }
 }
 
+// Used when changing the role of an existing account
 export function assertCanAssignRole(actorRole: Role, newRole: Role): void {
   if (!canManageRole(actorRole, newRole)) {
     throw forbidden(`A ${actorRole} cannot assign the ${newRole} role`);
+  }
+}
+
+export function assertCanCreateRole(actorRole: Role, newRole: Role): void {
+  if (!creatableRoles(actorRole).includes(newRole)) {
+    throw forbidden(`A ${actorRole} cannot create a ${newRole} account`);
   }
 }
 
