@@ -37,6 +37,8 @@ export interface UserFormProps {
   aside?: ReactNode;
   /** Blocks the form, e.g. when the account may not be managed by this user. */
   readOnly?: boolean;
+  /** Keeps the fields editable but freezes the role, e.g. when editing your own account. */
+  roleLocked?: boolean;
   readOnlyMessage?: string;
 }
 
@@ -78,6 +80,7 @@ export function UserForm({
   onCancel,
   aside,
   readOnly = false,
+  roleLocked = false,
   readOnlyMessage,
 }: UserFormProps) {
   const [fullName, setFullName] = useState(initial?.fullName ?? "");
@@ -90,6 +93,7 @@ export function UserForm({
 
   const errors = { ...localErrors, ...(serverErrors ?? {}) };
   const disabled = pending || readOnly;
+  const roleDisabled = disabled || roleLocked;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -236,7 +240,7 @@ export function UserForm({
                   key={item}
                   className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-3 transition-colors ${
                     role === item ? "border-accent bg-accent/5" : "border-slate-200 hover:border-slate-300"
-                  } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
+                  } ${roleDisabled ? "cursor-not-allowed opacity-60" : ""}`}
                 >
                   <span className="flex items-center gap-2 text-sm font-medium text-slate-900">
                     <input
@@ -245,13 +249,18 @@ export function UserForm({
                       className="h-4 w-4 accent-accent"
                       checked={role === item}
                       onChange={() => setRole(item)}
-                      disabled={disabled}
+                      disabled={roleDisabled}
                     />
                     {USER_ROLE_LABELS[item]}
                   </span>
                   <span className="pl-6 text-xs text-slate-500">{USER_ROLE_DESCRIPTIONS[item]}</span>
                 </label>
               ))}
+              {roleLocked && (
+                <p className="text-xs text-slate-500">
+                  Bạn không thể tự đổi vai trò của chính mình. Hãy nhờ một chủ sở hữu khác thực hiện.
+                </p>
+              )}
               <FieldError message={errors.role} />
             </div>
           )}

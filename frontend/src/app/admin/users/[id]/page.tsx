@@ -187,6 +187,7 @@ export default function AdminUserEditPage() {
           pending={action.pending}
           serverErrors={serverErrors}
           readOnly={!manageable || !can(PERMISSIONS.USER_UPDATE)}
+          roleLocked={isSelf}
           readOnlyMessage={
             manageable
               ? "Bạn không có quyền chỉnh sửa tài khoản nội bộ."
