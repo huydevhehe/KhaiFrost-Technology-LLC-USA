@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { siteConfig } from "@/content/siteConfig";
+import { useSiteConfig } from "@/lib/content/site";
 import {
   validateContactForm,
   ContactFormValues,
@@ -22,6 +22,7 @@ const initialValues: ContactFormValues = {
 
 export function ContactSection() {
   const { t } = useTranslation();
+  const siteConfig = useSiteConfig();
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submitted, setSubmitted] = useState(false);

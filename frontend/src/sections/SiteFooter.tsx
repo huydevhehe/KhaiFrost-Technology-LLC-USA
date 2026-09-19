@@ -5,10 +5,7 @@ import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SocialIcons } from "@/components/ui/SocialIcons";
-import { useLocalizedField } from "@/lib/useLocalizedField";
-import { navLinks } from "@/content/navLinks";
-import { services } from "@/content/services";
-import { siteConfig } from "@/content/siteConfig";
+import { useFooterNav, useSiteConfig } from "@/lib/content/site";
 
 function OfficeMap() {
   const { t } = useTranslation();
@@ -33,6 +30,9 @@ function OfficeMap() {
 
 export function SiteFooter() {
   const { t } = useTranslation();
+  const nav = useFooterNav();
+  const { email, phone, logoDarkUrl, logoUrl } = useSiteConfig();
+  const logo = logoDarkUrl ?? logoUrl;
 
   return (
     <footer className="border-t border-white/10 bg-navy py-14 text-white">
@@ -40,10 +40,18 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-slate-900">
-                K
-              </span>
-              <span className="text-sm font-semibold">KHAIFROST</span>
+              {logo ? (
+                <span className="relative block h-7 w-32">
+                  <Image src={logo} alt="KhaiFrost" fill sizes="128px" className="object-contain object-left" />
+                </span>
+              ) : (
+                <>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-slate-900">
+                    K
+                  </span>
+                  <span className="text-sm font-semibold">KHAIFROST</span>
+                </>
+              )}
             </div>
             <p className="mt-4 text-sm leading-relaxed text-white/60">
               {t("footer.description")}
@@ -55,13 +63,17 @@ export function SiteFooter() {
 
           <div>
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("footer.quickLinks")}
+              {nav.quickTitle}
             </p>
             <ul className="space-y-3 text-sm text-white/70">
-              {navLinks.map((link) => (
+              {nav.quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="hover:text-white">
-                    {t(`nav.${link.key}`)}
+                  <Link
+                    href={link.href}
+                    target={link.newTab ? "_blank" : undefined}
+                    className="hover:text-white"
+                  >
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -70,11 +82,13 @@ export function SiteFooter() {
 
           <div>
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("footer.ourServices")}
+              {nav.servicesTitle}
             </p>
             <ul className="space-y-3 text-sm text-white/70">
-              {services.map((service) => (
-                <ServiceLink key={service.id} service={service} />
+              {nav.services.map((service) => (
+                <li key={service.key} className="hover:text-white">
+                  {service.label}
+                </li>
               ))}
             </ul>
           </div>
@@ -86,14 +100,14 @@ export function SiteFooter() {
             <ul className="space-y-3 text-sm text-white/70">
               <li className="flex items-center gap-2">
                 <Mail size={14} className="text-white/40" />
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-white">
-                  {siteConfig.email}
+                <a href={`mailto:${email}`} className="hover:text-white">
+                  {email}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={14} className="text-white/40" />
-                <a href={`tel:${siteConfig.phone}`} className="hover:text-white">
-                  {siteConfig.phone}
+                <a href={`tel:${phone}`} className="hover:text-white">
+                  {phone}
                 </a>
               </li>
             </ul>
@@ -113,13 +127,4 @@ export function SiteFooter() {
       </div>
     </footer>
   );
-}
-
-function ServiceLink({
-  service,
-}: {
-  service: (typeof services)[number];
-}) {
-  const title = useLocalizedField(service.title);
-  return <li className="hover:text-white">{title}</li>;
 }

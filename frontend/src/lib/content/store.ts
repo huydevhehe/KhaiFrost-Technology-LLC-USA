@@ -9,6 +9,7 @@ const STALE_AFTER_MS = 60_000;
 /** After a failed request the same key is not retried before this delay. */
 const RETRY_AFTER_MS = 20_000;
 const REQUEST_TIMEOUT_MS = 8_000;
+const FETCH_DEFER_MS = 40;
 
 interface Entry {
   value: unknown;
@@ -91,8 +92,13 @@ export function usePublicData<T>(path: string, options?: { localized?: boolean; 
       if (localized) query.locale = locale;
       const entry = getEntry(key);
       entry.listeners.add(onChange);
-      ensureFresh(key, path, query);
+      // Deferred so the initial "en" render (before the saved language is applied) does not fire a request
+      // for a locale that is unsubscribed a moment later.
+      const timer = setTimeout(() => {
+        if (entry.listeners.has(onChange)) ensureFresh(key, path, query);
+      }, FETCH_DEFER_MS);
       return () => {
+        clearTimeout(timer);
         entry.listeners.delete(onChange);
       };
     },

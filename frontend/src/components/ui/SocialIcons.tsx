@@ -1,6 +1,6 @@
 import { GitBranch, Briefcase, X, LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { siteConfig } from "@/content/siteConfig";
+import { useSiteConfig } from "@/lib/content/site";
 import { SocialLink } from "@/types";
 
 const iconMap: Record<SocialLink["label"], LucideIcon> = {
@@ -10,9 +10,10 @@ const iconMap: Record<SocialLink["label"], LucideIcon> = {
 };
 
 export function SocialIcons() {
+  const { socialLinks } = useSiteConfig();
   return (
     <div className="flex items-center gap-4">
-      {siteConfig.socialLinks.map((social) => {
+      {socialLinks.map((social) => {
         const Icon = iconMap[social.label];
         return (
           <Link
