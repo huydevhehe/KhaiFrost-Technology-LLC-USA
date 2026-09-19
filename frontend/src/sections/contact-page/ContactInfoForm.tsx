@@ -3,7 +3,8 @@
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { siteConfig } from "@/content/siteConfig";
+import { useSectionText } from "@/lib/content/pages";
+import { useSiteConfig, type ResolvedOffice } from "@/lib/content/site";
 import { useLocalizedField } from "@/lib/useLocalizedField";
 import {
   validateContactForm,
@@ -12,7 +13,6 @@ import {
 } from "@/lib/validateContactForm";
 import { Button } from "@/components/ui/Button";
 import { SocialIcons } from "@/components/ui/SocialIcons";
-import { OfficeLocation } from "@/types";
 
 const fieldClassName =
   "w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/50";
@@ -24,7 +24,7 @@ const initialValues: ContactFormValues = {
   message: "",
 };
 
-function OfficeRow({ office }: { office: OfficeLocation }) {
+function OfficeRow({ office }: { office: ResolvedOffice }) {
   const label = useLocalizedField(office.label);
   const addressLine = office.state
     ? `${office.street}, ${office.city}, ${office.state} ${office.zip}`
@@ -47,6 +47,8 @@ function OfficeRow({ office }: { office: OfficeLocation }) {
 
 export function ContactInfoForm() {
   const { t } = useTranslation();
+  const siteConfig = useSiteConfig();
+  const info = useSectionText("/lien-he", "contact-form");
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -80,10 +82,10 @@ export function ContactInfoForm() {
       <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-2">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
-            {t("contactPage.info.eyebrow")}
+            {info("eyebrow", t("contactPage.info.eyebrow"))}
           </p>
-          <h2 className="text-3xl font-bold">{t("contactPage.info.heading")}</h2>
-          <p className="mt-4 text-white/70">{t("contactPage.info.paragraph")}</p>
+          <h2 className="text-3xl font-bold">{info("heading", t("contactPage.info.heading"))}</h2>
+          <p className="mt-4 text-white/70">{info("description", t("contactPage.info.paragraph"))}</p>
 
           <div className="mt-6 space-y-3 text-sm text-white/80">
             <div className="flex items-center gap-3">

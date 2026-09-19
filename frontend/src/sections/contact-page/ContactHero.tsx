@@ -1,17 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import { sectionImageUrl, useSection, useSectionText } from "@/lib/content/pages";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/sections/SiteHeader";
 
 export function ContactHero() {
   const { t } = useTranslation();
+  const hero = useSectionText("/lien-he", "hero");
+  const heroImage = sectionImageUrl(useSection("/lien-he", "hero"), "backgroundImage") ?? "/images/contact/office-banner.jpg";
 
   return (
     <section className="relative flex min-h-[65vh] flex-col overflow-hidden bg-navy text-white">
       <div className="absolute inset-0">
         <Image
-          src="/images/contact/office-banner.jpg"
+          src={heroImage}
           alt="KhaiFrost office and engineering team at work"
           fill
           sizes="100vw"
@@ -27,13 +30,13 @@ export function ContactHero() {
         <div className="mx-auto w-full max-w-[1800px] px-8 py-24 md:px-12">
           <div className="max-w-xl md:ml-10 lg:ml-20">
             <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-accent drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
-              {t("contactPage.hero.eyebrow")}
+              {hero("eyebrow", t("contactPage.hero.eyebrow"))}
             </p>
             <h1 className="text-4xl font-extrabold leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)] sm:text-5xl lg:text-6xl">
-              {t("contactPage.hero.headline")}
+              {hero("headline", t("contactPage.hero.headline"))}
             </h1>
             <p className="mt-5 max-w-lg text-lg text-white/90 drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
-              {t("contactPage.hero.subtext")}
+              {hero("description", t("contactPage.hero.subtext"))}
             </p>
           </div>
         </div>
