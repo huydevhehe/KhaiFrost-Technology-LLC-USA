@@ -23,6 +23,8 @@ const STAFF_PERMISSIONS: Permission[] = [
   Permission.SEO_READ,
   Permission.MEDIA_READ,
   Permission.MEDIA_UPLOAD,
+  Permission.CUSTOMER_READ,
+  Permission.CUSTOMER_CREATE,
   Permission.CONTACT_READ,
   Permission.CONTACT_UPDATE,
   Permission.DASHBOARD_READ,

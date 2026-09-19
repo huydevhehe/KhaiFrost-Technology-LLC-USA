@@ -9,6 +9,16 @@ describe('role permissions', () => {
     }
   });
 
+  it('lets owner, admin and staff create customers, and staff view them only', () => {
+    expect(roleHasPermission(Role.ADMIN, Permission.CUSTOMER_CREATE)).toBe(true);
+    expect(roleHasPermission(Role.STAFF, Permission.CUSTOMER_CREATE)).toBe(true);
+    expect(roleHasPermission(Role.STAFF, Permission.CUSTOMER_READ)).toBe(true);
+    expect(roleHasPermission(Role.STAFF, Permission.CUSTOMER_UPDATE)).toBe(false);
+    expect(roleHasPermission(Role.STAFF, Permission.CUSTOMER_LOCK)).toBe(false);
+    expect(roleHasPermission(Role.STAFF, Permission.CUSTOMER_DELETE)).toBe(false);
+    expect(roleHasPermission(Role.CUSTOMER, Permission.CUSTOMER_CREATE)).toBe(false);
+  });
+
   it('gives the admin everything except audit log export', () => {
     expect(roleHasPermission(Role.ADMIN, Permission.AUDIT_LOG_EXPORT)).toBe(false);
     expect(roleHasPermission(Role.ADMIN, Permission.AUDIT_LOG_READ)).toBe(true);
