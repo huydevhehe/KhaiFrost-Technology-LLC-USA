@@ -501,12 +501,18 @@ export function ProductEditor({
               onClick={() =>
                 void runWorkflow(
                   (id, version) => productsApi.unpublish(id, version),
-                  "Đã đưa sản phẩm về bản nháp.",
+                  status === "in_review"
+                    ? "Đã trả sản phẩm về bản nháp."
+                    : "Đã đưa sản phẩm về bản nháp.",
                   { saveFirst: false },
                 )
               }
             >
-              {status === "archived" ? "Khôi phục" : "Gỡ xuất bản"}
+              {status === "archived"
+                ? "Khôi phục"
+                : status === "in_review"
+                  ? "Từ chối duyệt"
+                  : "Gỡ xuất bản"}
             </ActionButton>
           )}
           {!isNew && canPublish && status !== "archived" && (
