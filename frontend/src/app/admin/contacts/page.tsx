@@ -1,138 +1,240 @@
 "use client";
 
 import { useState } from "react";
-import { Search, X } from "lucide-react";
-import { Panel, Input, Select, Pagination } from "@/components/admin/ui";
-import { StatusBadge } from "@/components/admin/StatusBadge";
-import { mockContacts, type AdminContact, type ContactStatus } from "@/content/admin/mockContacts";
+import { Search } from "lucide-react";
+import { Input, Panel, Select } from "@/components/admin/ui";
+import {
+  EmptyState,
+  ErrorState,
+  TableSkeleton,
+  formatDateTime,
+  useApiList,
+  useFilters,
+} from "@/components/admin/shared";
+import { Pager } from "@/components/admin/system/Pager";
+import {
+  ContactDetailPanel,
+  ContactStatusBadge,
+} from "@/components/admin/people/ContactDetailPanel";
+import {
+  CONTACT_STATUSES,
+  CONTACT_STATUS_LABELS,
+  type ContactListItem,
+  type ContactListMeta,
+  type ContactStatus,
+} from "@/lib/api/admin/contacts";
+import { toIsoBound } from "@/lib/api/admin/auditLog";
+import type { AdminUser } from "@/lib/api/admin/users";
+import { PERMISSIONS } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth";
+
+const PAGE_SIZE = 20;
 
 export default function AdminContactsPage() {
-  const [contacts, setContacts] = useState<AdminContact[]>(mockContacts);
-  const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
+  const { user } = useAuth();
+  const [status, setStatus] = useState<ContactStatus | "">("");
+  const [assignee, setAssignee] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = contacts.find((c) => c.id === selectedId) ?? null;
 
-  const filtered = contacts.filter((c) => {
-    const matchesQuery =
-      c.name.toLowerCase().includes(query.toLowerCase()) || c.email.toLowerCase().includes(query.toLowerCase());
-    const matchesStatus = statusFilter === "all" || c.status === statusFilter;
-    return matchesQuery && matchesStatus;
+  const canReadUsers = !!user?.permissions.includes(PERMISSIONS.USER_READ);
+
+  const filters = useFilters({
+    status: status || undefined,
+    assignedToId: assignee || undefined,
+    from: toIsoBound(from, "start"),
+    to: toIsoBound(to, "end"),
+  });
+  const list = useApiList<ContactListItem>("/admin/contacts", {
+    pageSize: PAGE_SIZE,
+    filters,
+    keepPreviousData: true,
+  });
+  const staffList = useApiList<AdminUser>("/admin/users", {
+    pageSize: 100,
+    enabled: canReadUsers,
   });
 
-  function openContact(contact: AdminContact) {
-    setSelectedId(contact.id);
-    if (contact.status === "Mới") {
-      setContacts((prev) => prev.map((c) => (c.id === contact.id ? { ...c, status: "Đã xem" } : c)));
-    }
-  }
+  const unreadCount = (list.meta as ContactListMeta).unreadCount ?? 0;
+  const staff = staffList.items;
+  const staffName = (id: string | null) =>
+    id ? (staff.find((member) => member.id === id)?.fullName ?? "Nhân sự khác") : "Chưa phân công";
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-slate-900">Form liên hệ</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-bold text-slate-900">Hộp thư liên hệ</h1>
+        {unreadCount > 0 && (
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-700">
+            {unreadCount.toLocaleString("vi-VN")} chưa xem
+          </span>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <Panel className={selected ? "xl:col-span-2" : "xl:col-span-3"}>
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input placeholder="Tìm theo tên hoặc email..." className="pl-9" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Panel className={selectedId ? "xl:col-span-2" : "xl:col-span-3"}>
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <div className="relative min-w-55 flex-1">
+              <Search
+                size={16}
+                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+              />
+              <label htmlFor="contactSearch" className="sr-only">
+                Tìm theo tên, email hoặc chủ đề
+              </label>
+              <Input
+                id="contactSearch"
+                type="search"
+                placeholder="Tìm theo tên, email hoặc chủ đề…"
+                className="pl-9"
+                value={list.search}
+                onChange={(event) => list.setSearch(event.target.value)}
+              />
             </div>
-            <Select className="w-44" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as ContactStatus | "all")}>
-              <option value="all">Tất cả trạng thái</option>
-              <option value="Mới">Mới</option>
-              <option value="Đã xem">Đã xem</option>
-              <option value="Đã phản hồi">Đã phản hồi</option>
-            </Select>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="contactStatus" className="text-xs font-medium text-slate-500">
+                Trạng thái
+              </label>
+              <Select
+                id="contactStatus"
+                className="w-40"
+                value={status}
+                onChange={(event) => setStatus(event.target.value as ContactStatus | "")}
+              >
+                <option value="">Tất cả</option>
+                {CONTACT_STATUSES.map((item) => (
+                  <option key={item} value={item}>
+                    {CONTACT_STATUS_LABELS[item]}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            {canReadUsers && (
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="contactAssigneeFilter" className="text-xs font-medium text-slate-500">
+                  Phụ trách
+                </label>
+                <Select
+                  id="contactAssigneeFilter"
+                  className="w-44"
+                  value={assignee}
+                  onChange={(event) => setAssignee(event.target.value)}
+                >
+                  <option value="">Tất cả nhân sự</option>
+                  {staff.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.fullName}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="contactFrom" className="text-xs font-medium text-slate-500">
+                Từ ngày
+              </label>
+              <Input
+                id="contactFrom"
+                type="date"
+                className="w-40"
+                value={from}
+                onChange={(event) => setFrom(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="contactTo" className="text-xs font-medium text-slate-500">
+                Đến ngày
+              </label>
+              <Input
+                id="contactTo"
+                type="date"
+                className="w-40"
+                value={to}
+                onChange={(event) => setTo(event.target.value)}
+              />
+            </div>
           </div>
 
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400">
-                <th className="py-3 pr-4 font-medium">Họ tên</th>
-                <th className="py-3 pr-4 font-medium">Email</th>
-                <th className="py-3 pr-4 font-medium">Nội dung</th>
-                <th className="py-3 pr-4 font-medium">Ngày gửi</th>
-                <th className="py-3 pr-4 font-medium">Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((c) => (
-                <tr
-                  key={c.id}
-                  onClick={() => openContact(c)}
-                  className={`cursor-pointer text-slate-700 ${selectedId === c.id ? "bg-accent/5" : ""}`}
-                >
-                  <td className="py-3 pr-4 font-medium text-slate-900">{c.name}</td>
-                  <td className="py-3 pr-4 text-slate-500">{c.email}</td>
-                  <td className="max-w-xs py-3 pr-4 text-slate-500">
-                    <p className="truncate">{c.message}</p>
-                  </td>
-                  <td className="py-3 pr-4 text-slate-500">{c.date}</td>
-                  <td className="py-3 pr-4">
-                    <StatusBadge status={c.status} />
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-sm text-slate-400">
-                    Không tìm thấy liên hệ phù hợp.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          {list.error ? (
+            <ErrorState error={list.error} onRetry={list.refetch} retryLabel="Tải lại" />
+          ) : list.loading && list.items.length === 0 ? (
+            <TableSkeleton rows={6} columns={5} />
+          ) : list.items.length === 0 ? (
+            <EmptyState
+              title="Không có liên hệ nào"
+              description="Liên hệ gửi từ website sẽ xuất hiện tại đây."
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-xs tracking-wide text-slate-400 uppercase">
+                    <th className="py-3 pr-4 font-medium">Người gửi</th>
+                    <th className="py-3 pr-4 font-medium">Nội dung</th>
+                    <th className="py-3 pr-4 font-medium">Phụ trách</th>
+                    <th className="py-3 pr-4 font-medium">Ngày gửi</th>
+                    <th className="py-3 pr-4 font-medium">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {list.items.map((item) => (
+                    <tr
+                      key={item.id}
+                      onClick={() => setSelectedId(item.id)}
+                      className={`cursor-pointer text-slate-700 ${selectedId === item.id ? "bg-accent/5" : ""}`}
+                    >
+                      <td className="py-3 pr-4">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedId(item.id)}
+                          className="text-left focus:ring-2 focus:ring-accent/30 focus:outline-none"
+                        >
+                          <span
+                            className={`block ${item.status === "new" ? "font-semibold" : "font-medium"} text-slate-900`}
+                          >
+                            {item.fullName}
+                          </span>
+                          <span className="block text-xs text-slate-500">{item.email}</span>
+                        </button>
+                      </td>
+                      <td className="max-w-xs py-3 pr-4 text-slate-500">
+                        {item.subject && <p className="truncate font-medium text-slate-700">{item.subject}</p>}
+                        <p className="truncate">{item.messagePreview}</p>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-500">{staffName(item.assignedToId)}</td>
+                      <td className="py-3 pr-4 text-slate-500">{formatDateTime(item.createdAt)}</td>
+                      <td className="py-3 pr-4">
+                        <ContactStatusBadge status={item.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-          <Pagination page={1} totalPages={1} totalLabel={`Tổng: ${filtered.length} liên hệ`} onChange={() => {}} />
+          <Pager
+            page={list.page}
+            totalPages={list.meta.totalPages}
+            totalLabel={`Tổng: ${list.meta.total.toLocaleString("vi-VN")} liên hệ`}
+            onChange={list.setPage}
+            disabled={list.loading}
+          />
         </Panel>
 
-        {selected && (
-          <Panel
-            title="Chi tiết liên hệ"
-            action={
-              <button onClick={() => setSelectedId(null)} className="text-slate-400 hover:text-slate-700">
-                <X size={16} />
-              </button>
-            }
-          >
-            <div className="flex flex-col gap-4 text-sm">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Họ tên</p>
-                <p className="font-medium text-slate-900">{selected.name}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Email</p>
-                <p className="text-slate-700">{selected.email}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Điện thoại</p>
-                <p className="text-slate-700">{selected.phone}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Ngày gửi</p>
-                <p className="text-slate-700">{selected.date}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Nội dung</p>
-                <p className="whitespace-pre-line rounded-lg bg-slate-50 p-3 text-slate-700">{selected.message}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-xs uppercase tracking-wide text-slate-400">Trạng thái</p>
-                <StatusBadge status={selected.status} />
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setContacts((prev) => prev.map((c) => (c.id === selected.id ? { ...c, status: "Đã phản hồi" } : c)));
-                  console.log("Marked as replied (mock)", selected.id);
-                }}
-                className="mt-2 w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent/90"
-              >
-                Đánh dấu đã phản hồi
-              </button>
-            </div>
-          </Panel>
+        {selectedId && (
+          <ContactDetailPanel
+            key={selectedId}
+            contactId={selectedId}
+            staff={staff}
+            onClose={() => setSelectedId(null)}
+            onChanged={list.refetch}
+            onDeleted={() => {
+              setSelectedId(null);
+              list.refetch();
+            }}
+          />
         )}
       </div>
     </div>
