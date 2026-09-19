@@ -6,7 +6,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
 import { Pill } from "@/components/ui/Pill";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { projects } from "@/content/projects";
+import { useProjects } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { Project } from "@/types";
 
 function ProjectCard({ project }: { project: Project }) {
@@ -36,17 +37,19 @@ function ProjectCard({ project }: { project: Project }) {
 
 export function FeaturedProjects() {
   const { t } = useTranslation();
+  const projects = useProjects();
+  const section = useSectionText("/", "featured-projects");
 
   return (
     <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <SectionEyebrow>{t("featuredProjects.eyebrow")}</SectionEyebrow>
-            <SectionHeading>{t("featuredProjects.heading")}</SectionHeading>
+            <SectionEyebrow>{section("eyebrow", t("featuredProjects.eyebrow"))}</SectionEyebrow>
+            <SectionHeading>{section("heading", t("featuredProjects.heading"))}</SectionHeading>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
-            {t("featuredProjects.viewAll")}
+            {section("viewAllLabel", t("featuredProjects.viewAll"))}
           </a>
         </div>
         <div className="grid gap-6 md:grid-cols-3">

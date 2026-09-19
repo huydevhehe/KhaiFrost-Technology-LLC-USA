@@ -5,7 +5,8 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { blogPosts } from "@/content/blogPosts";
+import { useBlogPosts } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { BlogPost } from "@/types";
 
 function BlogCard({ post }: { post: BlogPost }) {
@@ -33,14 +34,16 @@ function BlogCard({ post }: { post: BlogPost }) {
 
 export function BlogPreview() {
   const { t } = useTranslation();
+  const section = useSectionText("/", "blog-preview");
+  const blogPosts = useBlogPosts();
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <SectionEyebrow>{t("blog.eyebrow")}</SectionEyebrow>
-            <SectionHeading>{t("blog.heading")}</SectionHeading>
+            <SectionEyebrow>{section("eyebrow", t("blog.eyebrow"))}</SectionEyebrow>
+            <SectionHeading>{section("heading", t("blog.heading"))}</SectionHeading>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
             {t("blog.viewAll")}

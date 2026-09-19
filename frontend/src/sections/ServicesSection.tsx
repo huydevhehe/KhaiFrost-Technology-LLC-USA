@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { services } from "@/content/services";
+import { useServices } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { ServiceItem } from "@/types";
 
 function ServiceCard({ service }: { service: ServiceItem }) {
@@ -38,13 +39,15 @@ function ServiceCard({ service }: { service: ServiceItem }) {
 
 export function ServicesSection() {
   const { t } = useTranslation();
+  const services = useServices();
+  const section = useSectionText("/", "services");
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-[1440px] px-6">
         <div className="mb-10 text-center">
           <p className="text-lg font-semibold uppercase tracking-widest text-accent sm:text-xl">
-            {t("services.eyebrow")}
+            {section("eyebrow", t("services.eyebrow"))}
           </p>
         </div>
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">

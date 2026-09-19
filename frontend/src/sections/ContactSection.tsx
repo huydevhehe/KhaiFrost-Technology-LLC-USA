@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useSectionText } from "@/lib/content/pages";
 import { useSiteConfig } from "@/lib/content/site";
 import {
   validateContactForm,
@@ -23,6 +24,7 @@ const initialValues: ContactFormValues = {
 export function ContactSection() {
   const { t } = useTranslation();
   const siteConfig = useSiteConfig();
+  const section = useSectionText("/", "contact");
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -56,10 +58,10 @@ export function ContactSection() {
       <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-2">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
-            {t("contact.eyebrow")}
+            {section("eyebrow", t("contact.eyebrow"))}
           </p>
-          <h2 className="text-3xl font-bold text-slate-900">{t("contact.heading")}</h2>
-          <p className="mt-4 text-slate-500">{t("contact.subtext")}</p>
+          <h2 className="text-3xl font-bold text-slate-900">{section("heading", t("contact.heading"))}</h2>
+          <p className="mt-4 text-slate-500">{section("description", t("contact.subtext"))}</p>
           <div className="mt-6 space-y-2 text-sm text-slate-600">
             <p>{siteConfig.email}</p>
             <p>{siteConfig.phone}</p>

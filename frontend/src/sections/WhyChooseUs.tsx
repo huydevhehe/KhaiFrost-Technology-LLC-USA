@@ -3,17 +3,19 @@
 import { useTranslation } from "react-i18next";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useSectionText } from "@/lib/content/pages";
 
 export function WhyChooseUs() {
   const { t } = useTranslation();
+  const section = useSectionText("/", "why-choose-us");
 
   return (
     <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-4xl px-6 text-center">
-        <SectionEyebrow>{t("whyChooseUs.eyebrow")}</SectionEyebrow>
-        <SectionHeading>{t("whyChooseUs.heading")}</SectionHeading>
+        <SectionEyebrow>{section("eyebrow", t("whyChooseUs.eyebrow"))}</SectionEyebrow>
+        <SectionHeading>{section("heading", t("whyChooseUs.heading"))}</SectionHeading>
         <p className="mx-auto mt-6 max-w-3xl text-xl leading-relaxed text-slate-600">
-          {t("whyChooseUs.paragraph")}
+          {section("intro", t("whyChooseUs.paragraph"))}
         </p>
       </div>
     </section>
