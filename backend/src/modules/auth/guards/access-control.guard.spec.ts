@@ -159,7 +159,9 @@ describe('AccessControlGuard', () => {
 
     it('blocks everything except password change while the password must be changed', async () => {
       authenticate.mockResolvedValue(user(Role.OWNER, true, true));
-      const blocked = await failureOf(guard.canActivate(contextFor(AdminAreaController, 'read').context));
+      const blocked = await failureOf(
+        guard.canActivate(contextFor(AdminAreaController, 'read').context),
+      );
       expect(blocked.code).toBe('PASSWORD_CHANGE_REQUIRED');
       expect(blocked.getStatus()).toBe(403);
       const open = await failureOf(guard.canActivate(contextFor(PlainController, 'open').context));

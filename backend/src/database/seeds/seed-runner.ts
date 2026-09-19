@@ -37,7 +37,13 @@ export function resolveSeedOptions(partial: Partial<SeedOptions> = {}): SeedOpti
 }
 
 function toOwnerUser(id: string): AuthenticatedUser {
-  return { id, role: Role.OWNER, sessionId: 'seed', adminSessionActive: true, mustChangePassword: false };
+  return {
+    id,
+    role: Role.OWNER,
+    sessionId: 'seed',
+    adminSessionActive: true,
+    mustChangePassword: false,
+  };
 }
 
 async function findOwner(
