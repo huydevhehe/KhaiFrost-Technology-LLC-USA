@@ -21,6 +21,7 @@ export const PERMISSIONS = {
   USER_ASSIGN_ROLE: "user:assign-role",
 
   CUSTOMER_READ: "customer:read",
+  CUSTOMER_CREATE: "customer:create",
   CUSTOMER_UPDATE: "customer:update",
   CUSTOMER_LOCK: "customer:lock",
   CUSTOMER_DELETE: "customer:delete",

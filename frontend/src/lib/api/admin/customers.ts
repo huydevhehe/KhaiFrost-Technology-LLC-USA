@@ -27,6 +27,19 @@ export interface ListCustomersQuery {
   sortOrder?: "ASC" | "DESC";
 }
 
+export interface CreateCustomerInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  /** Omit to let the server generate a temporary password. */
+  password?: string;
+}
+
+export interface AdminCustomerWithTemporaryPassword extends AdminCustomer {
+  /** Returned exactly once, right after create. */
+  temporaryPassword?: string;
+}
+
 export interface CustomerPage {
   items: AdminCustomer[];
   meta: PaginationMeta;
@@ -44,6 +57,10 @@ export const customersApi = {
 
   get: (id: string, signal?: AbortSignal): Promise<AdminCustomer> =>
     api.get<AdminCustomer>(`/admin/customers/${encodeURIComponent(id)}`, undefined, { signal }),
+
+  /** `temporaryPassword` is present only when `password` was omitted. */
+  create: (input: CreateCustomerInput): Promise<AdminCustomerWithTemporaryPassword> =>
+    api.post<AdminCustomerWithTemporaryPassword>("/admin/customers", input),
 
   lock: (id: string): Promise<AdminCustomer> =>
     api.post<AdminCustomer>(`/admin/customers/${encodeURIComponent(id)}/lock`),

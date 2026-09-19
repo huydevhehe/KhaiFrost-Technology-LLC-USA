@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Search, Trash2, Unlock } from "lucide-react";
-import { IconButton, Input, Panel, Select } from "@/components/admin/ui";
+import { Lock, Plus, Search, Trash2, Unlock } from "lucide-react";
+import { IconButton, Input, Panel, PrimaryButton, Select } from "@/components/admin/ui";
 import {
   EmptyState,
   ErrorState,
@@ -18,7 +18,9 @@ import {
   useFilters,
 } from "@/components/admin/shared";
 import { Pager } from "@/components/admin/system/Pager";
+import { CustomerCreateModal } from "@/components/admin/people/CustomerCreateModal";
 import { AccountStatusBadge, InitialsAvatar } from "@/components/admin/people/peopleUi";
+import { TemporaryPasswordDialog } from "@/components/admin/people/TemporaryPasswordDialog";
 import { customersApi, type AdminCustomer } from "@/lib/api/admin/customers";
 import { USER_STATUS_LABELS, type UserStatus } from "@/lib/api/admin/users";
 import { PERMISSIONS } from "@/lib/api/types";
@@ -33,6 +35,8 @@ export default function AdminCustomersPage() {
 
   const [statusFilter, setStatusFilter] = useState<UserStatus | "">("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [temporary, setTemporary] = useState<{ password: string; name: string } | null>(null);
 
   const filters = useFilters({ status: statusFilter || undefined });
   const list = useApiList<AdminCustomer>("/admin/customers", {
@@ -85,9 +89,16 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Khách hàng</h1>
-        <p className="text-sm text-slate-500">Tài khoản khách hàng đăng ký trên website.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Khách hàng</h1>
+          <p className="text-sm text-slate-500">Tài khoản khách hàng đăng ký trên website.</p>
+        </div>
+        {can(PERMISSIONS.CUSTOMER_CREATE) && (
+          <PrimaryButton icon={<Plus size={16} />} onClick={() => setCreating(true)}>
+            Tạo khách hàng
+          </PrimaryButton>
+        )}
       </div>
 
       <Panel>
@@ -204,6 +215,25 @@ export default function AdminCustomersPage() {
           disabled={list.loading}
         />
       </Panel>
+
+      <CustomerCreateModal
+        open={creating}
+        onClose={() => setCreating(false)}
+        onCreated={(created) => {
+          setCreating(false);
+          list.refetch();
+          if (created.temporaryPassword) {
+            setTemporary({ password: created.temporaryPassword, name: created.fullName });
+          }
+        }}
+      />
+
+      <TemporaryPasswordDialog
+        open={temporary !== null}
+        password={temporary?.password ?? ""}
+        userName={temporary?.name ?? ""}
+        onClose={() => setTemporary(null)}
+      />
 
       <Modal
         open={selectedId !== null}
