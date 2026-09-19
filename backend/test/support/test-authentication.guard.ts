@@ -42,7 +42,12 @@ export class TestAuthenticationGuard implements CanActivate {
     const rawUser = request.headers[TEST_USER_HEADER];
     if (typeof rawUser === 'string') {
       const parsed = JSON.parse(rawUser) as TestUser;
-      request.user = { sessionId: 'test-session', adminSessionActive: true, ...parsed };
+      request.user = {
+        sessionId: 'test-session',
+        adminSessionActive: true,
+        mustChangePassword: false,
+        ...parsed,
+      };
       this.requestContext.setUserId(parsed.id);
     }
 

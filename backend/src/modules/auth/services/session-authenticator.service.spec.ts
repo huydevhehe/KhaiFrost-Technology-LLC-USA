@@ -38,6 +38,7 @@ describe('SessionAuthenticator', () => {
     role: Role.ADMIN,
     status: UserStatus.ACTIVE,
     adminSessionEndedAt: null,
+    mustChangePassword: false,
     ...overrides,
   });
 
@@ -104,6 +105,7 @@ describe('SessionAuthenticator', () => {
         role: Role.STAFF,
         sessionId: SESSION_ID,
         adminSessionActive: false,
+        mustChangePassword: false,
       });
     });
 
@@ -249,6 +251,7 @@ describe('SessionAuthenticator', () => {
         role: Role.ADMIN,
         sessionId: SESSION_ID,
         adminSessionActive: true,
+        mustChangePassword: false,
       });
       expect(state.active).toBe(true);
       expect(state.expiresAt!.getTime()).toBeLessThanOrEqual(sat + 30 * 60_000 + 1000);

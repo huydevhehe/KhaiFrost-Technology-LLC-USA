@@ -2,6 +2,7 @@ import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Permission } from '../../../common/constants/permissions';
 import { RequestContextService } from '../../../common/context/request-context.service';
+import { AllowPasswordChangePending } from '../../../common/decorators/allow-password-change-pending.decorator';
 import { AdminController } from '../../../common/decorators/admin-controller.decorator';
 import { Public } from '../../../common/decorators/public.decorator';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
@@ -23,6 +24,9 @@ class PlainController {
 
   @Roles(Role.CUSTOMER)
   customersOnly() {}
+
+  @AllowPasswordChangePending()
+  changePassword() {}
 }
 
 @Public()
@@ -40,8 +44,12 @@ class AdminAreaController {
   createUser() {}
 }
 
-function user(role: Role, adminSessionActive = true): AuthenticatedUser {
-  return { id: 'user-1', role, sessionId: 'session-1', adminSessionActive };
+function user(
+  role: Role,
+  adminSessionActive = true,
+  mustChangePassword = false,
+): AuthenticatedUser {
+  return { id: 'user-1', role, sessionId: 'session-1', adminSessionActive, mustChangePassword };
 }
 
 async function failureOf(promise: Promise<unknown>): Promise<ApplicationException> {
@@ -147,6 +155,18 @@ describe('AccessControlGuard', () => {
       const { context } = contextFor(AdminAreaController, 'read');
       const error = await failureOf(guard.canActivate(context));
       expect(error.code).toBe('FORBIDDEN');
+    });
+
+    it('blocks everything except password change while the password must be changed', async () => {
+      authenticate.mockResolvedValue(user(Role.OWNER, true, true));
+      const blocked = await failureOf(guard.canActivate(contextFor(AdminAreaController, 'read').context));
+      expect(blocked.code).toBe('PASSWORD_CHANGE_REQUIRED');
+      expect(blocked.getStatus()).toBe(403);
+      const open = await failureOf(guard.canActivate(contextFor(PlainController, 'open').context));
+      expect(open.code).toBe('PASSWORD_CHANGE_REQUIRED');
+      await expect(
+        guard.canActivate(contextFor(PlainController, 'changePassword').context),
+      ).resolves.toBe(true);
     });
 
     it('requires an elevated admin session even for the owner', async () => {

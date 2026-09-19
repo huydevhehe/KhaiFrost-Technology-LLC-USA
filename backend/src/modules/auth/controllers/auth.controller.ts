@@ -18,6 +18,7 @@ import {
   ADMIN_SESSION_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
 } from '../../../common/constants/cookie-names';
+import { AllowPasswordChangePending } from '../../../common/decorators/allow-password-change-pending.decorator';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { Public } from '../../../common/decorators/public.decorator';
 import { Roles } from '../../../common/decorators/roles.decorator';
@@ -48,6 +49,7 @@ import { AuthResult, AuthService } from '../services/auth.service';
 import { PasswordResetService } from '../services/password-reset.service';
 
 @Controller('auth')
+@AllowPasswordChangePending()
 @ApiTags('auth')
 @ApiCookieAuth(ACCESS_COOKIE_NAME)
 export class AuthController {

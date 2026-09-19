@@ -37,6 +37,14 @@ export function adminSessionRequired(): ApplicationException {
   );
 }
 
+export function passwordChangeRequired(): ApplicationException {
+  return new ApplicationException(
+    ErrorCode.PASSWORD_CHANGE_REQUIRED,
+    HttpStatus.FORBIDDEN,
+    'The password must be changed before anything else',
+  );
+}
+
 export function badRequest(code: string, message: string, details?: unknown): ApplicationException {
   return new ApplicationException(code, HttpStatus.BAD_REQUEST, message, details);
 }

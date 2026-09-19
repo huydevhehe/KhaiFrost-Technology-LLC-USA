@@ -48,6 +48,7 @@ export class SessionAuthenticator {
       role: record.role,
       sessionId: record.sessionId,
       adminSessionActive: this.resolveAdminSession(request, response, record).active,
+      mustChangePassword: record.mustChangePassword === true,
     };
   }
 

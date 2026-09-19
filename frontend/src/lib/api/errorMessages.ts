@@ -60,6 +60,8 @@ function describeByCode(error: ApiError, context: ErrorContext): string {
       return "Bạn cần đăng nhập để tiếp tục.";
     case "ADMIN_SESSION_REQUIRED":
       return "Phiên quản trị đã hết hạn. Vui lòng xác nhận lại mật khẩu.";
+    case "PASSWORD_CHANGE_REQUIRED":
+      return "Bạn cần đổi mật khẩu trước khi tiếp tục.";
     case "FORBIDDEN":
       return "Bạn không có quyền thực hiện thao tác này.";
     case "NOT_FOUND":

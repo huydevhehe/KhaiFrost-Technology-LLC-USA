@@ -5,4 +5,6 @@ export interface AuthenticatedUser {
   role: Role;
   sessionId: string;
   adminSessionActive: boolean;
+  // True while the account still has to replace a bootstrap or temporary password
+  mustChangePassword: boolean;
 }

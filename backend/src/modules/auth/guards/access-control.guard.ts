@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { Permission } from '../../../common/constants/permissions';
 import { roleHasPermission } from '../../../common/constants/role-permissions';
 import { RequestContextService } from '../../../common/context/request-context.service';
+import { ALLOW_PASSWORD_CHANGE_PENDING_KEY } from '../../../common/decorators/allow-password-change-pending.decorator';
 import { ADMIN_AREA_KEY } from '../../../common/decorators/admin-controller.decorator';
 import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
 import { PERMISSIONS_KEY } from '../../../common/decorators/require-permissions.decorator';
@@ -12,6 +13,7 @@ import { Role } from '../../../common/enums/role.enum';
 import {
   adminSessionRequired,
   forbidden,
+  passwordChangeRequired,
   unauthorized,
 } from '../../../common/exceptions/exception.factories';
 import { AuthenticatedRequest } from '../../../common/interfaces/authenticated-request.interface';
@@ -50,6 +52,14 @@ export class AccessControlGuard implements CanActivate {
     }
     if (isPublic) return true;
     if (!user) throw unauthorized();
+
+    // A bootstrap or temporary password must be replaced before anything else is allowed
+    if (
+      user.mustChangePassword &&
+      this.reflector.getAllAndOverride<boolean>(ALLOW_PASSWORD_CHANGE_PENDING_KEY, targets) !== true
+    ) {
+      throw passwordChangeRequired();
+    }
 
     if (this.reflector.getAllAndOverride<boolean>(ADMIN_AREA_KEY, targets) === true) {
       if (user.role === Role.CUSTOMER) throw forbidden();

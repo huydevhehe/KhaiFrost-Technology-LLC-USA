@@ -26,6 +26,7 @@ export interface ActiveSessionRecord {
   role: Role;
   status: UserStatus;
   adminSessionEndedAt: Date | null;
+  mustChangePassword: boolean;
 }
 
 export interface IssuedSession {
@@ -73,6 +74,7 @@ export class AuthSessionService {
       .addSelect('session.adminSessionEndedAt', 'adminSessionEndedAt')
       .addSelect('user.role', 'role')
       .addSelect('user.status', 'status')
+      .addSelect('user.mustChangePassword', 'mustChangePassword')
       .where('session.id = :sessionId', { sessionId })
       .andWhere('session.revokedAt IS NULL')
       .andWhere('session.expiresAt > :now', { now: new Date() })
