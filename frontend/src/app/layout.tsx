@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { I18nProvider } from "@/components/I18nProvider";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { siteConfig } from "@/content/siteConfig";
 import "./globals.css";
 
@@ -66,7 +67,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </I18nProvider>
       </body>
     </html>
   );
