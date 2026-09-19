@@ -7,7 +7,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IconCircle } from "@/components/ui/IconCircle";
 import { Button } from "@/components/ui/Button";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { services } from "@/content/services";
+import { useServices } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { ServiceItem } from "@/types";
 
 function ServiceOverviewCard({ service }: { service: ServiceItem }) {
@@ -38,13 +39,15 @@ function ServiceOverviewCard({ service }: { service: ServiceItem }) {
 
 export function ServicesOverviewGrid() {
   const { t } = useTranslation();
+  const services = useServices();
+  const section = useSectionText("/dich-vu", "core-services");
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10">
-          <SectionEyebrow>{t("servicesOverviewPage.services.eyebrow")}</SectionEyebrow>
-          <SectionHeading>{t("servicesOverviewPage.services.heading")}</SectionHeading>
+          <SectionEyebrow>{section("eyebrow", t("servicesOverviewPage.services.eyebrow"))}</SectionEyebrow>
+          <SectionHeading>{section("heading", t("servicesOverviewPage.services.heading"))}</SectionHeading>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
           {services.map((service) => (

@@ -10,20 +10,20 @@ import { ServicesOverviewWhyUs } from "@/sections/ServicesOverviewWhyUs";
 import { ServicesOverviewProjects } from "@/sections/ServicesOverviewProjects";
 import { ServicesOverviewCta } from "@/sections/ServicesOverviewCta";
 import { Reveal } from "@/components/ui/Reveal";
-import {
-  servicesOverviewProcessSteps,
-  servicesOverviewStats,
-} from "@/content/servicesOverviewPageData";
+import { useSectionText } from "@/lib/content/pages";
+import { useServicesOverview } from "@/lib/content/serviceDetail";
 
 export function ServicesOverviewPage() {
   const { t } = useTranslation();
+  const { stats, steps } = useServicesOverview();
+  const process = useSectionText("/dich-vu", "process");
 
   return (
     <>
       <ServicesOverviewHero />
       <CategoryBreadcrumb />
       <Reveal>
-        <CategoryStats stats={servicesOverviewStats} />
+        <CategoryStats stats={stats} />
       </Reveal>
       <Reveal>
         <ServicesOverviewGrid />
@@ -33,9 +33,9 @@ export function ServicesOverviewPage() {
       </Reveal>
       <Reveal>
         <CategoryProcess
-          eyebrow={t("servicesOverviewPage.process.eyebrow")}
-          heading={t("servicesOverviewPage.process.heading")}
-          steps={servicesOverviewProcessSteps}
+          eyebrow={process("eyebrow", t("servicesOverviewPage.process.eyebrow"))}
+          heading={process("heading", t("servicesOverviewPage.process.heading"))}
+          steps={steps}
         />
       </Reveal>
       <Reveal>

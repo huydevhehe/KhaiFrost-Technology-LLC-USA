@@ -39,6 +39,12 @@ function buildKey(path: string, query: QueryParams): string {
   return parts.length ? `${path}?${parts.join("&")}` : path;
 }
 
+function markFailed(entry: Entry): void {
+  const first = entry.failedAt === 0;
+  entry.failedAt = Date.now();
+  if (first && entry.value === undefined) for (const listener of Array.from(entry.listeners)) listener();
+}
+
 function ensureFresh(key: string, path: string, query: QueryParams): void {
   const entry = getEntry(key);
   if (entry.inFlight) return;
@@ -58,10 +64,10 @@ function ensureFresh(key: string, path: string, query: QueryParams): void {
           for (const listener of Array.from(entry.listeners)) listener();
         }
       } else {
-        entry.failedAt = Date.now();
+        markFailed(entry);
       }
     } catch {
-      entry.failedAt = Date.now();
+      markFailed(entry);
     } finally {
       entry.inFlight = false;
     }
@@ -79,7 +85,17 @@ export function useContentLocale(): ContentLocale {
  * when the request failed), so callers render their static fallback in that case. Server render and the
  * first client render always see `undefined`, which keeps hydration identical to the static content.
  */
-export function usePublicData<T>(path: string, options?: { localized?: boolean; query?: QueryParams }): T | undefined {
+export function usePublicData<T>(path: string, options?: PublicDataOptions): T | undefined {
+  return usePublicDataState<T>(path, options).data;
+}
+
+interface PublicDataOptions {
+  localized?: boolean;
+  query?: QueryParams;
+}
+
+/** Like usePublicData, plus `failed`: the request ended without data (404, network error, timeout). */
+export function usePublicDataState<T>(path: string, options?: PublicDataOptions): { data: T | undefined; failed: boolean } {
   const locale = useContentLocale();
   const localized = options?.localized ?? true;
   const extra = options?.query;
@@ -105,7 +121,13 @@ export function usePublicData<T>(path: string, options?: { localized?: boolean; 
     [key, path, locale, localized, queryKey],
   );
   const getSnapshot = useCallback(() => getEntry(key).value as T | undefined, [key]);
-  return useSyncExternalStore(subscribe, getSnapshot, () => undefined);
+  const getFailed = useCallback(() => {
+    const entry = getEntry(key);
+    return entry.value === undefined && entry.failedAt > 0;
+  }, [key]);
+  const data = useSyncExternalStore(subscribe, getSnapshot, () => undefined);
+  const failed = useSyncExternalStore(subscribe, getFailed, () => false);
+  return { data, failed };
 }
 
 /** One-off cached fetch for non-hook callers (UI translation bootstrap). Resolves null on failure. */

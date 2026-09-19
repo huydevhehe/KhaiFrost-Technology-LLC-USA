@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { serviceCategoryDetails, getServiceCategoryBySlug } from "@/content/serviceCategoryDetails";
+import { serviceCategoryDetails } from "@/content/serviceCategoryDetails";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { ServiceCategoryPage } from "@/sections/ServiceCategoryPage";
 import { PageTransition } from "@/components/PageTransition";
@@ -14,16 +13,10 @@ export default async function CategoryDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = getServiceCategoryBySlug(slug);
-
-  if (!category) {
-    notFound();
-  }
-
   return (
     <PageTransition>
       <main>
-        <ServiceCategoryPage category={category} />
+        <ServiceCategoryPage slug={slug} />
       </main>
       <SiteFooter />
     </PageTransition>

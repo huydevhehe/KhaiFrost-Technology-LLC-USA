@@ -5,7 +5,8 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VideoThumbnail } from "@/components/ui/VideoThumbnail";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { projects } from "@/content/projects";
+import { useProjects } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { Project } from "@/types";
 
 function ProjectOverviewCard({ project }: { project: Project }) {
@@ -33,17 +34,19 @@ function ProjectOverviewCard({ project }: { project: Project }) {
 
 export function ServicesOverviewProjects() {
   const { t } = useTranslation();
+  const projects = useProjects();
+  const section = useSectionText("/dich-vu", "featured-projects");
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <SectionEyebrow>{t("servicesOverviewPage.projects.eyebrow")}</SectionEyebrow>
-            <SectionHeading>{t("servicesOverviewPage.projects.heading")}</SectionHeading>
+            <SectionEyebrow>{section("eyebrow", t("servicesOverviewPage.projects.eyebrow"))}</SectionEyebrow>
+            <SectionHeading>{section("heading", t("servicesOverviewPage.projects.heading"))}</SectionHeading>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
-            {t("servicesOverviewPage.projects.viewAll")}
+            {section("viewAllLabel", t("servicesOverviewPage.projects.viewAll"))}
           </a>
         </div>
         <div className="grid gap-6 md:grid-cols-3">

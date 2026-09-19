@@ -1,8 +1,10 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { ServiceCategoryDetail } from "@/types";
+import { useServiceDetail } from "@/lib/content/serviceDetail";
+import type { ServiceCategoryDetail } from "@/types";
 import { CategoryBreadcrumb } from "@/sections/CategoryBreadcrumb";
 import { CategoryHero } from "@/sections/CategoryHero";
 import { CategoryStats } from "@/sections/CategoryStats";
@@ -15,11 +17,16 @@ import { CategoryPartnerBanner } from "@/sections/CategoryPartnerBanner";
 import { CategoryFaq } from "@/sections/CategoryFaq";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function ServiceCategoryPage({
-  category,
-}: {
-  category: ServiceCategoryDetail;
-}) {
+export function ServiceCategoryPage({ slug }: { slug: string }) {
+  const { category, notFound: missing } = useServiceDetail(slug);
+
+  if (missing) notFound();
+  if (!category) return <div className="min-h-screen bg-navy" />;
+
+  return <ServiceCategoryContent category={category} />;
+}
+
+function ServiceCategoryContent({ category }: { category: ServiceCategoryDetail }) {
   const { t } = useTranslation();
   const categoryName = useLocalizedField(category.categoryName);
 
@@ -31,57 +38,71 @@ export function ServiceCategoryPage({
         image={category.heroImage}
       />
       <CategoryBreadcrumb categoryName={category.categoryName} />
-      <Reveal>
-        <CategoryStats stats={category.stats} />
-      </Reveal>
-      <Reveal>
-        <CategoryProducts
-          eyebrow={category.productsEyebrow}
-          heading={category.productsHeading}
-          intro={category.productsIntro}
-          products={category.products}
-        />
-      </Reveal>
-      <Reveal>
-        <CategoryProcess
-          eyebrow={t("serviceCategoryPage.process.eyebrow")}
-          heading={t("serviceCategoryPage.process.heading")}
-          steps={category.process}
-        />
-      </Reveal>
-      <Reveal>
-        <CategoryWhyUs
-          eyebrow={t("serviceCategoryPage.whyUs.eyebrow")}
-          heading={t("serviceCategoryPage.whyUs.heading", { category: categoryName })}
-          items={category.whyUs}
-        />
-      </Reveal>
-      <Reveal>
-        <CategoryCaseStudies
-          eyebrow={t("serviceCategoryPage.caseStudies.eyebrow")}
-          heading={t("serviceCategoryPage.caseStudies.heading", { category: categoryName })}
-          caseStudies={category.caseStudies}
-        />
-      </Reveal>
-      <Reveal>
-        <CategoryTestimonials
-          eyebrow={t("serviceCategoryPage.testimonials.eyebrow")}
-          heading={t("serviceCategoryPage.testimonials.heading")}
-          testimonials={category.testimonials}
-        />
-      </Reveal>
+      {category.stats.length > 0 && (
+        <Reveal>
+          <CategoryStats stats={category.stats} />
+        </Reveal>
+      )}
+      {category.products.length > 0 && (
+        <Reveal>
+          <CategoryProducts
+            eyebrow={category.productsEyebrow}
+            heading={category.productsHeading}
+            intro={category.productsIntro}
+            products={category.products}
+          />
+        </Reveal>
+      )}
+      {category.process.length > 0 && (
+        <Reveal>
+          <CategoryProcess
+            eyebrow={t("serviceCategoryPage.process.eyebrow")}
+            heading={t("serviceCategoryPage.process.heading")}
+            steps={category.process}
+          />
+        </Reveal>
+      )}
+      {category.whyUs.length > 0 && (
+        <Reveal>
+          <CategoryWhyUs
+            eyebrow={t("serviceCategoryPage.whyUs.eyebrow")}
+            heading={t("serviceCategoryPage.whyUs.heading", { category: categoryName })}
+            items={category.whyUs}
+          />
+        </Reveal>
+      )}
+      {category.caseStudies.length > 0 && (
+        <Reveal>
+          <CategoryCaseStudies
+            eyebrow={t("serviceCategoryPage.caseStudies.eyebrow")}
+            heading={t("serviceCategoryPage.caseStudies.heading", { category: categoryName })}
+            caseStudies={category.caseStudies}
+          />
+        </Reveal>
+      )}
+      {category.testimonials.length > 0 && (
+        <Reveal>
+          <CategoryTestimonials
+            eyebrow={t("serviceCategoryPage.testimonials.eyebrow")}
+            heading={t("serviceCategoryPage.testimonials.heading")}
+            testimonials={category.testimonials}
+          />
+        </Reveal>
+      )}
       {category.partnerBanner && (
         <Reveal>
           <CategoryPartnerBanner banner={category.partnerBanner} />
         </Reveal>
       )}
-      <Reveal>
-        <CategoryFaq
-          eyebrow={t("serviceCategoryPage.faq.eyebrow")}
-          heading={t("serviceCategoryPage.faq.heading", { category: categoryName })}
-          faq={category.faq}
-        />
-      </Reveal>
+      {category.faq.length > 0 && (
+        <Reveal>
+          <CategoryFaq
+            eyebrow={t("serviceCategoryPage.faq.eyebrow")}
+            heading={t("serviceCategoryPage.faq.heading", { category: categoryName })}
+            faq={category.faq}
+          />
+        </Reveal>
+      )}
     </>
   );
 }

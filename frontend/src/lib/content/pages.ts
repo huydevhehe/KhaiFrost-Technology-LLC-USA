@@ -41,3 +41,17 @@ export function sectionImageUrl(content: SectionContent, field: string): string 
   }
   return undefined;
 }
+
+function normalizeSpace(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Hero headlines are stored as one string in the page composition, while some static heroes break the line by
+ * hand. When the API text equals the static two-line text the static line break is kept; otherwise the API text
+ * is shown as a single flowing headline (`line2` is null).
+ */
+export function headlineLines(apiHeadline: string, line1: string, line2: string): { line1: string; line2: string | null } {
+  const same = normalizeSpace(apiHeadline) === normalizeSpace(`${line1} ${line2}`);
+  return same ? { line1, line2 } : { line1: apiHeadline, line2: null };
+}
