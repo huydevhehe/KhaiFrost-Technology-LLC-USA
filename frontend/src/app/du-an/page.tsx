@@ -8,11 +8,13 @@ import { ProjectsFilterGrid } from "@/sections/ProjectsFilterGrid";
 import { ProjectsCta } from "@/sections/ProjectsCta";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { projectsPageStats } from "@/content/projectsPageData";
+import { usePageStats } from "@/lib/content/pages";
 import { PageTransition } from "@/components/PageTransition";
 import { Reveal } from "@/components/ui/Reveal";
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
+  const stats = usePageStats("/du-an", "stats", projectsPageStats);
 
   return (
     <PageTransition>
@@ -23,7 +25,7 @@ export default function ProjectsPage() {
           <ProjectsFilterGrid />
         </Reveal>
         <Reveal>
-          <CategoryStats stats={projectsPageStats} />
+          <CategoryStats stats={stats} />
         </Reveal>
         <Reveal>
           <ProjectsCta />

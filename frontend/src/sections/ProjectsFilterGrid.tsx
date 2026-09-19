@@ -6,9 +6,8 @@ import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { projects } from "@/content/projects";
-import { services } from "@/content/services";
-import { Project, ServiceItem } from "@/types";
+import { useProjectCategories, useProjects, type ProjectCategoryFilter } from "@/lib/content/catalog";
+import { Project } from "@/types";
 
 function FilterPill({
   label,
@@ -34,16 +33,16 @@ function FilterPill({
   );
 }
 
-function ServiceFilterPill({
-  service,
+function CategoryFilterPill({
+  category,
   active,
   onClick,
 }: {
-  service: ServiceItem;
+  category: ProjectCategoryFilter;
   active: boolean;
   onClick: () => void;
 }) {
-  const label = useLocalizedField(service.title);
+  const label = useLocalizedField(category.label);
   return <FilterPill label={label} active={active} onClick={onClick} />;
 }
 
@@ -110,10 +109,14 @@ export function ProjectsFilterGrid() {
   const { t } = useTranslation();
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
-  const activeCategory = services.find((service) => service.slug === activeSlug);
+  const projects = useProjects();
+  const categories = useProjectCategories();
+  const activeCategory = categories.find((category) => category.slug === activeSlug);
   const filteredProjects = activeCategory
-    ? projects.filter(
-        (project) => project.categoryLabel?.en === activeCategory.title.en
+    ? projects.filter((project) =>
+        project.categorySlug
+          ? project.categorySlug === activeCategory.slug
+          : project.categoryLabel?.en === activeCategory.label.en
       )
     : projects;
 
@@ -126,12 +129,12 @@ export function ProjectsFilterGrid() {
             active={activeSlug === null}
             onClick={() => setActiveSlug(null)}
           />
-          {services.map((service) => (
-            <ServiceFilterPill
-              key={service.slug}
-              service={service}
-              active={activeSlug === service.slug}
-              onClick={() => setActiveSlug(service.slug)}
+          {categories.map((category) => (
+            <CategoryFilterPill
+              key={category.slug}
+              category={category}
+              active={activeSlug === category.slug}
+              onClick={() => setActiveSlug(category.slug)}
             />
           ))}
         </div>

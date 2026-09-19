@@ -29,6 +29,8 @@ export interface Project {
   // Optional video badge shown on the /du-an (projects) page's card grid.
   hasVideo?: boolean;
   videoDuration?: string;
+  // Slug of the project category when the project comes from the API.
+  categorySlug?: string;
 }
 
 export interface BlogPost {

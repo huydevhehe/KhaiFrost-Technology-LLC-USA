@@ -78,6 +78,7 @@ function mapProjects(locale: ContentLocale, dtos: ProjectDto[] | undefined): Pro
       thumbnail,
       techStack: asArray<string>(dto.technologies),
       demoHref: text(dto.demoUrl, "#"),
+      categorySlug: dto.category?.slug || undefined,
       categoryLabel: dto.category?.name ? localized(locale, dto.category.name, { en: "", vi: "" }) : undefined,
       hasVideo: !!dto.hasVideo,
       videoDuration: text(dto.videoDuration, "") || undefined,
@@ -91,6 +92,35 @@ export function useProjects(): Project[] {
   const locale = useContentLocale();
   const dtos = usePublicData<ProjectDto[]>("/public/projects", { query: PROJECT_QUERY });
   return useMemo(() => mapProjects(locale, dtos), [locale, dtos]);
+}
+
+// ---------------------------------------------------------------------------
+// Project categories (GET /public/projects/categories), used by the /du-an filter pills
+// ---------------------------------------------------------------------------
+
+interface ProjectCategoryDto {
+  slug?: string;
+  name?: string;
+  projectCount?: number;
+}
+
+export interface ProjectCategoryFilter {
+  slug: string;
+  label: { en: string; vi: string };
+}
+
+export function useProjectCategories(): ProjectCategoryFilter[] {
+  const locale = useContentLocale();
+  const dtos = usePublicData<ProjectCategoryDto[]>("/public/projects/categories");
+  return useMemo(() => {
+    const mapped: ProjectCategoryFilter[] = [];
+    for (const dto of asArray<ProjectCategoryDto>(dtos)) {
+      if (typeof dto.slug !== "string" || dto.slug === "" || !dto.name || dto.projectCount === 0) continue;
+      mapped.push({ slug: dto.slug, label: localized(locale, dto.name, { en: dto.name, vi: dto.name }) });
+    }
+    if (mapped.length > 0) return mapped;
+    return staticServices.map((s) => ({ slug: s.slug, label: s.title }));
+  }, [locale, dtos]);
 }
 
 // ---------------------------------------------------------------------------

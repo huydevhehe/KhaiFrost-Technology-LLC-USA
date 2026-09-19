@@ -1,5 +1,7 @@
 import { useMemo } from "react";
-import { asArray, text, usePublicData } from "./store";
+import type { ServiceCategoryStat } from "@/types";
+import { categoryIcon } from "./serviceDetail";
+import { asArray, localized, text, useContentLocale, usePublicData } from "./store";
 
 // GET /public/pages/by-path?path=/... : page composition (sections with free-form content per section key).
 
@@ -54,4 +56,27 @@ function normalizeSpace(value: string): string {
 export function headlineLines(apiHeadline: string, line1: string, line2: string): { line1: string; line2: string | null } {
   const same = normalizeSpace(apiHeadline) === normalizeSpace(`${line1} ${line2}`);
   return same ? { line1, line2 } : { line1: apiHeadline, line2: null };
+}
+
+interface PageStatDto {
+  icon?: string;
+  value?: string;
+  label?: string;
+  description?: string;
+}
+
+/** Stats strip stored as `{ items: [{ icon, value, label, description }] }` in a page section. */
+export function usePageStats(path: string, sectionKey: string, fallback: ServiceCategoryStat[]): ServiceCategoryStat[] {
+  const locale = useContentLocale();
+  const content = useSection(path, sectionKey);
+  return useMemo(() => {
+    const items = asArray<PageStatDto>(content.items);
+    if (items.length === 0) return fallback;
+    return items.map((item, i) => ({
+      icon: categoryIcon(item.icon, fallback[i]?.icon ?? "rocket"),
+      value: text(item.value, fallback[i]?.value ?? ""),
+      label: localized(locale, item.label, fallback[i]?.label ?? { en: "", vi: "" }),
+      description: localized(locale, item.description, fallback[i]?.description ?? { en: "", vi: "" }),
+    }));
+  }, [content, fallback, locale]);
 }
