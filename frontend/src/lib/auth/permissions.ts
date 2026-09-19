@@ -17,7 +17,7 @@ export function isStaff(user: AuthUser | null | undefined): boolean {
 export function roleLabel(role: AuthUser["role"]): string {
   switch (role) {
     case "owner":
-      return "Chủ sở hữu";
+      return "Quản trị viên.";
     case "admin":
       return "Quản trị viên";
     case "staff":

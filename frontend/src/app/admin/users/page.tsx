@@ -19,7 +19,7 @@ import { Pager } from "@/components/admin/system/Pager";
 import { AccountStatusBadge, InitialsAvatar, RoleBadge } from "@/components/admin/people/peopleUi";
 import { TemporaryPasswordDialog } from "@/components/admin/people/TemporaryPasswordDialog";
 import {
-  STAFF_ROLES,
+  visibleRoles,
   USER_ROLE_LABELS,
   USER_STATUS_LABELS,
   canManageUser,
@@ -142,7 +142,7 @@ export default function AdminUsersPage() {
             onChange={(event) => setRoleFilter(event.target.value as StaffRole | "")}
           >
             <option value="">Tất cả vai trò</option>
-            {STAFF_ROLES.map((role) => (
+            {visibleRoles(user?.role).map((role) => (
               <option key={role} value={role}>
                 {USER_ROLE_LABELS[role]}
               </option>

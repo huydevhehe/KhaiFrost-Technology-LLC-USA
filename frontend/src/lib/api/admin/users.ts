@@ -46,7 +46,8 @@ export interface CreateUserInput {
   fullName: string;
   email: string;
   phone: string;
-  role: StaffRole;
+  /** Optional: the server defaults to the only role the signed-in user may create. */
+  role?: StaffRole;
   /** Omit to let the server generate a temporary password. */
   password?: string;
 }
@@ -76,14 +77,14 @@ export const USER_LIMITS = {
 } as const;
 
 export const USER_ROLE_LABELS: Record<StaffRole, string> = {
-  owner: "Chủ sở hữu",
+  owner: "Quản trị viên.",
   admin: "Quản trị viên",
   staff: "Nhân viên",
 };
 
 export const USER_ROLE_DESCRIPTIONS: Record<StaffRole, string> = {
-  owner: "Toàn quyền hệ thống, quản lý được mọi tài khoản nội bộ.",
-  admin: "Quản trị nội dung và chỉ quản lý được tài khoản nhân viên.",
+  owner: "Toàn quyền hệ thống. Chỉ hiển thị với các tài khoản cùng vai trò.",
+  admin: "Quản trị nội dung, tạo và quản lý tài khoản nhân viên và khách hàng.",
   staff: "Biên tập nội dung trong phạm vi được cấp quyền.",
 };
 
@@ -92,14 +93,22 @@ export const USER_STATUS_LABELS: Record<UserStatus, string> = {
   locked: "Đã khoá",
 };
 
-/** Roles the signed-in user may create or assign (owner: all, admin: staff only). */
+/**
+ * Roles the signed-in user may create or assign to an existing account
+ * (owner: admin or staff, admin: staff only). Nobody can assign the owner role.
+ */
 export function assignableRoles(actorRole: Role | undefined): StaffRole[] {
-  if (actorRole === "owner") return ["owner", "admin", "staff"];
+  if (actorRole === "owner") return ["admin", "staff"];
   if (actorRole === "admin") return ["staff"];
   return [];
 }
 
-/** True when the signed-in user may edit/lock/delete the given account. */
+/** Roles the signed-in user may know about: owner accounts are invisible to everyone else. */
+export function visibleRoles(actorRole: Role | undefined): StaffRole[] {
+  return actorRole === "owner" ? [...STAFF_ROLES] : STAFF_ROLES.filter((role) => role !== "owner");
+}
+
+/** True when the signed-in user may edit/lock/delete the given account (never an owner). */
 export function canManageUser(actorRole: Role | undefined, targetRole: Role): boolean {
   return assignableRoles(actorRole).includes(targetRole as StaffRole);
 }

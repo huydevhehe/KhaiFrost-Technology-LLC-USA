@@ -86,7 +86,7 @@ export function UserForm({
   const [fullName, setFullName] = useState(initial?.fullName ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
   const [phone, setPhone] = useState(initial?.phone ?? "");
-  const [role, setRole] = useState<StaffRole>(initial?.role ?? roles[roles.length - 1] ?? "staff");
+  const [role, setRole] = useState<StaffRole>(initial?.role ?? roles[0] ?? "staff");
   const [passwordMode, setPasswordMode] = useState<PasswordMode>("temporary");
   const [password, setPassword] = useState("");
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
@@ -262,7 +262,7 @@ export function UserForm({
               ))}
               {roleLocked && (
                 <p className="text-xs text-slate-500">
-                  Bạn không thể tự đổi vai trò của chính mình. Hãy nhờ một chủ sở hữu khác thực hiện.
+                  Bạn không thể tự đổi vai trò của chính mình.
                 </p>
               )}
               <FieldError message={errors.role} />
