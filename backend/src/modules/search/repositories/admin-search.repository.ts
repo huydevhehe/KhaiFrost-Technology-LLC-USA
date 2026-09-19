@@ -1,3 +1,4 @@
+import { visibleBackOfficeRoles } from '../../../common/constants/owner-visibility';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Brackets, DataSource, EntityTarget, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
@@ -49,14 +50,18 @@ interface OwnSearchOptions {
   restrict?: (builder: SelectQueryBuilder<ObjectLiteral>) => void;
 }
 
-const STAFF_ROLES = [Role.OWNER, Role.ADMIN, Role.STAFF];
 const STATUS_AND_SLUG = `item.status || ' / ' || item.slug`;
 
 @Injectable()
 export class AdminSearchRepository {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-  search(type: AdminSearchType, pattern: string, limit: number): Promise<AdminSearchRow[]> {
+  search(
+    type: AdminSearchType,
+    pattern: string,
+    limit: number,
+    viewerRole?: Role | null,
+  ): Promise<AdminSearchRow[]> {
     switch (type) {
       case AdminSearchType.POSTS:
         return this.searchTranslated(
@@ -150,7 +155,9 @@ export class AdminSearchRepository {
             title: 'item.fullName',
             subtitle: 'item.email',
             restrict: (builder) =>
-              builder.andWhere('item.role IN (:...roles)', { roles: STAFF_ROLES }),
+              builder.andWhere('item.role IN (:...roles)', {
+                roles: visibleBackOfficeRoles(viewerRole),
+              }),
           },
           pattern,
           limit,

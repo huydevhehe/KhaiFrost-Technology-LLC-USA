@@ -32,7 +32,7 @@ export class AdminSearchService {
     const groups = await Promise.all(
       types.map(async (type) => ({
         type,
-        rows: await this.repository.search(type, pattern, query.limit),
+        rows: await this.repository.search(type, pattern, query.limit, user.role),
       })),
     );
 

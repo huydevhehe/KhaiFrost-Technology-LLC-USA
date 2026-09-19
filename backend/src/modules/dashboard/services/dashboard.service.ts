@@ -5,6 +5,7 @@ import { Permission } from '../../../common/constants/permissions';
 import { roleHasPermission } from '../../../common/constants/role-permissions';
 import { Locale } from '../../../common/enums/locale.enum';
 import { PublicationStatus } from '../../../common/enums/publication-status.enum';
+import { canSeeOwners } from '../../../common/constants/owner-visibility';
 import { Role } from '../../../common/enums/role.enum';
 import { AuthenticatedUser } from '../../../common/interfaces/authenticated-user.interface';
 import { AuditLogEntry } from '../../audit-log/entities/audit-log-entry.entity';
@@ -39,6 +40,11 @@ import {
   GroupedCount,
 } from '../repositories/dashboard-counts.repository';
 
+import {
+  maskOwnerActor,
+  restrictAuditToViewer,
+} from '../../audit-log/utils/audit-owner-visibility';
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const STAFF_ROLES: string[] = [Role.OWNER, Role.ADMIN, Role.STAFF];
 
@@ -49,7 +55,7 @@ export class DashboardService {
     @InjectRepository(AuditLogEntry) private readonly auditEntries: Repository<AuditLogEntry>,
   ) {}
 
-  async getSummary(locale: Locale): Promise<DashboardSummaryResponseDto> {
+  async getSummary(locale: Locale, viewerRole?: Role | null): Promise<DashboardSummaryResponseDto> {
     const now = Date.now();
     const window: CountWindow = {
       since: new Date(now - TREND_WINDOW_DAYS * DAY_MS),
@@ -63,7 +69,9 @@ export class DashboardService {
         this.counts.countGrouped(ServiceCategory, 'status', window),
         this.counts.countGrouped(Testimonial, 'status', window),
         this.counts.countGrouped(ClientLocation, 'status', window),
-        this.counts.countGrouped(User, 'role', window),
+        this.counts
+          .countGrouped(User, 'role', window)
+          .then((rows) => rows.filter((row) => canSeeOwners(viewerRole) || row.key !== Role.OWNER)),
         this.counts.countGrouped(Contact, 'status', window),
         this.counts.countGrouped(MediaAsset, null, window),
       ]);
@@ -95,10 +103,11 @@ export class DashboardService {
         restricted: `${RESTRICTED_AUDIT_ACTION_PREFIX}%`,
       });
     }
+    await restrictAuditToViewer(builder, this.auditEntries.manager, user.role);
     const entries = await builder.getMany();
     return entries.map((entry) => ({
       id: entry.id,
-      actorName: entry.actorName,
+      actorName: maskOwnerActor(entry, user.role).actorName,
       action: entry.action,
       entityName: entry.entityName,
       entityId: entry.entityId,

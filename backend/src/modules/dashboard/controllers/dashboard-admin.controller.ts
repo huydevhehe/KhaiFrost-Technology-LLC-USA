@@ -18,8 +18,11 @@ export class DashboardAdminController {
   @RequirePermissions(Permission.DASHBOARD_READ)
   @ApiOperation({ summary: 'Business counters with the change against the previous 30 days' })
   @ApiOkResponse({ type: DashboardSummaryResponseDto })
-  summary(@Query() query: LocaleQueryDto): Promise<DashboardSummaryResponseDto> {
-    return this.dashboard.getSummary(query.locale);
+  summary(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: LocaleQueryDto,
+  ): Promise<DashboardSummaryResponseDto> {
+    return this.dashboard.getSummary(query.locale, user.role);
   }
 
   @Get('recent-activity')
