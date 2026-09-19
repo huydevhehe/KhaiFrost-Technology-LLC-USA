@@ -15,6 +15,10 @@ i18n.use(initReactI18next).init({
   interpolation: {
     escapeValue: false,
   },
+  // Re-render translated components when the API strings are merged in after load.
+  react: {
+    bindI18nStore: "added",
+  },
 });
 
 export default i18n;
