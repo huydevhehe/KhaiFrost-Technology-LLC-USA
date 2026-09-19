@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { clientLocations } from "@/content/clientLocations";
+import { useClientLocations } from "@/lib/content/catalog";
+import { useSectionText } from "@/lib/content/pages";
 import { ClientLocation } from "@/types";
 
 function ClientMarker({ client }: { client: ClientLocation }) {
@@ -67,13 +68,15 @@ function ClientMarker({ client }: { client: ClientLocation }) {
 
 export function GlobalClientsMap() {
   const { t } = useTranslation();
+  const clientLocations = useClientLocations();
+  const section = useSectionText("/", "global-clients");
 
   return (
     <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-[1600px] px-6">
         <div className="mb-10 text-center">
-          <SectionEyebrow>{t("globalClients.eyebrow")}</SectionEyebrow>
-          <SectionHeading>{t("globalClients.heading")}</SectionHeading>
+          <SectionEyebrow>{section("eyebrow", t("globalClients.eyebrow"))}</SectionEyebrow>
+          <SectionHeading>{section("heading", t("globalClients.heading"))}</SectionHeading>
         </div>
         <div className="relative mx-auto aspect-[2/1] w-full rounded-2xl bg-navy shadow-lg">
           <div className="absolute inset-0 overflow-hidden rounded-2xl">

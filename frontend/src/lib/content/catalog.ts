@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { blogPosts } from "@/content/blogPosts";
+import { clientLocations as staticClientLocations } from "@/content/clientLocations";
+import { testimonials as staticTestimonials } from "@/content/testimonials";
 import { projects as staticProjects } from "@/content/projects";
 import { services as staticServices } from "@/content/services";
-import type { BlogPost, Project, ServiceIcon, ServiceItem } from "@/types";
+import type { BlogPost, ClientLocation, Project, ServiceIcon, ServiceItem, Testimonial } from "@/types";
 import { asArray, localized, text, useContentLocale, usePublicData, type ContentLocale } from "./store";
 
 const SERVICE_ICONS: readonly ServiceIcon[] = ["ai", "cloud", "security", "code"];
@@ -166,4 +168,87 @@ export function useBlogPosts(count = 4): BlogPost[] {
   const locale = useContentLocale();
   const dtos = usePublicData<PostDto[]>("/public/posts", { query: { pageSize: count } });
   return useMemo(() => mapPosts(locale, dtos).slice(0, count), [locale, dtos, count]);
+}
+
+// ---------------------------------------------------------------------------
+// Client locations (GET /public/client-locations): markers of the "trusted worldwide" map
+// ---------------------------------------------------------------------------
+
+interface ClientLocationDto {
+  id?: string;
+  name?: string;
+  role?: string;
+  country?: string;
+  quote?: string;
+  x?: number;
+  y?: number;
+  avatarUrl?: string | null;
+  coverImageUrl?: string | null;
+}
+
+function mapClientLocations(locale: ContentLocale, dtos: ClientLocationDto[] | undefined): ClientLocation[] {
+  const mapped: ClientLocation[] = [];
+  for (const dto of asArray<ClientLocationDto>(dtos)) {
+    if (typeof dto.id !== "string" || typeof dto.x !== "number" || typeof dto.y !== "number") continue;
+    const fallback = staticClientLocations[mapped.length];
+    const avatar = text(dto.avatarUrl, fallback?.avatar ?? "");
+    const coverImage = text(dto.coverImageUrl, fallback?.coverImage ?? "");
+    if (avatar === "" || coverImage === "") continue;
+    mapped.push({
+      id: dto.id,
+      name: text(dto.name, fallback?.name ?? ""),
+      role: text(dto.role, fallback?.role ?? ""),
+      country: text(dto.country, fallback?.country ?? ""),
+      quote: localized(locale, dto.quote, fallback?.quote ?? { en: "", vi: "" }),
+      avatar,
+      coverImage,
+      x: dto.x,
+      y: dto.y,
+    });
+  }
+  return mapped.length > 0 ? mapped : staticClientLocations;
+}
+
+export function useClientLocations(): ClientLocation[] {
+  const locale = useContentLocale();
+  const dtos = usePublicData<ClientLocationDto[]>("/public/client-locations", { query: { pageSize: 100 } });
+  return useMemo(() => mapClientLocations(locale, dtos), [locale, dtos]);
+}
+
+// ---------------------------------------------------------------------------
+// Testimonials (GET /public/testimonials)
+// ---------------------------------------------------------------------------
+
+interface TestimonialDto {
+  id?: string;
+  authorName?: string;
+  authorRole?: string | null;
+  company?: string | null;
+  location?: string | null;
+  avatarUrl?: string | null;
+  quote?: string;
+}
+
+function mapTestimonials(locale: ContentLocale, dtos: TestimonialDto[] | undefined): Testimonial[] {
+  const mapped: Testimonial[] = [];
+  for (const dto of asArray<TestimonialDto>(dtos)) {
+    if (typeof dto.id !== "string") continue;
+    const fallback = staticTestimonials[mapped.length];
+    const thumbnail = text(dto.avatarUrl, fallback?.thumbnail ?? "");
+    if (thumbnail === "") continue;
+    mapped.push({
+      id: dto.id,
+      quote: localized(locale, dto.quote, fallback?.quote ?? { en: "", vi: "" }),
+      name: text(dto.authorName, fallback?.name ?? ""),
+      role: text(dto.location ?? dto.authorRole ?? dto.company, fallback?.role ?? ""),
+      thumbnail,
+    });
+  }
+  return mapped.length > 0 ? mapped : staticTestimonials;
+}
+
+export function useTestimonials(): Testimonial[] {
+  const locale = useContentLocale();
+  const dtos = usePublicData<TestimonialDto[]>("/public/testimonials");
+  return useMemo(() => mapTestimonials(locale, dtos), [locale, dtos]);
 }
