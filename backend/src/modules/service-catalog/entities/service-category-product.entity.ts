@@ -1,0 +1,24 @@
+import { Column, Entity, JoinColumn, ManyToOne, Index } from 'typeorm';
+import { MediaAsset } from '../../media/entities/media-asset.entity';
+import { CategoryChildEntity } from './category-child.entity';
+
+@Entity('service_category_products')
+@Index(['categoryId'])
+export class ServiceCategoryProduct extends CategoryChildEntity {
+  @Column({ type: 'uuid', nullable: true })
+  imageId!: string | null;
+
+  @ManyToOne(() => MediaAsset, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'image_id' })
+  image?: MediaAsset | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  durationLabel!: string | null;
+
+  @Column({ type: 'text', array: true, default: () => "'{}'" })
+  tags!: string[];
+
+  // Fragment of the category page this product links to (for example "ai-receptionist")
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  anchor!: string | null;
+}
