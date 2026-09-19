@@ -14,6 +14,7 @@ import { configureApplication } from '../../../src/bootstrap/configure-app';
 import { CommonModule } from '../../../src/common/common.module';
 import { AllExceptionsFilter } from '../../../src/common/filters/all-exceptions.filter';
 import { validationExceptionFactory } from '../../../src/common/filters/validation-exception.factory';
+import { OwnerIdentityMaskInterceptor } from '../../../src/common/interceptors/owner-identity-mask.interceptor';
 import { ResponseEnvelopeInterceptor } from '../../../src/common/interceptors/response-envelope.interceptor';
 import {
   appConfig,
@@ -138,6 +139,7 @@ export async function createIdentityTestingContext(
         AuditColumnsSubscriber,
         { provide: APP_FILTER, useClass: AllExceptionsFilter },
         { provide: APP_INTERCEPTOR, useClass: ResponseEnvelopeInterceptor },
+        { provide: APP_INTERCEPTOR, useClass: OwnerIdentityMaskInterceptor },
         {
           provide: APP_PIPE,
           useValue: new ValidationPipe({
