@@ -17,32 +17,50 @@ import {
   ScrollText,
   Settings,
   Snowflake,
+  Package,
+  UserRound,
+  Navigation,
+  Languages,
+  HeartPulse,
+  MapPin,
 } from "lucide-react";
 import type { ComponentType } from "react";
+import { PERMISSIONS, type Permission } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 interface NavItem {
   href: string;
   label: string;
   icon: ComponentType<{ size?: number; className?: string }>;
+  /** Item is hidden unless the user holds this permission. */
+  permission: Permission;
 }
 
 const navItems: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/blog", label: "Blog", icon: FileText },
-  { href: "/admin/projects", label: "Projects", icon: Briefcase },
-  { href: "/admin/services", label: "Services", icon: Wrench },
-  { href: "/admin/testimonials", label: "Testimonials", icon: Star },
-  { href: "/admin/pages", label: "Pages", icon: Layers },
-  { href: "/admin/seo", label: "SEO", icon: Search },
-  { href: "/admin/media", label: "Media", icon: ImageIcon },
-  { href: "/admin/contacts", label: "Contacts", icon: Mail },
-  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, permission: PERMISSIONS.DASHBOARD_READ },
+  { href: "/admin/users", label: "Users", icon: Users, permission: PERMISSIONS.USER_READ },
+  { href: "/admin/customers", label: "Khách hàng", icon: UserRound, permission: PERMISSIONS.CUSTOMER_READ },
+  { href: "/admin/blog", label: "Bài viết", icon: FileText, permission: PERMISSIONS.POST_READ },
+  { href: "/admin/products", label: "Sản phẩm", icon: Package, permission: PERMISSIONS.PRODUCT_READ },
+  { href: "/admin/projects", label: "Projects", icon: Briefcase, permission: PERMISSIONS.PROJECT_READ },
+  { href: "/admin/services", label: "Services", icon: Wrench, permission: PERMISSIONS.SERVICE_READ },
+  { href: "/admin/testimonials", label: "Testimonials", icon: Star, permission: PERMISSIONS.TESTIMONIAL_READ },
+  { href: "/admin/client-locations", label: "Bản đồ khách hàng", icon: MapPin, permission: PERMISSIONS.CLIENT_LOCATION_READ },
+  { href: "/admin/pages", label: "Pages", icon: Layers, permission: PERMISSIONS.PAGE_READ },
+  { href: "/admin/navigation", label: "Điều hướng", icon: Navigation, permission: PERMISSIONS.NAVIGATION_MANAGE },
+  { href: "/admin/translations", label: "Chuỗi giao diện", icon: Languages, permission: PERMISSIONS.UI_TRANSLATION_READ },
+  { href: "/admin/seo", label: "SEO", icon: Search, permission: PERMISSIONS.SEO_READ },
+  { href: "/admin/media", label: "Media", icon: ImageIcon, permission: PERMISSIONS.MEDIA_READ },
+  { href: "/admin/contacts", label: "Contacts", icon: Mail, permission: PERMISSIONS.CONTACT_READ },
+  { href: "/admin/content-health", label: "Kiểm tra nội dung", icon: HeartPulse, permission: PERMISSIONS.CONTENT_HEALTH_READ },
+  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, permission: PERMISSIONS.AUDIT_LOG_READ },
+  { href: "/admin/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.SETTING_READ },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { hasPermission } = useAuth();
+  const visibleItems = navItems.filter((item) => hasPermission(item.permission));
 
   return (
     <aside className="relative flex h-screen w-60 shrink-0 flex-col overflow-hidden text-white">
@@ -63,7 +81,7 @@ export function AdminSidebar() {
       </div>
       <nav className="relative flex-1 overflow-y-auto px-3 pb-6">
         <ul className="flex flex-col gap-1">
-          {navItems.map((item) => {
+          {visibleItems.map((item) => {
             const isActive =
               item.href === "/admin" ? pathname === "/admin" : pathname?.startsWith(item.href);
             const Icon = item.icon;
