@@ -9,9 +9,12 @@ import { applyUserSearch } from '../../users/utils/apply-user-search';
 import { User } from '../../users/entities/user.entity';
 import { UserStatus } from '../../users/enums/user-status.enum';
 import { UsersService } from '../../users/services/users.service';
+import { generateTemporaryPassword } from '../../users/services/temporary-password';
 import {
   CUSTOMER_SORT_FIELDS,
+  CreateCustomerDto,
   CustomerResponseDto,
+  CustomerWithTemporaryPasswordDto,
   ListCustomersQueryDto,
 } from '../dto/customer.dto';
 import { toCustomerResponse } from '../mappers/customer.mapper';
@@ -38,6 +41,20 @@ export class CustomersAdminService {
 
   async get(id: string): Promise<CustomerResponseDto> {
     return (await this.toResponses([await this.getCustomer(id)]))[0];
+  }
+
+  async create(dto: CreateCustomerDto): Promise<CustomerWithTemporaryPasswordDto> {
+    const generated = dto.password ? undefined : generateTemporaryPassword();
+    const user = await this.usersService.create({
+      fullName: dto.fullName,
+      email: dto.email,
+      phone: dto.phone,
+      role: Role.CUSTOMER,
+      password: dto.password ?? (generated as string),
+      mustChangePassword: generated !== undefined,
+    });
+    const [customer] = await this.toResponses([user]);
+    return { ...customer, temporaryPassword: generated };
   }
 
   async lock(id: string): Promise<CustomerResponseDto> {

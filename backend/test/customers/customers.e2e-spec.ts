@@ -67,7 +67,7 @@ describe('customers (real access control guard)', () => {
   const cookie = (jar: Record<string, string>) => cookieHeader(jar);
 
   describe('admin API', () => {
-    it('is closed to anonymous, customer and staff callers', async () => {
+    it('is closed to anonymous and customer callers, and staff can only view and create', async () => {
       const customer = await registerCustomer();
       const staff = await staffJar(Role.STAFF);
       await request(server()).get('/api/v1/admin/customers').expect(401);
@@ -78,7 +78,99 @@ describe('customers (real access control guard)', () => {
       await request(server())
         .get('/api/v1/admin/customers')
         .set('Cookie', cookie(staff))
+        .expect(200);
+      await request(server())
+        .post(`/api/v1/admin/customers/${customer.id}/lock`)
+        .set('Cookie', cookie(staff))
         .expect(403);
+      await request(server())
+        .delete(`/api/v1/admin/customers/${customer.id}`)
+        .set('Cookie', cookie(staff))
+        .expect(403);
+    });
+
+    describe('create', () => {
+      const payload = () => {
+        const { fullName, email, phone } = details();
+        return { fullName, email: email.toUpperCase(), phone };
+      };
+
+      it('lets admin, staff and owner create a customer with a one-time temporary password', async () => {
+        for (const role of [Role.ADMIN, Role.STAFF, Role.OWNER]) {
+          const jar = await staffJar(role);
+          const body = payload();
+          const created = await request(server())
+            .post('/api/v1/admin/customers')
+            .set('Cookie', cookie(jar))
+            .send(body)
+            .expect(201);
+          expect(created.body.data.temporaryPassword).toHaveLength(16);
+          expect(created.body.data).toMatchObject({
+            fullName: body.fullName,
+            email: body.email.toLowerCase(),
+            status: 'active',
+          });
+          expect(created.body.data.role).toBeUndefined();
+          const stored = await users
+            .createQueryBuilder('u')
+            .addSelect('u.passwordHash')
+            .where('u.id = :id', { id: created.body.data.id })
+            .getOneOrFail();
+          expect(stored.role).toBe(Role.CUSTOMER);
+          expect(stored.mustChangePassword).toBe(true);
+          const login = await request(server())
+            .post('/api/v1/auth/login')
+            .send({
+              identifier: body.email,
+              password: created.body.data.temporaryPassword,
+            })
+            .expect(200);
+          expect(login.body.data.user.role).toBe('customer');
+          const fetched = await request(server())
+            .get(`/api/v1/admin/customers/${created.body.data.id}`)
+            .set('Cookie', cookie(jar))
+            .expect(200);
+          expect(fetched.body.data.temporaryPassword).toBeUndefined();
+        }
+      });
+
+      it('accepts an explicit password, ignores role input and audits the creation', async () => {
+        const staff = await staffJar(Role.STAFF);
+        const body = { ...payload(), password: PASSWORD };
+        const created = await request(server())
+          .post('/api/v1/admin/customers')
+          .set('Cookie', cookie(staff))
+          .send(body)
+          .expect(201);
+        expect(created.body.data.temporaryPassword).toBeUndefined();
+        await request(server())
+          .post('/api/v1/admin/customers')
+          .set('Cookie', cookie(staff))
+          .send({ ...payload(), role: 'admin' })
+          .expect(400);
+        const entry = await context.dataSource
+          .getRepository(AuditLogEntry)
+          .findOneByOrFail({ action: 'customer.created', entityId: created.body.data.id });
+        expect(entry).toMatchObject({ actorRole: 'staff', entityName: 'User' });
+      });
+
+      it('validates input, reports clashes and is closed to customers and anonymous callers', async () => {
+        const admin = await staffJar(Role.ADMIN);
+        const existing = await registerCustomer();
+        const send = (body: object) =>
+          request(server()).post('/api/v1/admin/customers').set('Cookie', cookie(admin)).send(body);
+        expect((await send({ ...payload(), email: 'bad' })).status).toBe(400);
+        expect((await send({ ...payload(), phone: '1' })).status).toBe(400);
+        expect((await send({ ...payload(), password: 'short' })).status).toBe(400);
+        const clash = await send({ ...payload(), email: existing.identity.email });
+        expect(clash.status).toBe(409);
+        await request(server()).post('/api/v1/admin/customers').send(payload()).expect(401);
+        await request(server())
+          .post('/api/v1/admin/customers')
+          .set('Cookie', cookie(existing.jar))
+          .send(payload())
+          .expect(403);
+      });
     });
 
     it('lists only customers with search, status filter and pagination', async () => {

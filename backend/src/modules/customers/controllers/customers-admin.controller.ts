@@ -1,4 +1,5 @@
 import {
+  Body,
   Delete,
   Get,
   HttpCode,
@@ -14,7 +15,12 @@ import { AdminController } from '../../../common/decorators/admin-controller.dec
 import { AuditAction } from '../../../common/decorators/audit-action.decorator';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 import { PaginatedResponseDto } from '../../../common/dto/paginated-response.dto';
-import { CustomerResponseDto, ListCustomersQueryDto } from '../dto/customer.dto';
+import {
+  CreateCustomerDto,
+  CustomerResponseDto,
+  CustomerWithTemporaryPasswordDto,
+  ListCustomersQueryDto,
+} from '../dto/customer.dto';
 import { CustomersAdminService } from '../services/customers-admin.service';
 
 @AdminController('customers')
@@ -33,6 +39,14 @@ export class CustomersAdminController {
   @ApiOperation({ summary: 'Get a customer' })
   get(@Param('id', ParseUUIDPipe) id: string): Promise<CustomerResponseDto> {
     return this.customers.get(id);
+  }
+
+  @Post()
+  @RequirePermissions(Permission.CUSTOMER_CREATE)
+  @AuditAction('customer.created', 'User')
+  @ApiOperation({ summary: 'Create a customer account (temporary password returned once)' })
+  create(@Body() dto: CreateCustomerDto): Promise<CustomerWithTemporaryPasswordDto> {
+    return this.customers.create(dto);
   }
 
   @Post(':id/lock')

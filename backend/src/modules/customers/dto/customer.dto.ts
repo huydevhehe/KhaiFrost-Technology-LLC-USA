@@ -1,6 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 import { Locale } from '../../../common/enums/locale.enum';
 import { IsNormalizablePhone } from '../../../common/validators/is-normalizable-phone.validator';
@@ -8,6 +17,8 @@ import { UserStatus } from '../../users/enums/user-status.enum';
 
 export const CUSTOMER_SORT_FIELDS = ['createdAt', 'fullName', 'email', 'status', 'lastLoginAt'];
 
+const trimLower = ({ value }: { value: unknown }) =>
+  typeof value === 'string' ? value.trim().toLowerCase() : value;
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
 export class ListCustomersQueryDto extends PaginationQueryDto {
@@ -29,6 +40,46 @@ export class CustomerResponseDto {
   lastLoginAt!: string | null;
   @ApiProperty({ format: 'date-time' }) createdAt!: string;
   @ApiProperty() version!: number;
+}
+
+export class CustomerWithTemporaryPasswordDto extends CustomerResponseDto {
+  @ApiPropertyOptional({
+    description: 'Shown exactly once; the customer must change it at first login',
+  })
+  temporaryPassword?: string;
+}
+
+export class CreateCustomerDto {
+  @ApiProperty({ maxLength: 150 })
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(150)
+  fullName!: string;
+
+  @ApiProperty({ maxLength: 254 })
+  @Transform(trimLower)
+  @IsEmail()
+  @MaxLength(254)
+  email!: string;
+
+  @ApiProperty({ maxLength: 32, description: 'Vietnamese or international (+country code)' })
+  @Transform(trim)
+  @IsString()
+  @MaxLength(32)
+  @IsNormalizablePhone()
+  phone!: string;
+
+  @ApiPropertyOptional({
+    minLength: 10,
+    maxLength: 128,
+    description: 'When omitted a temporary password is generated and returned once',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(10)
+  @MaxLength(128)
+  password?: string;
 }
 
 export class UpdateProfileDto {
