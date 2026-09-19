@@ -19,6 +19,7 @@ describe('post status transitions', () => {
     [PostWorkflowAction.ARCHIVE, IN_REVIEW, ARCHIVED],
     [PostWorkflowAction.ARCHIVE, PUBLISHED, ARCHIVED],
     [PostWorkflowAction.RESTORE, ARCHIVED, DRAFT],
+    [PostWorkflowAction.REJECT, IN_REVIEW, DRAFT],
   ];
 
   it.each(allowed)('%s: %s -> %s is allowed', (action, from, to) => {
@@ -37,6 +38,9 @@ describe('post status transitions', () => {
     [PostWorkflowAction.UNPUBLISH, ARCHIVED],
     [PostWorkflowAction.ARCHIVE, ARCHIVED],
     [PostWorkflowAction.RESTORE, DRAFT],
+    [PostWorkflowAction.REJECT, DRAFT],
+    [PostWorkflowAction.REJECT, PUBLISHED],
+    [PostWorkflowAction.REJECT, ARCHIVED],
     [PostWorkflowAction.RESTORE, IN_REVIEW],
     [PostWorkflowAction.RESTORE, PUBLISHED],
   ];

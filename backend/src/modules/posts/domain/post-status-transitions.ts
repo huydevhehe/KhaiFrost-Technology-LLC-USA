@@ -8,6 +8,7 @@ export enum PostWorkflowAction {
   UNPUBLISH = 'unpublish',
   ARCHIVE = 'archive',
   RESTORE = 'restore',
+  REJECT = 'reject',
 }
 
 interface Transition {
@@ -31,6 +32,11 @@ export const POST_TRANSITIONS: Readonly<Record<PostWorkflowAction, Transition>> 
   [PostWorkflowAction.ARCHIVE]: {
     from: [PublicationStatus.DRAFT, PublicationStatus.IN_REVIEW, PublicationStatus.PUBLISHED],
     to: PublicationStatus.ARCHIVED,
+  },
+  // A reviewer sends a post in review back to its author
+  [PostWorkflowAction.REJECT]: {
+    from: [PublicationStatus.IN_REVIEW],
+    to: PublicationStatus.DRAFT,
   },
   [PostWorkflowAction.RESTORE]: {
     from: [PublicationStatus.ARCHIVED],

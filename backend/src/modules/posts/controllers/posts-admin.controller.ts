@@ -107,6 +107,18 @@ export class PostsAdminController {
     return this.postsAdmin.unpublish(id, user);
   }
 
+  @Post(':id/reject')
+  @HttpCode(200)
+  @RequirePermissions(Permission.POST_PUBLISH)
+  @AuditAction('post.rejected', 'Post')
+  @ApiOperation({ summary: 'Send a post in review back to draft' })
+  reject(
+    @Param('id', PostIdPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<AdminPostDetailResponse> {
+    return this.postsAdmin.reject(id, user);
+  }
+
   @Post(':id/archive')
   @HttpCode(200)
   @RequirePermissions(Permission.POST_PUBLISH)

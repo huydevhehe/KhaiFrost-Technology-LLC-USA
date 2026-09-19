@@ -236,6 +236,10 @@ export class PostsAdminService {
     return this.transition(id, PostWorkflowAction.UNPUBLISH, user);
   }
 
+  reject(id: string, user: AuthenticatedUser): Promise<AdminPostDetailResponse> {
+    return this.transition(id, PostWorkflowAction.REJECT, user);
+  }
+
   archive(id: string, user: AuthenticatedUser): Promise<AdminPostDetailResponse> {
     return this.transition(id, PostWorkflowAction.ARCHIVE, user);
   }

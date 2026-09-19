@@ -71,6 +71,7 @@ describe('Posts admin API', () => {
       ],
       ['POST publish', (a) => api.post(`${ADMIN}/posts/${postId}/publish`, a), false],
       ['POST unpublish', (a) => api.post(`${ADMIN}/posts/${postId}/unpublish`, a), false],
+      ['POST reject', (a) => api.post(`${ADMIN}/posts/${postId}/reject`, a), false],
       ['POST archive', (a) => api.post(`${ADMIN}/posts/${postId}/archive`, a), false],
       ['POST restore', (a) => api.post(`${ADMIN}/posts/${postId}/restore`, a), false],
       ['DELETE posts/:id', (a) => api.delete(`${ADMIN}/posts/${NOT_EXISTING_ID}`, a), false],
@@ -524,6 +525,16 @@ describe('Posts admin API', () => {
       actor: TestActor = USERS.admin,
       body?: object,
     ) => api.post(`${ADMIN}/posts/${id}/${action}`, actor, body);
+
+    it('lets a reviewer send a post in review back to draft, and the author submit it again', async () => {
+      const post = await api.createPost({ translations: bothLanguages('Rejected') }, USERS.staff);
+      await transition(post.id, 'reject').expect(409);
+      await transition(post.id, 'submit-for-review', USERS.staff).expect(200);
+      await transition(post.id, 'reject', USERS.staff).expect(403);
+      const rejected = await transition(post.id, 'reject').expect(200);
+      expect(rejected.body.data.status).toBe('draft');
+      await transition(post.id, 'submit-for-review', USERS.staff).expect(200);
+    });
 
     it('walks draft -> in_review -> published -> draft -> archived -> draft', async () => {
       const post = await api.createPost({ translations: bothLanguages('Walk') }, USERS.staff);
