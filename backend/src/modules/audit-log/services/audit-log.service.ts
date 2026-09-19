@@ -6,6 +6,7 @@ import { RequestContextService } from '../../../common/context/request-context.s
 import { paginate, resolveSort } from '../../../common/dto/paginate';
 import { PaginatedResponseDto } from '../../../common/dto/paginated-response.dto';
 import { Role } from '../../../common/enums/role.enum';
+import { canSeeOwners } from '../../../common/constants/owner-visibility';
 import { containsPattern } from '../../../common/utils/escape-like-pattern';
 import { User } from '../../users/entities/user.entity';
 import {
@@ -17,6 +18,7 @@ import {
 import { AuditLogEntryResponseDto } from '../dto/audit-log-response.dto';
 import { AuditLogEntry } from '../entities/audit-log-entry.entity';
 import { toCsvLine } from '../utils/csv';
+import { maskOwnerActor, restrictAuditToViewer } from '../utils/audit-owner-visibility';
 import { sanitizeMetadata } from '../utils/sanitize-metadata';
 
 export interface AuditRecordInput {
@@ -103,34 +105,40 @@ export class AuditLogService {
   }
 
   async list(
+    viewerRole: Role | null | undefined,
     query: ListAuditLogsQueryDto,
   ): Promise<PaginatedResponseDto<AuditLogEntryResponseDto>> {
-    const builder = this.applyFilters(
-      this.entries.createQueryBuilder('entry'),
-      query,
-      query.search,
+    const builder = await this.restrict(
+      this.applyFilters(this.entries.createQueryBuilder('entry'), query, viewerRole, query.search),
+      viewerRole,
     );
     const sort = resolveSort(query, AUDIT_LOG_SORT_FIELDS, 'occurredAt');
     builder.orderBy(`entry.${sort.field}`, sort.order).addOrderBy('entry.id', 'DESC');
-    return paginate(builder, query, (entry) => this.toResponse(entry));
+    return paginate(builder, query, (entry) => this.toResponse(entry, viewerRole));
   }
 
   // Streams in batches so a large export never sits in memory; the upper bound freezes the result set
-  exportCsv(query: ExportAuditLogsQueryDto): Readable {
-    return Readable.from(this.generateCsv(query, new Date()));
+  exportCsv(viewerRole: Role | null | undefined, query: ExportAuditLogsQueryDto): Readable {
+    return Readable.from(this.generateCsv(viewerRole, query, new Date()));
   }
 
   private async *generateCsv(
+    viewerRole: Role | null | undefined,
     query: ExportAuditLogsQueryDto,
     startedAt: Date,
   ): AsyncGenerator<string> {
     yield '\uFEFF' + toCsvLine(EXPORT_HEADER);
     for (let offset = 0; offset < EXPORT_MAX_ROWS; offset += EXPORT_BATCH_SIZE) {
-      const rows = await this.applyFilters(
-        this.entries.createQueryBuilder('entry'),
-        query,
-        query.search,
-      )
+      const filtered = await this.restrict(
+        this.applyFilters(
+          this.entries.createQueryBuilder('entry'),
+          query,
+          viewerRole,
+          query.search,
+        ),
+        viewerRole,
+      );
+      const rows = await filtered
         .andWhere('entry.occurredAt <= :startedAt', { startedAt })
         .orderBy('entry.occurredAt', 'DESC')
         .addOrderBy('entry.id', 'DESC')
@@ -139,12 +147,13 @@ export class AuditLogService {
         .getMany();
       if (rows.length === 0) return;
       yield rows
-        .map((row) =>
-          toCsvLine([
+        .map((row) => {
+          const actor = maskOwnerActor(row, viewerRole);
+          return toCsvLine([
             row.occurredAt,
-            row.actorId,
-            row.actorName,
-            row.actorRole,
+            actor.actorId,
+            actor.actorName,
+            actor.actorRole,
             row.action,
             row.entityName,
             row.entityId,
@@ -153,8 +162,8 @@ export class AuditLogService {
             row.statusCode,
             row.userAgent,
             row.metadata,
-          ]),
-        )
+          ]);
+        })
         .join('');
       if (rows.length < EXPORT_BATCH_SIZE) return;
     }
@@ -163,18 +172,26 @@ export class AuditLogService {
   private applyFilters(
     builder: SelectQueryBuilder<AuditLogEntry>,
     filters: AuditLogFilterFieldsDto,
+    viewerRole: Role | null | undefined,
     search?: string,
   ): SelectQueryBuilder<AuditLogEntry> {
     if (filters.from) builder.andWhere('entry.occurredAt >= :from', { from: filters.from });
     if (filters.to) builder.andWhere('entry.occurredAt <= :to', { to: filters.to });
     if (filters.actorId) builder.andWhere('entry.actorId = :actorId', { actorId: filters.actorId });
+    // Whatever an owner did is not attributable to an id for anyone but owners
+    if (filters.actorId && !canSeeOwners(viewerRole)) {
+      builder.andWhere("entry.actorRole IS DISTINCT FROM 'owner'");
+    }
     if (filters.action) builder.andWhere('entry.action = :action', { action: filters.action });
     if (filters.entityName) {
       builder.andWhere('entry.entityName = :entityName', { entityName: filters.entityName });
     }
     if (search) {
+      const actorNameMatch = canSeeOwners(viewerRole)
+        ? 'entry.actorName ILIKE :pattern'
+        : "(entry.actorRole IS DISTINCT FROM 'owner' AND entry.actorName ILIKE :pattern)";
       builder.andWhere(
-        `(entry.action ILIKE :pattern OR entry.actorName ILIKE :pattern
+        `(entry.action ILIKE :pattern OR ${actorNameMatch}
           OR entry.entityName ILIKE :pattern OR entry.entityId ILIKE :pattern
           OR entry.ipAddress ILIKE :pattern)`,
         { pattern: containsPattern(search) },
@@ -183,21 +200,33 @@ export class AuditLogService {
     return builder;
   }
 
-  private toResponse(entry: AuditLogEntry): AuditLogEntryResponseDto {
+  private restrict(
+    builder: SelectQueryBuilder<AuditLogEntry>,
+    viewerRole: Role | null | undefined,
+  ): Promise<SelectQueryBuilder<AuditLogEntry>> {
+    return restrictAuditToViewer(builder, this.entries.manager, viewerRole);
+  }
+
+  private toResponse(
+    entry: AuditLogEntry,
+    viewerRole: Role | null | undefined,
+  ): AuditLogEntryResponseDto {
+    const masked = maskOwnerActor(entry, viewerRole);
+    const hidden = masked.actorRole !== entry.actorRole;
     return {
       id: entry.id,
       occurredAt: entry.occurredAt.toISOString(),
-      actorId: entry.actorId,
-      actorName: entry.actorName,
-      actorRole: entry.actorRole,
+      actorId: masked.actorId,
+      actorName: masked.actorName,
+      actorRole: masked.actorRole,
       action: entry.action,
       entityName: entry.entityName,
       entityId: entry.entityId,
-      ipAddress: entry.ipAddress,
-      userAgent: entry.userAgent,
+      ipAddress: hidden ? null : entry.ipAddress,
+      userAgent: hidden ? null : entry.userAgent,
       requestId: entry.requestId,
       statusCode: entry.statusCode,
-      metadata: entry.metadata,
+      metadata: hidden ? {} : entry.metadata,
     };
   }
 

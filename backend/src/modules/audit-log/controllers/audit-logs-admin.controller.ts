@@ -3,9 +3,11 @@ import { ApiOperation, ApiProduces } from '@nestjs/swagger';
 import { Permission } from '../../../common/constants/permissions';
 import { AdminController } from '../../../common/decorators/admin-controller.decorator';
 import { AuditAction } from '../../../common/decorators/audit-action.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 import { SkipResponseEnvelope } from '../../../common/decorators/skip-response-envelope.decorator';
 import { PaginatedResponseDto } from '../../../common/dto/paginated-response.dto';
+import { AuthenticatedUser } from '../../../common/interfaces/authenticated-user.interface';
 import { ExportAuditLogsQueryDto, ListAuditLogsQueryDto } from '../dto/audit-log-query.dto';
 import { AuditLogEntryResponseDto } from '../dto/audit-log-response.dto';
 import { AuditLogService } from '../services/audit-log.service';
@@ -18,9 +20,10 @@ export class AuditLogsAdminController {
   @RequirePermissions(Permission.AUDIT_LOG_READ)
   @ApiOperation({ summary: 'Search the audit trail' })
   list(
+    @CurrentUser() actor: AuthenticatedUser,
     @Query() query: ListAuditLogsQueryDto,
   ): Promise<PaginatedResponseDto<AuditLogEntryResponseDto>> {
-    return this.auditLog.list(query);
+    return this.auditLog.list(actor.role, query);
   }
 
   // Declared before any ":id" style route so "export" is never captured as an id
@@ -33,7 +36,10 @@ export class AuditLogsAdminController {
   @Header('Cache-Control', 'no-store')
   @ApiProduces('text/csv')
   @ApiOperation({ summary: 'Export the audit trail as CSV (streamed)' })
-  export(@Query() query: ExportAuditLogsQueryDto): StreamableFile {
-    return new StreamableFile(this.auditLog.exportCsv(query));
+  export(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Query() query: ExportAuditLogsQueryDto,
+  ): StreamableFile {
+    return new StreamableFile(this.auditLog.exportCsv(actor.role, query));
   }
 }
