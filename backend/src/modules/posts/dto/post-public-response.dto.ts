@@ -45,7 +45,6 @@ export class PublicPostNeighborResponse {
 export class PublicPostDetailResponse extends PublicPostListItemResponse {
   @ApiProperty({ enum: Locale }) locale!: Locale;
   @ApiProperty({ description: 'Sanitized HTML' }) contentHtml!: string;
-  @ApiProperty() authorName!: string;
   @ApiProperty({ type: () => PublicPostSeoResponse }) seo!: PublicPostSeoResponse;
   @ApiProperty({
     type: () => [PublicPostListItemResponse],

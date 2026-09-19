@@ -1,3 +1,4 @@
+import { User } from '../../../src/modules/users/entities/user.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import request, { Response } from 'supertest';
@@ -26,7 +27,7 @@ class TestMediaModule {}
 
 export function createPostsTestContext(): Promise<ModuleTestingContext> {
   return createModuleTestingContext({
-    entities: [MediaAsset, Post, PostTranslation, PostCategory, PostCategoryTranslation],
+    entities: [MediaAsset, User, Post, PostTranslation, PostCategory, PostCategoryTranslation],
     imports: [PostsModule],
     customize: (builder) => builder.overrideModule(MediaModule).useModule(TestMediaModule),
   });

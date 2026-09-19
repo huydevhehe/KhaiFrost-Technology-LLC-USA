@@ -37,6 +37,7 @@ import {
   PostTranslationsInputDto,
 } from '../dto/post-translation-input.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { User } from '../../users/entities/user.entity';
 import { PostCategory } from '../entities/post-category.entity';
 import { PostTranslation } from '../entities/post-translation.entity';
 import { Post } from '../entities/post.entity';
@@ -146,7 +147,9 @@ export class PostsAdminService {
               categoryId: dto.categoryId ?? null,
               coverImageId: dto.coverImageId ?? null,
               authorId: user.id,
-              authorName: toPlainText(dto.authorName ?? '') || DEFAULT_AUTHOR_NAME,
+              authorName:
+                toPlainText(dto.authorName ?? '') ||
+                (await this.resolveCreatorName(manager, user.id)),
               createdById: user.id,
               updatedById: user.id,
             }),
@@ -453,5 +456,11 @@ export class PostsAdminService {
       post.translations = translations.filter((item) => item.postId === post.id);
       post.category = categories.find((item) => item.id === post.categoryId) ?? null;
     }
+  }
+
+  // Default author is the staff member who created the post; only shown in the admin
+  private async resolveCreatorName(manager: EntityManager, userId: string): Promise<string> {
+    const creator = await manager.getRepository(User).findOne({ where: { id: userId } });
+    return toPlainText(creator?.fullName ?? '') || DEFAULT_AUTHOR_NAME;
   }
 }

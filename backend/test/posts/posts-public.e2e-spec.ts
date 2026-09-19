@@ -277,7 +277,6 @@ describe('Posts public API', () => {
         title: 'Bài một',
         excerpt: 'Tóm tắt Bài một',
         contentHtml: '<p>Nội dung Bài một</p>',
-        authorName: 'KhaiFrost',
         publishedAt: '2025-01-01T00:00:00.000Z',
         category: { slug: 'chuoi-lanh', name: 'Chuỗi lạnh' },
         tags: ['lạnh', 'kho'],
@@ -291,6 +290,7 @@ describe('Posts public API', () => {
         },
       });
       expect(article.seo.ogImageUrl).toMatch(/public-cover\.webp$/);
+      expect(article).not.toHaveProperty('authorName');
       expect(article.updatedAt).toBeDefined();
       expect(response.headers['cache-control']).toMatch(/public/);
     });

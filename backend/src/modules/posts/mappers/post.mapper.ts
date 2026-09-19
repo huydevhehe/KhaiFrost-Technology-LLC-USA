@@ -238,7 +238,6 @@ export function toPublicDetail(
     ...toPublicListItem(post, locale, media),
     locale,
     contentHtml: translation.contentHtml,
-    authorName: post.authorName,
     seo: toSeo(post, translation, media),
     related,
     previous,
