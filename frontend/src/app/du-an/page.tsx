@@ -9,6 +9,7 @@ import { ProjectsCta } from "@/sections/ProjectsCta";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { projectsPageStats } from "@/content/projectsPageData";
 import { PageTransition } from "@/components/PageTransition";
+import { Reveal } from "@/components/ui/Reveal";
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
@@ -18,9 +19,15 @@ export default function ProjectsPage() {
       <main>
         <ProjectsHero />
         <CategoryBreadcrumb currentLabel={t("projectsPage.breadcrumb.current")} />
-        <ProjectsFilterGrid />
-        <CategoryStats stats={projectsPageStats} />
-        <ProjectsCta />
+        <Reveal>
+          <ProjectsFilterGrid />
+        </Reveal>
+        <Reveal>
+          <CategoryStats stats={projectsPageStats} />
+        </Reveal>
+        <Reveal>
+          <ProjectsCta />
+        </Reveal>
       </main>
       <SiteFooter />
     </PageTransition>

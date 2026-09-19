@@ -13,6 +13,7 @@ import { AboutCta } from "@/sections/AboutCta";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { aboutStats, aboutValues } from "@/content/aboutPageData";
 import { PageTransition } from "@/components/PageTransition";
+import { Reveal } from "@/components/ui/Reveal";
 
 export default function AboutPage() {
   const { t } = useTranslation();
@@ -22,17 +23,31 @@ export default function AboutPage() {
       <main>
         <AboutHero />
         <CategoryBreadcrumb currentLabel={t("aboutPage.breadcrumb.current")} />
-        <AboutStory />
-        <CategoryStats stats={aboutStats} />
-        <AboutVisionMission />
-        <CategoryWhyUs
-          eyebrow={t("aboutPage.values.eyebrow")}
-          heading={t("aboutPage.values.heading")}
-          items={aboutValues}
-        />
-        <AboutTeam />
-        <AboutOffices />
-        <AboutCta />
+        <Reveal>
+          <AboutStory />
+        </Reveal>
+        <Reveal>
+          <CategoryStats stats={aboutStats} />
+        </Reveal>
+        <Reveal>
+          <AboutVisionMission />
+        </Reveal>
+        <Reveal>
+          <CategoryWhyUs
+            eyebrow={t("aboutPage.values.eyebrow")}
+            heading={t("aboutPage.values.heading")}
+            items={aboutValues}
+          />
+        </Reveal>
+        <Reveal>
+          <AboutTeam />
+        </Reveal>
+        <Reveal>
+          <AboutOffices />
+        </Reveal>
+        <Reveal>
+          <AboutCta />
+        </Reveal>
       </main>
       <SiteFooter />
     </PageTransition>
