@@ -229,15 +229,15 @@ describe('search (e2e)', () => {
       const staff = await adminSearch('q=sigma', TEST_USERS.staff);
 
       expect(typesOf(admin.hits)).toEqual(['contacts', 'customers', 'posts', 'users']);
-      expect(typesOf(staff.hits)).toEqual(['contacts', 'posts']);
+      expect(typesOf(staff.hits)).toEqual(['contacts', 'customers', 'posts']);
       expect(staff.meta.types).not.toContain('users');
-      expect(staff.meta.types).not.toContain('customers');
     });
 
     it('silently ignores a requested type the caller may not read', async () => {
       await seedUser(context.dataSource, { role: Role.CUSTOMER, fullName: 'Tau Khách' });
       const staff = await adminSearch('q=tau&types=customers,users', TEST_USERS.staff);
-      expect(staff.hits).toEqual([]);
+      expect(typesOf(staff.hits)).toEqual(['customers']);
+      expect(staff.meta.types).not.toContain('users');
       const owner = await adminSearch('q=tau&types=customers', TEST_USERS.owner);
       expect(owner.hits).toHaveLength(1);
     });

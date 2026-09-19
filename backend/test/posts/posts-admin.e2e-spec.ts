@@ -1,6 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DomainEvent } from '../../src/common/constants/domain-events';
+import { Role } from '../../src/common/enums/role.enum';
 import { Post } from '../../src/modules/posts/entities/post.entity';
+import { User } from '../../src/modules/users/entities/user.entity';
 import { ModuleTestingContext } from '../support/create-module-testing-context';
 import {
   ADMIN,
@@ -165,6 +167,28 @@ describe('Posts admin API', () => {
       expect(post.slug).toBe('long-read');
       expect(post.translations.en.readingTimeMinutes).toBe(3);
       expect(post.missingLocales).toEqual(['vi']);
+    });
+
+    it('never names an owner as the default author but keeps other creators', async () => {
+      const users = context.dataSource.getRepository(User);
+      const seed = (id: string, role: Role, fullName: string, n: number) =>
+        users.save(
+          users.create({
+            id,
+            fullName,
+            email: `byline${n}@example.com`,
+            phone: `+8491000000${n}`,
+            passwordHash: 'x',
+            role,
+          }),
+        );
+      await seed(USERS.owner.id, Role.OWNER, 'Chủ Thật', 1);
+      await seed(USERS.staff.id, Role.STAFF, 'Nhân Viên Thật', 2);
+      const translations = { en: { title: 'Byline check', contentHtml: '<p>x</p>' } };
+      const byOwner = await api.createPost({ translations }, USERS.owner);
+      expect(byOwner.authorName).toBe('KhaiFrost');
+      const byStaff = await api.createPost({ translations }, USERS.staff);
+      expect(byStaff.authorName).toBe('Nhân Viên Thật');
     });
 
     it('stores sanitized HTML and plain-text titles', async () => {

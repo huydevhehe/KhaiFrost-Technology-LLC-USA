@@ -452,7 +452,7 @@ describe('staff users admin API', () => {
     });
 
     describe('role rules', () => {
-      it('lets an admin edit staff but not admins or owners, and not assign elevated roles', async () => {
+      it('lets an admin edit staff but not admins (owners do not exist for them), and not assign elevated roles', async () => {
         const admin = await makeUser(Role.ADMIN);
         const staff = await makeUser(Role.STAFF);
         const otherAdmin = await makeUser(Role.ADMIN);
@@ -471,7 +471,7 @@ describe('staff users admin API', () => {
           .patch(`/api/v1/admin/users/${owner.id}`)
           .set(as(admin))
           .send({ version: owner.version, fullName: 'No' })
-          .expect(403);
+          .expect(404);
         const fresh = await users.findOneByOrFail({ id: staff.id });
         await request(server())
           .patch(`/api/v1/admin/users/${staff.id}`)
@@ -596,11 +596,11 @@ describe('staff users admin API', () => {
       await request(server())
         .post(`/api/v1/admin/users/${owner.id}/lock`)
         .set(as(admin))
-        .expect(403);
+        .expect(404);
       await request(server())
         .post(`/api/v1/admin/users/${owner.id}/unlock`)
         .set(as(admin))
-        .expect(403);
+        .expect(404);
       await request(server())
         .post(`/api/v1/admin/users/${staff.id}/lock`)
         .set(as(staff))
@@ -668,7 +668,7 @@ describe('staff users admin API', () => {
       await request(server())
         .post(`/api/v1/admin/users/${owner.id}/reset-password`)
         .set(as(admin))
-        .expect(403);
+        .expect(404);
       await request(server())
         .post(`/api/v1/admin/users/${admin.id}/reset-password`)
         .set(as(admin))
@@ -712,7 +712,7 @@ describe('staff users admin API', () => {
       const admin = await makeUser(Role.ADMIN);
       const owner = await makeUser(Role.OWNER);
       const staff = await makeUser(Role.STAFF);
-      await request(server()).delete(`/api/v1/admin/users/${owner.id}`).set(as(admin)).expect(403);
+      await request(server()).delete(`/api/v1/admin/users/${owner.id}`).set(as(admin)).expect(404);
       await request(server()).delete(`/api/v1/admin/users/${admin.id}`).set(as(admin)).expect(403);
       await request(server()).delete(`/api/v1/admin/users/${staff.id}`).set(as(staff)).expect(403);
       await request(server()).delete(`/api/v1/admin/users/${owner.id}`).set(as(owner)).expect(403);

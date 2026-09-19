@@ -154,10 +154,17 @@ describe('dashboard (e2e)', () => {
       const data = response.body.data;
 
       expect(data.customers.total).toBe(2);
-      expect(data.staffUsers.total).toBe(3);
+      // The seeded owner is invisible to staff, so only the admin and the staff member count
+      expect(data.staffUsers.total).toBe(2);
       expect(data.contacts.total).toBe(5);
       expect(data.contacts.byStatus).toEqual({ new: 2, seen: 1, replied: 1, archived: 1 });
       expect(data.contacts.unread).toBe(2);
+
+      const ownerView = await request(server())
+        .get(summaryUrl)
+        .set(as(TEST_USERS.owner))
+        .expect(200);
+      expect(ownerView.body.data.staffUsers.total).toBe(3);
     });
 
     it('compares the last 30 days with the 30 days before', async () => {
