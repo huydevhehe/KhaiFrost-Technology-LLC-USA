@@ -233,6 +233,10 @@ export function UserForm({
         <Panel title="Vai trò">
           {roles.length === 0 ? (
             <p className="text-sm text-slate-500">Bạn không có quyền gán vai trò cho tài khoản nội bộ.</p>
+          ) : roles.length === 1 ? (
+            <p className="text-sm text-slate-600">
+              {mode === "create" ? "Tài khoản sẽ được tạo với vai trò" : "Tài khoản có vai trò"} <strong>{USER_ROLE_LABELS[roles[0]]}</strong>. Bạn không có quyền gán vai trò khác.
+            </p>
           ) : (
             <div className="flex flex-col gap-3">
               {roles.map((item) => (
