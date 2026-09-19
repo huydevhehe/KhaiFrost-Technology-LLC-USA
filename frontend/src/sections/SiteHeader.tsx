@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { AccountMenu } from "@/components/account/AccountMenu";
 import { Button } from "@/components/ui/Button";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { navLinks } from "@/content/navLinks";
@@ -54,6 +55,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-4">
           <LanguageToggle />
+          <AccountMenu />
           <Button href="/login" variant="primary-pill-light">
             {t("nav.getStarted")} →
           </Button>
