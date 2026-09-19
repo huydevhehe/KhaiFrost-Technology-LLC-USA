@@ -37,24 +37,24 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, permission: PERMISSIONS.DASHBOARD_READ },
-  { href: "/admin/users", label: "Users", icon: Users, permission: PERMISSIONS.USER_READ },
+  { href: "/admin", label: "Tổng quan", icon: LayoutDashboard, permission: PERMISSIONS.DASHBOARD_READ },
+  { href: "/admin/users", label: "Nhân sự", icon: Users, permission: PERMISSIONS.USER_READ },
   { href: "/admin/customers", label: "Khách hàng", icon: UserRound, permission: PERMISSIONS.CUSTOMER_READ },
   { href: "/admin/blog", label: "Bài viết", icon: FileText, permission: PERMISSIONS.POST_READ },
   { href: "/admin/products", label: "Sản phẩm", icon: Package, permission: PERMISSIONS.PRODUCT_READ },
-  { href: "/admin/projects", label: "Projects", icon: Briefcase, permission: PERMISSIONS.PROJECT_READ },
-  { href: "/admin/services", label: "Services", icon: Wrench, permission: PERMISSIONS.SERVICE_READ },
-  { href: "/admin/testimonials", label: "Testimonials", icon: Star, permission: PERMISSIONS.TESTIMONIAL_READ },
+  { href: "/admin/projects", label: "Dự án", icon: Briefcase, permission: PERMISSIONS.PROJECT_READ },
+  { href: "/admin/services", label: "Dịch vụ", icon: Wrench, permission: PERMISSIONS.SERVICE_READ },
+  { href: "/admin/testimonials", label: "Đánh giá", icon: Star, permission: PERMISSIONS.TESTIMONIAL_READ },
   { href: "/admin/client-locations", label: "Bản đồ khách hàng", icon: MapPin, permission: PERMISSIONS.CLIENT_LOCATION_READ },
-  { href: "/admin/pages", label: "Pages", icon: Layers, permission: PERMISSIONS.PAGE_READ },
+  { href: "/admin/pages", label: "Trang", icon: Layers, permission: PERMISSIONS.PAGE_READ },
   { href: "/admin/navigation", label: "Điều hướng", icon: Navigation, permission: PERMISSIONS.NAVIGATION_MANAGE },
   { href: "/admin/translations", label: "Chuỗi giao diện", icon: Languages, permission: PERMISSIONS.UI_TRANSLATION_READ },
   { href: "/admin/seo", label: "SEO", icon: Search, permission: PERMISSIONS.SEO_READ },
-  { href: "/admin/media", label: "Media", icon: ImageIcon, permission: PERMISSIONS.MEDIA_READ },
-  { href: "/admin/contacts", label: "Contacts", icon: Mail, permission: PERMISSIONS.CONTACT_READ },
+  { href: "/admin/media", label: "Thư viện ảnh", icon: ImageIcon, permission: PERMISSIONS.MEDIA_READ },
+  { href: "/admin/contacts", label: "Liên hệ", icon: Mail, permission: PERMISSIONS.CONTACT_READ },
   { href: "/admin/content-health", label: "Kiểm tra nội dung", icon: HeartPulse, permission: PERMISSIONS.CONTENT_HEALTH_READ },
-  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, permission: PERMISSIONS.AUDIT_LOG_READ },
-  { href: "/admin/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.SETTING_READ },
+  { href: "/admin/audit-log", label: "Nhật ký hoạt động", icon: ScrollText, permission: PERMISSIONS.AUDIT_LOG_READ },
+  { href: "/admin/settings", label: "Cài đặt", icon: Settings, permission: PERMISSIONS.SETTING_READ },
 ];
 
 export function AdminSidebar() {
