@@ -63,11 +63,14 @@
       "messagePlaceholder": "Message *",
       "submit": "Send Message →",
       "successMessage": "Sent! Thanks for reaching out.",
+      "sending": "Sending...",
       "errors": {
         "nameRequired": "Please enter your name",
         "emailRequired": "Please enter your email",
         "emailInvalid": "Invalid email address",
-        "messageRequired": "Please enter your message"
+        "messageRequired": "Please enter your message",
+        "sendFailed": "Could not send your message. Please try again or email us directly.",
+        "rateLimited": "Too many attempts. Please wait a minute and try again."
       }
     }
   },

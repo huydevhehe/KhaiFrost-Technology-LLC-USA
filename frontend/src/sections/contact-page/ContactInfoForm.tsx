@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { useContactSubmit } from "@/lib/content/contact";
 import { useSectionText } from "@/lib/content/pages";
 import { useSiteConfig, type ResolvedOffice } from "@/lib/content/site";
 import { useLocalizedField } from "@/lib/useLocalizedField";
@@ -51,17 +52,25 @@ export function ContactInfoForm() {
   const info = useSectionText("/lien-he", "contact-form");
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const { status, submit, reset } = useContactSubmit();
 
-  function handleSubmit(e: FormEvent) {
+  const SUBJECT_KEYS: Record<string, string> = {
+    "source-code": "contact.form.subjectOptionSourceCode",
+    services: "contact.form.subjectOptionServices",
+    partnership: "contact.form.subjectOptionPartnership",
+    other: "contact.form.subjectOptionOther",
+  };
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitted(false);
+    reset();
     const validationErrors = validateContactForm(values);
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length === 0) {
-      setSubmitted(true);
-      setValues(initialValues);
-    }
+    if (Object.keys(validationErrors).length > 0) return;
+    const subjectKey = SUBJECT_KEYS[values.subject];
+    const ok = await submit(values, subjectKey ? t(subjectKey) : "", honeypot);
+    if (ok) setValues(initialValues);
   }
 
   const nameErrorText = errors.name
@@ -136,6 +145,18 @@ export function ContactInfoForm() {
           onSubmit={handleSubmit}
           className="space-y-4 rounded-xl bg-white/5 p-6 backdrop-blur"
         >
+          <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+            <label htmlFor="contact-page-website">Website</label>
+            <input
+              id="contact-page-website"
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="contact-page-name" className="sr-only">
@@ -246,12 +267,22 @@ export function ContactInfoForm() {
               </p>
             )}
           </div>
-          <Button type="submit" variant="primary-blue">
-            {t("contact.form.submit")}
+          <Button type="submit" variant="primary-blue" disabled={status === "sending"}>
+            {status === "sending" ? t("contact.form.sending") : t("contact.form.submit")}
           </Button>
-          {submitted && (
-            <p className="text-sm text-accent">
+          {status === "success" && (
+            <p className="text-sm text-accent" role="status">
               {t("contact.form.successMessage")}
+            </p>
+          )}
+          {status === "error" && (
+            <p className="text-sm text-red-400" role="alert">
+              {t("contact.form.errors.sendFailed")}
+            </p>
+          )}
+          {status === "rateLimited" && (
+            <p className="text-sm text-red-400" role="alert">
+              {t("contact.form.errors.rateLimited")}
             </p>
           )}
         </form>

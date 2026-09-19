@@ -63,11 +63,14 @@
       "messagePlaceholder": "Nội dung *",
       "submit": "Gửi tin nhắn →",
       "successMessage": "Đã gửi! Cảm ơn bạn đã liên hệ.",
+      "sending": "Đang gửi...",
       "errors": {
         "nameRequired": "Vui lòng nhập họ tên",
         "emailRequired": "Vui lòng nhập email",
         "emailInvalid": "Email không hợp lệ",
-        "messageRequired": "Vui lòng nhập nội dung"
+        "messageRequired": "Vui lòng nhập nội dung",
+        "sendFailed": "Không gửi được tin nhắn. Vui lòng thử lại hoặc gửi email trực tiếp cho chúng tôi.",
+        "rateLimited": "Bạn đã gửi quá nhiều lần. Vui lòng đợi một phút rồi thử lại."
       }
     }
   },

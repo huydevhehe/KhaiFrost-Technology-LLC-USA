@@ -10,6 +10,7 @@ interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -25,6 +26,7 @@ export function Button({
   children,
   onClick,
   type = "button",
+  disabled,
 }: ButtonProps) {
   const classes = `inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${variantClasses[variant]}`;
 
@@ -38,7 +40,12 @@ export function Button({
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`${classes} disabled:cursor-not-allowed disabled:opacity-60`}
+    >
       {icon}
       {children}
     </button>
