@@ -1,0 +1,12 @@
+import { Panel } from "@/components/admin/ui";
+
+export default function AdminCustomersPage() {
+  return (
+    <div className="flex flex-col gap-6">
+      <h1 className="text-xl font-bold text-slate-900">Khách hàng</h1>
+      <Panel title="Khách hàng">
+        <p className="text-sm text-slate-500">Đang được phát triển.</p>
+      </Panel>
+    </div>
+  );
+}
