@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { Permission } from '../../../common/constants/permissions';
 import { roleHasPermission } from '../../../common/constants/role-permissions';
+import { Role } from '../../../common/enums/role.enum';
 import { DomainEvent, PostSubmittedForReviewEvent } from '../../../common/constants/domain-events';
 import { PaginatedResponseDto } from '../../../common/dto/paginated-response.dto';
 import { paginate, resolveSort } from '../../../common/dto/paginate';
@@ -465,6 +466,8 @@ export class PostsAdminService {
   // Default author is the staff member who created the post; only shown in the admin
   private async resolveCreatorName(manager: EntityManager, userId: string): Promise<string> {
     const creator = await manager.getRepository(User).findOne({ where: { id: userId } });
+    // Owners are never named publicly: their posts carry the default author
+    if (creator?.role === Role.OWNER) return DEFAULT_AUTHOR_NAME;
     return toPlainText(creator?.fullName ?? '') || DEFAULT_AUTHOR_NAME;
   }
 }
