@@ -61,10 +61,11 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className = "", children, ...rest } = props;
+  const widthClass = /(^|\s)w-/.test(className) ? "" : "w-full";
   return (
     <select
       {...rest}
-      className={`w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20 ${className}`}
+      className={`${widthClass} rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20 ${className}`}
     >
       {children}
     </select>
