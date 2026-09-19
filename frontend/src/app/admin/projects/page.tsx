@@ -1,135 +1,277 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Plus, X } from "lucide-react";
-import { Panel, Field, Input, Select, Textarea, PrimaryButton, SecondaryButton } from "@/components/admin/ui";
-import { mockProjects, projectCategories, type AdminProject } from "@/content/admin/mockProjects";
+import Link from "next/link";
+import { FolderCog, FolderKanban, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import {
+  EmptyState,
+  ErrorState,
+  ImageThumb,
+  PublicationBadge,
+  TableSkeleton,
+  formatDateTime,
+  useApiAction,
+  useApiList,
+  useConfirm,
+  useFilters,
+  useToast,
+} from "@/components/admin/shared";
+import {
+  ActionButton,
+  Pager,
+  RowIconButton,
+  describeContentError,
+} from "@/components/admin/content";
+import { Input, Panel, Select } from "@/components/admin/ui";
+import { PERMISSIONS } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth";
+import { projectsApi, type ProjectListItem } from "@/lib/api/admin/projects";
+import { projectCategoryName, useProjectCategories } from "./useCategories";
+
+const STATUS_OPTIONS = [
+  { value: "", label: "Mọi trạng thái" },
+  { value: "draft", label: "Bản nháp" },
+  { value: "in_review", label: "Chờ duyệt" },
+  { value: "published", label: "Đã xuất bản" },
+  { value: "archived", label: "Lưu trữ" },
+];
 
 export default function AdminProjectsPage() {
-  const [projects, setProjects] = useState<AdminProject[]>(mockProjects);
-  const [selectedId, setSelectedId] = useState<string>(mockProjects[0].id);
-  const selected = projects.find((p) => p.id === selectedId) ?? projects[0];
+  const toast = useToast();
+  const confirm = useConfirm();
+  const { hasPermission } = useAuth();
+  const action = useApiAction({ showErrorToast: false });
+  const { categories } = useProjectCategories();
 
-  const [title, setTitle] = useState(selected.title);
-  const [description, setDescription] = useState(selected.description);
-  const [category, setCategory] = useState(selected.category);
+  const [status, setStatus] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [featured, setFeatured] = useState("");
+  const [mine, setMine] = useState(false);
 
-  function selectProject(project: AdminProject) {
-    setSelectedId(project.id);
-    setTitle(project.title);
-    setDescription(project.description);
-    setCategory(project.category);
-  }
+  const filters = useFilters({
+    status: status || undefined,
+    categoryId: categoryId || undefined,
+    featured: featured === "" ? undefined : featured === "yes",
+    mine: mine || undefined,
+  });
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setProjects((prev) => prev.map((p) => (p.id === selectedId ? { ...p, title, description, category } : p)));
-    console.log("Project saved (mock)", { id: selectedId, title, description, category });
-  }
+  const list = useApiList<ProjectListItem>("/admin/projects", { filters, pageSize: 20 });
+  const canCreate = hasPermission(PERMISSIONS.PROJECT_CREATE);
+  const canDelete = hasPermission(PERMISSIONS.PROJECT_DELETE);
 
-  function removeGalleryImage(index: number) {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === selectedId ? { ...p, gallery: p.gallery.filter((_, i) => i !== index) } : p))
-    );
-  }
+  const categoryLabel = (id: string | null) => {
+    const found = id ? categories.find((category) => category.id === id) : undefined;
+    return found ? projectCategoryName(found) : "Chưa có danh mục";
+  };
+
+  const remove = async (project: ProjectListItem) => {
+    const title = project.titles.vi || project.titles.en || project.slug;
+    const ok = await confirm({
+      title: "Xoá dự án?",
+      message: `“${title}” sẽ bị xoá khỏi trang công khai.`,
+      confirmLabel: "Xoá dự án",
+      danger: true,
+    });
+    if (!ok) return;
+    const done = await action.run(() => projectsApi.remove(project.id), {
+      onError: (error) => toast.error(describeContentError(error)),
+    });
+    if (done !== undefined) {
+      toast.success("Đã xoá dự án.");
+      list.refetch();
+    }
+  };
+
+  const createButton = (
+    <Link href="/admin/projects/new">
+      <ActionButton variant="primary" icon={<Plus size={16} />}>
+        Tạo dự án
+      </ActionButton>
+    </Link>
+  );
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-slate-900">Quản lý dự án</h1>
-        <PrimaryButton
-          icon={<Plus size={16} />}
-          onClick={() => {
-            const newProject: AdminProject = {
-              id: `PRJ-${Math.floor(Math.random() * 900 + 100)}`,
-              title: "Dự án mới",
-              description: "",
-              category: projectCategories[0],
-              thumbnail: "/images/placeholders/project-1.jpg",
-              gallery: [],
-            };
-            setProjects((prev) => [newProject, ...prev]);
-            selectProject(newProject);
-          }}
-        >
-          Tạo dự án
-        </PrimaryButton>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/admin/projects/categories">
+            <ActionButton variant="secondary" icon={<FolderCog size={16} />}>
+              Danh mục
+            </ActionButton>
+          </Link>
+          {canCreate && createButton}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <button
-              key={project.id}
-              onClick={() => selectProject(project)}
-              className={`overflow-hidden rounded-xl border bg-white text-left shadow-sm transition-colors ${
-                project.id === selectedId ? "border-accent ring-2 ring-accent/20" : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <div className="relative h-32 w-full bg-slate-100">
-                <Image src={project.thumbnail} alt={project.title} fill className="object-cover" sizes="240px" />
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-semibold text-slate-900">{project.title}</p>
-                <span className="mt-1 inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                  {project.category}
-                </span>
-              </div>
-            </button>
-          ))}
+      <Panel>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative min-w-55 flex-1">
+            <Search
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+            />
+            <Input
+              placeholder="Tìm theo tên dự án hoặc đường dẫn…"
+              aria-label="Tìm dự án"
+              className="pl-9"
+              value={list.search}
+              onChange={(event) => list.setSearch(event.target.value)}
+            />
+          </div>
+          <Select
+            aria-label="Lọc theo trạng thái"
+            className="w-44"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+          <Select
+            aria-label="Lọc theo danh mục"
+            className="w-48"
+            value={categoryId}
+            onChange={(event) => setCategoryId(event.target.value)}
+          >
+            <option value="">Mọi danh mục</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {projectCategoryName(category)}
+              </option>
+            ))}
+          </Select>
+          <Select
+            aria-label="Lọc theo nổi bật"
+            className="w-40"
+            value={featured}
+            onChange={(event) => setFeatured(event.target.value)}
+          >
+            <option value="">Nổi bật: tất cả</option>
+            <option value="yes">Chỉ dự án nổi bật</option>
+            <option value="no">Không nổi bật</option>
+          </Select>
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={mine}
+              onChange={(event) => setMine(event.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent/30"
+            />
+            Dự án của tôi
+          </label>
         </div>
 
-        <Panel title="Chỉnh sửa dự án">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="Tên dự án" htmlFor="projectTitle" required>
-              <Input id="projectTitle" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </Field>
-            <Field label="Danh mục" htmlFor="projectCategory">
-              <Select id="projectCategory" value={category} onChange={(e) => setCategory(e.target.value)}>
-                {projectCategories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Mô tả" htmlFor="projectDescription">
-              <Textarea
-                id="projectDescription"
-                rows={5}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Mô tả dự án..."
-              />
-            </Field>
-            <Field label="Thư viện ảnh (gallery)">
-              <div className="flex flex-wrap gap-2">
-                {selected.gallery.map((img, i) => (
-                  <div key={img + i} className="relative h-16 w-16 overflow-hidden rounded-md bg-slate-100">
-                    <Image src={img} alt="" fill className="object-cover" sizes="64px" />
-                    <button
-                      type="button"
-                      onClick={() => removeGalleryImage(i)}
-                      className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 text-white"
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
-                ))}
-                <label className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-md border border-dashed border-slate-300 text-slate-400 hover:border-accent hover:text-accent">
-                  <Plus size={18} />
-                  <input type="file" accept="image/*" className="hidden" />
-                </label>
-              </div>
-            </Field>
-            <div className="flex gap-3">
-              <PrimaryButton type="submit">Lưu</PrimaryButton>
-              <SecondaryButton onClick={() => selectProject(selected)}>Huỷ thay đổi</SecondaryButton>
-            </div>
-          </form>
-        </Panel>
-      </div>
+        {list.loading && list.items.length === 0 ? (
+          <TableSkeleton rows={6} columns={4} />
+        ) : list.error ? (
+          <ErrorState error={list.error} onRetry={list.refetch} />
+        ) : list.items.length === 0 ? (
+          <EmptyState
+            title="Chưa có dự án nào"
+            description="Tạo dự án đầu tiên hoặc đổi lại bộ lọc phía trên."
+            icon={<FolderKanban size={28} />}
+            action={canCreate ? createButton : undefined}
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Danh sách dự án</caption>
+              <thead>
+                <tr className="border-b border-slate-100 text-xs tracking-wide text-slate-400 uppercase">
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Dự án
+                  </th>
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Trạng thái
+                  </th>
+                  <th scope="col" className="py-3 pr-4 font-medium">
+                    Cập nhật
+                  </th>
+                  <th scope="col" className="py-3 pr-4 text-right font-medium">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {list.items.map((project) => {
+                  const missing = (["vi", "en"] as const).filter((code) => !project.titles[code]);
+                  return (
+                    <tr key={project.id} className="text-slate-700">
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center gap-3">
+                          <ImageThumb
+                            src={project.thumbnailUrl}
+                            alt=""
+                            width={64}
+                            height={48}
+                            rounded="md"
+                          />
+                          <div className="min-w-0">
+                            <Link
+                              href={`/admin/projects/${project.id}`}
+                              className="font-medium text-slate-900 hover:text-accent"
+                            >
+                              {project.titles.vi || project.titles.en || "(Chưa có tên)"}
+                            </Link>
+                            <p className="truncate text-xs text-slate-400">
+                              {categoryLabel(project.categoryId)} · /{project.slug}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <PublicationBadge status={project.status} />
+                          {missing.length > 0 && (
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                              Thiếu {missing.map((code) => code.toUpperCase()).join(", ")}
+                            </span>
+                          )}
+                          {project.featured && (
+                            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                              Nổi bật
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-500">
+                        {formatDateTime(project.updatedAt)}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/admin/projects/${project.id}`}>
+                            <RowIconButton title="Chỉnh sửa">
+                              <Pencil size={15} />
+                            </RowIconButton>
+                          </Link>
+                          {canDelete && (
+                            <RowIconButton
+                              title="Xoá dự án"
+                              tone="danger"
+                              disabled={action.pending}
+                              onClick={() => void remove(project)}
+                            >
+                              <Trash2 size={15} />
+                            </RowIconButton>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {list.items.length > 0 && (
+          <Pager meta={list.meta} onChange={list.setPage} noun="dự án" disabled={list.loading} />
+        )}
+      </Panel>
     </div>
   );
 }
