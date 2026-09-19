@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { useLocalizedField } from "@/lib/useLocalizedField";
 import { aboutMission, aboutVision } from "@/content/aboutPageData";
+import { htmlParagraphs, sectionImageUrl, useSection } from "@/lib/content/pages";
+import { text } from "@/lib/content/store";
 import { LocalizedText } from "@/types";
 
 function VisionMissionCard({
@@ -44,22 +46,26 @@ function VisionMissionCard({
 
 export function AboutVisionMission() {
   const { t } = useTranslation();
+  const vision = useSection("/ve-chung-toi", "vision");
+  const mission = useSection("/ve-chung-toi", "mission");
+  const visionText = htmlParagraphs(vision.body).join(" ");
+  const missionText = htmlParagraphs(mission.body).join(" ");
 
   return (
     <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid gap-6 md:grid-cols-2">
           <VisionMissionCard
-            image={aboutVision.image}
+            image={sectionImageUrl(vision, "image") ?? aboutVision.image}
             imageAlt={t("aboutPage.visionMission.visionImageAlt")}
-            title={t("aboutPage.visionMission.visionTitle")}
-            description={aboutVision.description}
+            title={text(vision.heading, t("aboutPage.visionMission.visionTitle"))}
+            description={visionText ? { en: visionText, vi: visionText } : aboutVision.description}
           />
           <VisionMissionCard
-            image={aboutMission.image}
+            image={sectionImageUrl(mission, "image") ?? aboutMission.image}
             imageAlt={t("aboutPage.visionMission.missionImageAlt")}
-            title={t("aboutPage.visionMission.missionTitle")}
-            description={aboutMission.description}
+            title={text(mission.heading, t("aboutPage.visionMission.missionTitle"))}
+            description={missionText ? { en: missionText, vi: missionText } : aboutMission.description}
           />
         </div>
       </div>

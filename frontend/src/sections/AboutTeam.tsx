@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLocalizedField } from "@/lib/useLocalizedField";
-import { aboutTeamMembers } from "@/content/aboutPageData";
+import { useTeamMembers } from "@/lib/content/about";
+import { useSectionText } from "@/lib/content/pages";
 import { AboutTeamMember } from "@/types";
 
 function TeamMemberCard({ member }: { member: AboutTeamMember }) {
@@ -32,16 +33,18 @@ function TeamMemberCard({ member }: { member: AboutTeamMember }) {
 
 export function AboutTeam() {
   const { t } = useTranslation();
+  const section = useSectionText("/ve-chung-toi", "team");
+  const members = useTeamMembers();
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <SectionEyebrow>{t("aboutPage.team.eyebrow")}</SectionEyebrow>
-            <SectionHeading>{t("aboutPage.team.heading")}</SectionHeading>
+            <SectionEyebrow>{section("eyebrow", t("aboutPage.team.eyebrow"))}</SectionEyebrow>
+            <SectionHeading>{section("heading", t("aboutPage.team.heading"))}</SectionHeading>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              {t("aboutPage.team.intro")}
+              {section("intro", t("aboutPage.team.intro"))}
             </p>
           </div>
           <a href="#" className="text-sm font-medium text-accent">
@@ -49,7 +52,7 @@ export function AboutTeam() {
           </a>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
-          {aboutTeamMembers.map((member) => (
+          {members.map((member) => (
             <TeamMemberCard key={member.id} member={member} />
           ))}
         </div>

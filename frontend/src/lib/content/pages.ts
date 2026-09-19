@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { ServiceCategoryStat } from "@/types";
+import type { ServiceCategoryStat, ServiceCategoryWhyUsItem } from "@/types";
 import { categoryIcon } from "./serviceDetail";
 import { asArray, localized, text, useContentLocale, usePublicData } from "./store";
 
@@ -76,6 +76,45 @@ export function usePageStats(path: string, sectionKey: string, fallback: Service
       icon: categoryIcon(item.icon, fallback[i]?.icon ?? "rocket"),
       value: text(item.value, fallback[i]?.value ?? ""),
       label: localized(locale, item.label, fallback[i]?.label ?? { en: "", vi: "" }),
+      description: localized(locale, item.description, fallback[i]?.description ?? { en: "", vi: "" }),
+    }));
+  }, [content, fallback, locale]);
+}
+
+const HTML_ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", "#39": "'" };
+
+/** Plain text of every <p> (or of the whole value when it has none) in an HTML rich-text field; tags are dropped. */
+export function htmlParagraphs(html: unknown): string[] {
+  if (typeof html !== "string" || html.trim() === "") return [];
+  const chunks = html.match(/<p\b[^>]*>[\s\S]*?<\/p>/gi) ?? [html];
+  return chunks
+    .map((chunk) =>
+      chunk
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(/<[^>]*>/g, "")
+        .replace(/&(#?\w+);/g, (m, name: string) => HTML_ENTITIES[name] ?? m)
+        .replace(/\s+/g, " ")
+        .trim(),
+    )
+    .filter((p) => p !== "");
+}
+
+interface PageCardDto {
+  icon?: string;
+  title?: string;
+  description?: string;
+}
+
+/** Card grid section (`{ items: [{ icon, title, description }] }`) shown as icon + title + description cards. */
+export function usePageCards(path: string, sectionKey: string, fallback: ServiceCategoryWhyUsItem[]): ServiceCategoryWhyUsItem[] {
+  const locale = useContentLocale();
+  const content = useSection(path, sectionKey);
+  return useMemo(() => {
+    const items = asArray<PageCardDto>(content.items);
+    if (items.length === 0) return fallback;
+    return items.map((item, i) => ({
+      icon: categoryIcon(item.icon, fallback[i]?.icon ?? "briefcase"),
+      title: localized(locale, item.title, fallback[i]?.title ?? { en: "", vi: "" }),
       description: localized(locale, item.description, fallback[i]?.description ?? { en: "", vi: "" }),
     }));
   }, [content, fallback, locale]);
