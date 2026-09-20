@@ -10,7 +10,7 @@ import { SiteHeader } from "./SiteHeader";
 export function HeroSection() {
   const { t } = useTranslation();
   const hero = useSectionText("/", "hero");
-  const heroImage = sectionImageUrl(useSection("/", "hero"), "backgroundImage") ?? "/images/hero/banner-3.jpg";
+  const heroImage = sectionImageUrl(useSection("/", "hero"), "backgroundImage") ?? "/images/hero/banner-5.jpg";
 
   return (
     <section className="relative flex min-h-screen flex-col overflow-hidden bg-navy text-white">
