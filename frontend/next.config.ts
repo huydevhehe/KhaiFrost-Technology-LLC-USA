@@ -15,9 +15,10 @@ const mediaOrigin = (() => {
   }
 })();
 
-const isLoopbackHost = mediaOrigin
-  ? ["localhost", "127.0.0.1", "[::1]", "::1"].includes(mediaOrigin.hostname)
-  : false;
+// Loopback and private-network (RFC 1918) hosts, e.g. a test server reached by its LAN address
+const PRIVATE_HOST = /^(localhost|127\.\d+\.\d+\.\d+|\[::1\]|::1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/;
+
+const isPrivateHost = mediaOrigin ? PRIVATE_HOST.test(mediaOrigin.hostname) : false;
 
 const nextConfig: NextConfig = {
   images: {
@@ -30,8 +31,8 @@ const nextConfig: NextConfig = {
           },
         ]
       : [],
-    // The optimizer refuses loopback hosts unless allowed; only enabled when media lives on localhost (dev).
-    dangerouslyAllowLocalIP: isLoopbackHost,
+    // The optimizer refuses private hosts unless allowed; only enabled when media lives on localhost or a LAN address.
+    dangerouslyAllowLocalIP: isPrivateHost,
   },
 };
 
