@@ -1,5 +1,8 @@
 export const ADMIN_SESSION_ABSOLUTE_MAX_MS = 8 * 60 * 60 * 1000;
 export const NON_PERSISTENT_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+// Admin and staff logins are force-logged-out after this long without an authenticated request.
+// Owner and customer sessions are exempt and rely on the normal expiry/refresh flow instead.
+export const PRIVILEGED_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 // A stale refresh token presented this soon after rotation is a race between tabs, not theft
 export const REFRESH_REUSE_GRACE_MS = 10_000;
 export const PASSWORD_RESET_MAX_ATTEMPTS = 5;

@@ -27,6 +27,7 @@ export interface ActiveSessionRecord {
   status: UserStatus;
   adminSessionEndedAt: Date | null;
   mustChangePassword: boolean;
+  lastUsedAt: Date;
 }
 
 export interface IssuedSession {
@@ -72,6 +73,7 @@ export class AuthSessionService {
       .select('session.id', 'sessionId')
       .addSelect('session.userId', 'userId')
       .addSelect('session.adminSessionEndedAt', 'adminSessionEndedAt')
+      .addSelect('session.lastUsedAt', 'lastUsedAt')
       .addSelect('user.role', 'role')
       .addSelect('user.status', 'status')
       .addSelect('user.mustChangePassword', 'mustChangePassword')
@@ -169,6 +171,11 @@ export class AuthSessionService {
       .set({ revokedAt: new Date(), revokedReason: reason })
       .where('family_id = :familyId AND revoked_at IS NULL', { familyId })
       .execute();
+  }
+
+  // Marks the session as active right now, so idle-timeout checks measure from real activity
+  async touchLastUsedAt(sessionId: string): Promise<void> {
+    await this.sessions.update({ id: sessionId }, { lastUsedAt: new Date() });
   }
 
   async endAdminElevation(sessionId: string): Promise<void> {

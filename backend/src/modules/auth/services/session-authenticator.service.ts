@@ -9,7 +9,10 @@ import { Role } from '../../../common/enums/role.enum';
 import { AuthenticatedUser } from '../../../common/interfaces/authenticated-user.interface';
 import { authConfig } from '../../../config/auth.config';
 import { UserStatus } from '../../users/enums/user-status.enum';
-import { ADMIN_SESSION_ABSOLUTE_MAX_MS } from '../constants/auth-constants';
+import {
+  ADMIN_SESSION_ABSOLUTE_MAX_MS,
+  PRIVILEGED_IDLE_TIMEOUT_MS,
+} from '../constants/auth-constants';
 import { ActiveSessionRecord, AuthSessionService } from './auth-session.service';
 import { AuthCookieService } from './auth-cookie.service';
 import { AdminSessionClaims, TokenService } from './token.service';
@@ -23,6 +26,10 @@ function readCookie(request: Request, name: string): string | undefined {
   const value = (request.cookies as Record<string, unknown> | undefined)?.[name];
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
+
+// Roles that get force-logged-out after PRIVILEGED_IDLE_TIMEOUT_MS without an authenticated
+// request. Owner and customer sessions rely on the normal expiry/refresh flow instead.
+const IDLE_TIMEOUT_ROLES: ReadonlySet<Role> = new Set([Role.ADMIN, Role.STAFF]);
 
 @Injectable()
 export class SessionAuthenticator {
@@ -42,6 +49,14 @@ export class SessionAuthenticator {
 
     const record = await this.sessions.findActiveWithUser(claims.sid);
     if (!record || record.userId !== claims.sub || record.status !== UserStatus.ACTIVE) return null;
+
+    if (IDLE_TIMEOUT_ROLES.has(record.role)) {
+      if (Date.now() - record.lastUsedAt.getTime() > PRIVILEGED_IDLE_TIMEOUT_MS) {
+        await this.sessions.revoke(record.sessionId, 'idle-timeout');
+        return null;
+      }
+      await this.sessions.touchLastUsedAt(record.sessionId);
+    }
 
     return {
       id: record.userId,

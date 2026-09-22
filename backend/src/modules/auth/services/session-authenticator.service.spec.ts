@@ -29,6 +29,8 @@ const SESSION_ID = '22222222-2222-4222-8222-222222222222';
 describe('SessionAuthenticator', () => {
   const tokens = new TokenService(new JwtService(), config);
   let findActive: jest.Mock;
+  let revoke: jest.Mock;
+  let touchLastUsedAt: jest.Mock;
   let setAdminCookie: jest.Mock;
   let authenticator: SessionAuthenticator;
 
@@ -39,6 +41,7 @@ describe('SessionAuthenticator', () => {
     status: UserStatus.ACTIVE,
     adminSessionEndedAt: null,
     mustChangePassword: false,
+    lastUsedAt: new Date(),
     ...overrides,
   });
 
@@ -49,10 +52,16 @@ describe('SessionAuthenticator', () => {
 
   beforeEach(() => {
     findActive = jest.fn().mockResolvedValue(record());
+    revoke = jest.fn().mockResolvedValue(true);
+    touchLastUsedAt = jest.fn().mockResolvedValue(undefined);
     setAdminCookie = jest.fn();
     authenticator = new SessionAuthenticator(
       tokens,
-      { findActiveWithUser: findActive } as unknown as AuthSessionService,
+      {
+        findActiveWithUser: findActive,
+        revoke,
+        touchLastUsedAt,
+      } as unknown as AuthSessionService,
       { setAdminSessionCookie: setAdminCookie } as unknown as AuthCookieService,
       config,
     );
@@ -137,6 +146,77 @@ describe('SessionAuthenticator', () => {
           response,
         ),
       ).toBeNull();
+    });
+  });
+
+  describe('idle timeout', () => {
+    const staleLastUsedAt = () => new Date(Date.now() - 10 * 60_000 - 1000);
+
+    it('logs out an admin idle past 10 minutes and revokes the session', async () => {
+      findActive.mockResolvedValue(record({ role: Role.ADMIN, lastUsedAt: staleLastUsedAt() }));
+      expect(
+        await authenticator.authenticate(
+          requestWith({ [ACCESS_COOKIE_NAME]: accessCookie() }),
+          response,
+        ),
+      ).toBeNull();
+      expect(revoke).toHaveBeenCalledWith(SESSION_ID, 'idle-timeout');
+      expect(touchLastUsedAt).not.toHaveBeenCalled();
+    });
+
+    it('logs out staff idle past 10 minutes', async () => {
+      findActive.mockResolvedValue(record({ role: Role.STAFF, lastUsedAt: staleLastUsedAt() }));
+      expect(
+        await authenticator.authenticate(
+          requestWith({
+            [ACCESS_COOKIE_NAME]: accessCookie({ sub: USER_ID, sid: SESSION_ID, role: Role.STAFF }),
+          }),
+          response,
+        ),
+      ).toBeNull();
+      expect(revoke).toHaveBeenCalledWith(SESSION_ID, 'idle-timeout');
+    });
+
+    it('never times out the owner, no matter how idle', async () => {
+      findActive.mockResolvedValue(record({ role: Role.OWNER, lastUsedAt: staleLastUsedAt() }));
+      const user = await authenticator.authenticate(
+        requestWith({
+          [ACCESS_COOKIE_NAME]: accessCookie({ sub: USER_ID, sid: SESSION_ID, role: Role.OWNER }),
+        }),
+        response,
+      );
+      expect(user).not.toBeNull();
+      expect(revoke).not.toHaveBeenCalled();
+      expect(touchLastUsedAt).not.toHaveBeenCalled();
+    });
+
+    it('never times out a customer', async () => {
+      findActive.mockResolvedValue(record({ role: Role.CUSTOMER, lastUsedAt: staleLastUsedAt() }));
+      const user = await authenticator.authenticate(
+        requestWith({
+          [ACCESS_COOKIE_NAME]: accessCookie({
+            sub: USER_ID,
+            sid: SESSION_ID,
+            role: Role.CUSTOMER,
+          }),
+        }),
+        response,
+      );
+      expect(user).not.toBeNull();
+      expect(revoke).not.toHaveBeenCalled();
+    });
+
+    it('stays logged in and refreshes activity just under the 10 minute mark', async () => {
+      findActive.mockResolvedValue(
+        record({ role: Role.ADMIN, lastUsedAt: new Date(Date.now() - 9 * 60_000) }),
+      );
+      const user = await authenticator.authenticate(
+        requestWith({ [ACCESS_COOKIE_NAME]: accessCookie() }),
+        response,
+      );
+      expect(user).not.toBeNull();
+      expect(touchLastUsedAt).toHaveBeenCalledWith(SESSION_ID);
+      expect(revoke).not.toHaveBeenCalled();
     });
   });
 
@@ -232,6 +312,8 @@ describe('SessionAuthenticator', () => {
         const sat = Date.now();
         const token = adminToken({ sat });
         jest.setSystemTime(Date.now() + 16 * 60_000);
+        // Unrelated to the elevated-session slide under test: keep the login session itself fresh
+        findActive.mockResolvedValue(record({ lastUsedAt: new Date() }));
         const user = await authenticator.authenticate(requestWith(cookies(token)), response);
         expect(user?.adminSessionActive).toBe(true);
         expect(setAdminCookie).toHaveBeenCalledTimes(1);
