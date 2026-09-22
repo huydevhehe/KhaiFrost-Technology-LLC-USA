@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { Field, Input } from "@/components/admin/ui";
 import { ActionButton, Alert, AuthShell, FieldError, PasswordField, PasswordHints } from "@/components/account/ui";
 import { describeApiError, getFieldErrors } from "@/lib/api/errorMessages";
@@ -11,6 +12,7 @@ import { useRedirectWhenAuthenticated } from "@/lib/auth/useRedirectWhenAuthenti
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const { i18n } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -38,7 +40,7 @@ export default function RegisterPage() {
         phone: phone.trim(),
         email: email.trim().toLowerCase(),
         password,
-        preferredLocale: "vi",
+        preferredLocale: i18n.language?.startsWith("vi") ? "vi" : "en",
       });
     } catch (err) {
       setFieldErrors(getFieldErrors(err));

@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Heart, KeyRound, LayoutDashboard, LogOut, Monitor, ShoppingCart, Trash2 } from "lucide-react";
+import { AlertTriangle, Heart, KeyRound, LayoutDashboard, LogOut, Monitor, ShoppingCart, Trash2 } from "lucide-react";
 import { Field, Input, Panel, Select } from "@/components/admin/ui";
 import { ActionButton, Alert, FieldError } from "@/components/account/ui";
 import { accountApi } from "@/lib/api/account";
@@ -90,7 +90,83 @@ function AccountContent() {
           </ActionButton>
         </div>
       </Panel>
+
+      {!isStaff(user) && <DeleteAccountPanel />}
     </div>
+  );
+}
+
+function DeleteAccountPanel() {
+  const { refreshUser } = useAuth();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete(e: FormEvent) {
+    e.preventDefault();
+    if (submitting || !password) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await accountApi.deleteAccount(password);
+      await refreshUser();
+      router.replace("/");
+    } catch (err) {
+      setError(describeApiError(err));
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Panel title="Vùng nguy hiểm">
+      {!open ? (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-slate-900">Xoá tài khoản</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Xoá vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan. Không thể hoàn tác.
+            </p>
+          </div>
+          <ActionButton variant="danger" onClick={() => setOpen(true)}>
+            <AlertTriangle size={15} />
+            Xoá tài khoản
+          </ActionButton>
+        </div>
+      ) : (
+        <form onSubmit={handleDelete} className="flex flex-col gap-4" noValidate>
+          {error && <Alert>{error}</Alert>}
+          <Alert tone="info">Nhập mật khẩu hiện tại để xác nhận xoá vĩnh viễn tài khoản này.</Alert>
+          <Field label="Mật khẩu hiện tại" htmlFor="delete-account-password" required>
+            <Input
+              id="delete-account-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </Field>
+          <div className="flex gap-3">
+            <ActionButton type="submit" variant="danger" loading={submitting} disabled={!password}>
+              Xác nhận xoá vĩnh viễn
+            </ActionButton>
+            <ActionButton
+              variant="secondary"
+              disabled={submitting}
+              onClick={() => {
+                setOpen(false);
+                setPassword("");
+                setError(null);
+              }}
+            >
+              Huỷ
+            </ActionButton>
+          </div>
+        </form>
+      )}
+    </Panel>
   );
 }
 

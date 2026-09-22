@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { ImageOff, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { Panel } from "@/components/admin/ui";
 import { ActionButton, Alert } from "@/components/account/ui";
 import { accountApi } from "@/lib/api/account";
 import { describeApiError } from "@/lib/api/errorMessages";
-import type { BillingPeriod, Cart, CartItem, CartItemUnavailableReason } from "@/lib/api/types";
+import type { BillingPeriod, Cart, CartItem, CartItemUnavailableReason, Locale } from "@/lib/api/types";
 import { formatMoney } from "@/lib/format";
 
 const MAX_QUANTITY = 99;
@@ -26,18 +27,20 @@ const unavailableLabel: Record<CartItemUnavailableReason, string> = {
 };
 
 export default function CartPage() {
+  const { i18n } = useTranslation();
+  const locale: Locale = i18n.language?.startsWith("vi") ? "vi" : "en";
   const [cart, setCart] = useState<Cart | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      setCart(await accountApi.cart.get("vi"));
+      setCart(await accountApi.cart.get(locale));
       setError(null);
     } catch (err) {
       setError(describeApiError(err));
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     void (async () => {
@@ -69,7 +72,7 @@ export default function CartPage() {
           </p>
         </div>
         {items.length > 0 && (
-          <ActionButton variant="danger" disabled={busy !== null} onClick={() => run("clear", () => accountApi.cart.clear("vi"))}>
+          <ActionButton variant="danger" disabled={busy !== null} onClick={() => run("clear", () => accountApi.cart.clear(locale))}>
             <Trash2 size={15} />
             Xoá toàn bộ
           </ActionButton>
@@ -109,8 +112,8 @@ export default function CartPage() {
                 key={item.id}
                 item={item}
                 busy={busy !== null}
-                onQuantity={(q) => run(item.id, () => accountApi.cart.updateItem(item.id, q, "vi"))}
-                onRemove={() => run(item.id, () => accountApi.cart.removeItem(item.id, "vi"))}
+                onQuantity={(q) => run(item.id, () => accountApi.cart.updateItem(item.id, q, locale))}
+                onRemove={() => run(item.id, () => accountApi.cart.removeItem(item.id, locale))}
               />
             ))}
           </ul>
@@ -160,7 +163,13 @@ function CartRow({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-slate-900">{name}</p>
+        {item.product?.slug ? (
+          <Link href={`/san-pham/${item.product.slug}`} className="hover:text-accent transition-colors">
+            <p className="font-semibold text-slate-900">{name}</p>
+          </Link>
+        ) : (
+          <p className="font-semibold text-slate-900">{name}</p>
+        )}
         <p className="text-xs text-slate-500">{periodLabel[item.billingPeriod]}</p>
         <div className="mt-1.5 flex flex-wrap gap-2">
           {item.unavailable && (

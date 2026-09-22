@@ -96,9 +96,13 @@ export function AdminGate({ children }: { children: ReactNode }) {
   const { user, status, adminSessionActive } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [shellReady, setShellReady] = useState(false);
+  const [shellReady, setShellReady] = useState(() => adminSessionActive);
+  const [prevAdminSessionActive, setPrevAdminSessionActive] = useState(adminSessionActive);
 
-  if (adminSessionActive && !shellReady) setShellReady(true);
+  if (adminSessionActive !== prevAdminSessionActive) {
+    setPrevAdminSessionActive(adminSessionActive);
+    if (adminSessionActive) setShellReady(true);
+  }
 
   const staff = isStaff(user);
   const mustChange = !!user?.mustChangePassword;

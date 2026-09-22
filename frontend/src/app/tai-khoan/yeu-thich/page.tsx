@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { Heart, ImageOff } from "lucide-react";
 import { Panel } from "@/components/admin/ui";
 import { ActionButton, Alert } from "@/components/account/ui";
 import { accountApi } from "@/lib/api/account";
 import { describeApiError } from "@/lib/api/errorMessages";
-import type { ProductCard } from "@/lib/api/types";
+import type { Locale, ProductCard } from "@/lib/api/types";
 import { formatMoney } from "@/lib/format";
 
 const PAGE_SIZE = 12;
@@ -21,6 +22,8 @@ function priceLabel(product: ProductCard): string {
 }
 
 export default function FavoritesPage() {
+  const { i18n } = useTranslation();
+  const locale: Locale = i18n.language?.startsWith("vi") ? "vi" : "en";
   const [items, setItems] = useState<ProductCard[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -32,7 +35,7 @@ export default function FavoritesPage() {
   const load = useCallback(async (targetPage: number) => {
     setLoading(true);
     try {
-      const result = await accountApi.favorites.list({ page: targetPage, pageSize: PAGE_SIZE });
+      const result = await accountApi.favorites.list({ locale, page: targetPage, pageSize: PAGE_SIZE });
       setItems(result.items);
       setTotal(result.meta.total);
       setTotalPages(Math.max(1, result.meta.totalPages));
@@ -42,7 +45,7 @@ export default function FavoritesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     void (async () => {
@@ -115,7 +118,9 @@ export default function FavoritesPage() {
                 </button>
               </div>
               <div className="p-4">
-                <h2 className="font-semibold text-slate-900">{product.name}</h2>
+                <Link href={`/san-pham/${product.slug}`} className="hover:text-accent transition-colors">
+                  <h2 className="font-semibold text-slate-900">{product.name}</h2>
+                </Link>
                 {product.tagline && <p className="mt-1 line-clamp-2 text-sm text-slate-500">{product.tagline}</p>}
                 <p className="mt-3 text-sm font-semibold text-accent">{priceLabel(product)}</p>
               </div>
