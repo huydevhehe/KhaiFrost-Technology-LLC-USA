@@ -78,7 +78,7 @@ export function GlobalClientsMap() {
           <SectionEyebrow>{section("eyebrow", t("globalClients.eyebrow"))}</SectionEyebrow>
           <SectionHeading>{section("heading", t("globalClients.heading"))}</SectionHeading>
         </div>
-        <div className="relative mx-auto aspect-[2/1] w-full rounded-2xl bg-navy shadow-lg">
+        <div className="relative mx-auto aspect-[2/1] w-full overflow-hidden rounded-2xl bg-navy shadow-lg">
           <div className="absolute inset-0 overflow-hidden rounded-2xl">
             <Image
               src="/images/map/global-reach.jpg"
