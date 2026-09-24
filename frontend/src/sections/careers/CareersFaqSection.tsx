@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { useLocalizedField } from "@/lib/useLocalizedField";
+import { careersFaqMentor, careersFaqRecruitment } from "@/content/careersPageData";
+import { siteConfig } from "@/content/siteConfig";
 import { ServiceCategoryFaqItem } from "@/types";
 
 function FaqAccordionItem({ item }: { item: ServiceCategoryFaqItem }) {
@@ -35,60 +37,49 @@ function FaqAccordionItem({ item }: { item: ServiceCategoryFaqItem }) {
   );
 }
 
-export function CategoryFaq({
-  eyebrow,
-  heading,
-  faq,
-  cta,
-}: {
-  eyebrow: string;
-  heading: string;
-  faq: ServiceCategoryFaqItem[];
-  // Sidebar CTA copy override — falls back to the service-category default text below.
-  cta?: {
-    eyebrow: string;
-    heading: string;
-    text: string;
-    primaryLabel: string;
-    secondaryLabel: string;
-    href?: string;
-  };
-}) {
+function FaqColumn({ label, items }: { label: string; items: ServiceCategoryFaqItem[] }) {
+  return (
+    <div>
+      <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">{label}</p>
+      <div className="space-y-4">
+        {items.map((item, index) => (
+          <FaqAccordionItem key={index} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CareersFaqSection() {
   const { t } = useTranslation();
-  const href = cta?.href ?? "/lien-he";
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10">
-          <SectionEyebrow>{eyebrow}</SectionEyebrow>
-          <SectionHeading>{heading}</SectionHeading>
+          <SectionEyebrow>{t("careersPage.faq.eyebrow")}</SectionEyebrow>
+          <SectionHeading>{t("careersPage.faq.heading")}</SectionHeading>
         </div>
-        <div className="grid gap-8 md:grid-cols-[1.4fr_1fr]">
-          <div className="space-y-4">
-            {faq.map((item, index) => (
-              <FaqAccordionItem key={index} item={item} />
-            ))}
-          </div>
+        <div className="grid gap-8 md:grid-cols-[1fr_1fr_0.85fr]">
+          <FaqColumn label={t("careersPage.faq.recruitmentLabel")} items={careersFaqRecruitment} />
+          <FaqColumn label={t("careersPage.faq.mentorLabel")} items={careersFaqMentor} />
+
           <div className="h-fit rounded-xl bg-slate-50 p-6">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
-              {cta?.eyebrow ?? t("serviceCategoryPage.faq.cta.eyebrow")}
+              {t("careersPage.faq.cta.eyebrow")}
             </p>
-            <h3 className="text-lg font-bold text-slate-900">
-              {cta?.heading ?? t("serviceCategoryPage.faq.cta.heading")}
-            </h3>
-            <p className="mt-2 text-sm text-slate-500">
-              {cta?.text ?? t("serviceCategoryPage.faq.cta.text")}
-            </p>
+            <h3 className="text-lg font-bold text-slate-900">{t("careersPage.faq.cta.heading")}</h3>
+            <p className="mt-2 text-sm text-slate-500">{t("careersPage.faq.cta.text")}</p>
             <div className="mt-5 flex flex-col gap-3">
-              <Button href={href} variant="primary-blue">
-                {cta?.primaryLabel ?? t("serviceCategoryPage.faq.cta.primaryCta")}
+              <Button href="/lien-he" variant="primary-blue">
+                {t("careersPage.faq.cta.primaryCta")}
               </Button>
               <Link
-                href={href}
+                href={`mailto:${siteConfig.email}`}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
               >
-                {cta?.secondaryLabel ?? t("serviceCategoryPage.faq.cta.secondaryCta")}
+                <Mail size={16} />
+                {t("careersPage.faq.cta.secondaryCta")}
               </Link>
             </div>
           </div>

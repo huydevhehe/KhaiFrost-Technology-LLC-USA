@@ -4,6 +4,7 @@
     "service": "Service",
     "discover": "Discover",
     "about": "About Us",
+    "careers": "Careers",
     "contact": "Contact",
     "getStarted": "Get Started",
     "demo": "Demo"
@@ -161,6 +162,69 @@
       }
     }
   },
+  "postDetailPage": {
+    "breadcrumb": {
+      "home": "Home",
+      "posts": "Articles"
+    },
+    "hero": {
+      "readingTime": "{{count}} min read"
+    },
+    "sidebar": {
+      "topics": "Topics",
+      "related": "Related in this topic"
+    },
+    "neighborNav": {
+      "previous": "Previous article",
+      "next": "Next article"
+    },
+    "related": {
+      "heading": "Related articles"
+    }
+  },
+  "productDetailPage": {
+    "breadcrumb": {
+      "home": "Home",
+      "products": "Products"
+    },
+    "sections": {
+      "description": "Product Description",
+      "features": "Key Features",
+      "techStack": "Tech Stack",
+      "specs": "Specifications",
+      "related": "Related Products"
+    },
+    "related": {
+      "intro": "A few more products you might like."
+    },
+    "gallery": {
+      "previous": "Previous image",
+      "next": "Next image",
+      "moreImages": "+{{count}} photos"
+    },
+    "sidebar": {
+      "choosePlan": "Choose a plan",
+      "periodMonthly": "Monthly",
+      "periodYearly": "Yearly",
+      "periodOneTime": "One-time",
+      "periodMonthShort": "month",
+      "periodYearShort": "year",
+      "priceOnRequest": "Contact us for a quote",
+      "bullet1": "Full access to every feature",
+      "bullet2": "12 months of free updates",
+      "bullet3": "Lifetime technical support",
+      "bullet4": "Unlimited domains",
+      "addToCart": "Add to Cart",
+      "addedToCart": "Added to cart",
+      "contactCta": "Talk to us",
+      "viewDemo": "View Live Demo",
+      "favoriteToggle": "Toggle favorite",
+      "infoDelivery": "Instant delivery",
+      "infoSupport": "24/7 support",
+      "infoWarranty": "12-month warranty",
+      "infoPayment": "Secure payment"
+    }
+  },
   "servicesOverviewPage": {
     "breadcrumb": {
       "current": "Service"
@@ -266,13 +330,74 @@
       "button": "Start Your Project →"
     }
   },
+  "careersPage": {
+    "breadcrumb": {
+      "current": "Careers"
+    },
+    "hero": {
+      "eyebrow": "Join KhaiFrost",
+      "headlineLine1": "Real work,",
+      "headlineLine2": "learned on real projects",
+      "description": "We're hiring for full-time roles and welcoming people into our mentorship program, working on live cloud and infrastructure projects.",
+      "imageAlt": "KhaiFrost team working at the office",
+      "ctaPositions": "View open positions →",
+      "ctaMentor": "Explore the Mentor program →"
+    },
+    "paths": {
+      "eyebrow": "Two Ways to Join KhaiFrost",
+      "heading": "Two paths, one journey",
+      "recruitment": {
+        "title": "Full-Time Hiring",
+        "body": "Join our full-time team in roles like Developer, AI Engineer, Cloud/DevOps, or Cybersecurity — with a clear growth path and stable benefits.",
+        "cta": "View open positions →"
+      },
+      "mentor": {
+        "badge": "New",
+        "title": "Real-Project Mentor Program",
+        "body": "Work directly on live cloud and infrastructure projects for real clients, paired 1-on-1 with a senior mentor. Great for students, juniors, or career switchers.",
+        "cta": "Explore the program →"
+      }
+    },
+    "benefits": {
+      "eyebrow": "Why KhaiFrost",
+      "heading": "A workplace you'll actually enjoy"
+    },
+    "positions": {
+      "eyebrow": "Open Positions",
+      "heading": "Current career opportunities",
+      "empty": "No matching openings right now, but we always welcome applications.",
+      "applyButton": "Apply now"
+    },
+    "mentor": {
+      "eyebrow": "Mentor Program",
+      "heading": "Learn by doing — on real client projects",
+      "intro": "Not a theory course. You'll work directly on live cloud and infrastructure projects (AWS migration, CI/CD, infrastructure as code, systems monitoring, and more) under the guidance of senior engineers.",
+      "processLabel": "How It Works",
+      "benefitsHeading": "What you'll get",
+      "fitForHeading": "Who it's for",
+      "ctaButton": "Apply for the Mentor program →"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Answers to your questions",
+      "recruitmentLabel": "About Hiring",
+      "mentorLabel": "About the Mentor Program",
+      "cta": {
+        "eyebrow": "Ready to join?",
+        "heading": "Send us your application",
+        "text": "Tell us who you are, what skills you bring, and what you'd like to contribute. We'll get back to you as soon as we can.",
+        "primaryCta": "Contact to apply →",
+        "secondaryCta": "Email us"
+      }
+    }
+  },
   "footer": {
     "description": "KhaiFrost Technology LLC builds AI-powered software, cloud infrastructure and automation tools for businesses in the USA and worldwide.",
     "quickLinks": "Quick Links",
     "ourServices": "Our Services",
     "contactUs": "Contact Us",
     "ourOffices": "Our Offices",
-    "copyright": "© 2025 KhaiFrost Technology LLC. All rights reserved.",
+    "copyright": "© {{year}} KhaiFrost Technology LLC. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms"
   }

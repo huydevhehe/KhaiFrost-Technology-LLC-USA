@@ -4,6 +4,7 @@
     "service": "Dịch vụ",
     "discover": "Khám phá",
     "about": "Về chúng tôi",
+    "careers": "Tuyển dụng",
     "contact": "Liên hệ",
     "getStarted": "Bắt đầu ngay",
     "demo": "Demo"
@@ -161,6 +162,69 @@
       }
     }
   },
+  "postDetailPage": {
+    "breadcrumb": {
+      "home": "Trang chủ",
+      "posts": "Bài viết"
+    },
+    "hero": {
+      "readingTime": "{{count}} phút đọc"
+    },
+    "sidebar": {
+      "topics": "Chủ đề",
+      "related": "Bài viết cùng chủ đề"
+    },
+    "neighborNav": {
+      "previous": "Bài trước",
+      "next": "Bài sau"
+    },
+    "related": {
+      "heading": "Bài viết liên quan"
+    }
+  },
+  "productDetailPage": {
+    "breadcrumb": {
+      "home": "Trang chủ",
+      "products": "Sản phẩm"
+    },
+    "sections": {
+      "description": "Mô tả sản phẩm",
+      "features": "Tính năng nổi bật",
+      "techStack": "Công nghệ sử dụng",
+      "specs": "Thông số kỹ thuật",
+      "related": "Sản phẩm liên quan"
+    },
+    "related": {
+      "intro": "Một vài sản phẩm khác bạn có thể quan tâm."
+    },
+    "gallery": {
+      "previous": "Ảnh trước",
+      "next": "Ảnh sau",
+      "moreImages": "+{{count}} ảnh"
+    },
+    "sidebar": {
+      "choosePlan": "Chọn phiên bản",
+      "periodMonthly": "1 tháng",
+      "periodYearly": "1 năm",
+      "periodOneTime": "Trọn gói",
+      "periodMonthShort": "tháng",
+      "periodYearShort": "năm",
+      "priceOnRequest": "Liên hệ để nhận báo giá",
+      "bullet1": "Sử dụng đầy đủ tính năng",
+      "bullet2": "Cập nhật miễn phí 12 tháng",
+      "bullet3": "Hỗ trợ kỹ thuật trọn đời",
+      "bullet4": "Không giới hạn tên miền",
+      "addToCart": "Thêm vào giỏ hàng",
+      "addedToCart": "Đã thêm vào giỏ",
+      "contactCta": "Liên hệ tư vấn",
+      "viewDemo": "Xem demo trực tiếp",
+      "favoriteToggle": "Yêu thích",
+      "infoDelivery": "Bàn giao ngay",
+      "infoSupport": "Hỗ trợ 24/7",
+      "infoWarranty": "Bảo hành 12 tháng",
+      "infoPayment": "Thanh toán an toàn"
+    }
+  },
   "servicesOverviewPage": {
     "breadcrumb": {
       "current": "Dịch vụ"
@@ -266,13 +330,74 @@
       "button": "Bắt đầu dự án của bạn →"
     }
   },
+  "careersPage": {
+    "breadcrumb": {
+      "current": "Tuyển dụng"
+    },
+    "hero": {
+      "eyebrow": "Gia nhập KhaiFrost",
+      "headlineLine1": "Làm việc thật,",
+      "headlineLine2": "học từ dự án thật",
+      "description": "Chúng tôi tuyển dụng các vị trí full-time và nhận người tham gia chương trình mentor theo dự án cloud/hạ tầng thực tế.",
+      "imageAlt": "Đội ngũ KhaiFrost làm việc tại văn phòng",
+      "ctaPositions": "Xem vị trí tuyển dụng →",
+      "ctaMentor": "Tìm hiểu chương trình Mentor →"
+    },
+    "paths": {
+      "eyebrow": "Hai cách gia nhập KhaiFrost",
+      "heading": "Hai con đường, một hành trình",
+      "recruitment": {
+        "title": "Tuyển dụng chính thức",
+        "body": "Gia nhập đội ngũ full-time với các vị trí Dev, AI Engineer, Cloud/DevOps, Cybersecurity... cùng lộ trình phát triển rõ ràng và chế độ đãi ngộ ổn định.",
+        "cta": "Xem vị trí đang tuyển →"
+      },
+      "mentor": {
+        "badge": "Mới",
+        "title": "Chương trình Mentor dự án thực tế",
+        "body": "Làm trực tiếp trên các dự án cloud/hạ tầng đang triển khai cho khách hàng, có mentor senior kèm 1-1. Phù hợp với sinh viên, junior hoặc người chuyển ngành.",
+        "cta": "Tìm hiểu chương trình →"
+      }
+    },
+    "benefits": {
+      "eyebrow": "Vì sao chọn KhaiFrost",
+      "heading": "Môi trường làm việc bạn sẽ thích"
+    },
+    "positions": {
+      "eyebrow": "Vị trí đang tuyển",
+      "heading": "Cơ hội nghề nghiệp hiện có",
+      "empty": "Hiện chưa có vị trí phù hợp, nhưng chúng tôi luôn chào đón hồ sơ ứng tuyển.",
+      "applyButton": "Ứng tuyển ngay"
+    },
+    "mentor": {
+      "eyebrow": "Chương trình Mentor",
+      "heading": "Học bằng cách làm — trên dự án khách hàng thật",
+      "intro": "Không phải khóa học lý thuyết. Bạn sẽ tham gia trực tiếp vào các dự án cloud/hạ tầng đang triển khai (AWS migration, CI/CD, infrastructure as code, giám sát hệ thống...) dưới sự dẫn dắt của kỹ sư senior.",
+      "processLabel": "Quy trình",
+      "benefitsHeading": "Bạn sẽ được gì",
+      "fitForHeading": "Phù hợp với ai",
+      "ctaButton": "Đăng ký tham gia chương trình Mentor →"
+    },
+    "faq": {
+      "eyebrow": "Câu hỏi thường gặp",
+      "heading": "Giải đáp thắc mắc của bạn",
+      "recruitmentLabel": "Về tuyển dụng",
+      "mentorLabel": "Về chương trình Mentor",
+      "cta": {
+        "eyebrow": "Sẵn sàng gia nhập?",
+        "heading": "Gửi hồ sơ ứng tuyển cho chúng tôi",
+        "text": "Hãy cho chúng tôi biết bạn là ai, kỹ năng của bạn và bạn muốn đóng góp gì. Chúng tôi sẽ phản hồi sớm nhất.",
+        "primaryCta": "Liên hệ ứng tuyển →",
+        "secondaryCta": "Gửi email cho chúng tôi"
+      }
+    }
+  },
   "footer": {
     "description": "KhaiFrost Technology LLC xây dựng phần mềm AI, hạ tầng cloud và công cụ tự động hoá cho doanh nghiệp tại Mỹ và trên toàn thế giới.",
     "quickLinks": "Liên kết nhanh",
     "ourServices": "Dịch vụ",
     "contactUs": "Liên hệ",
     "ourOffices": "Văn phòng",
-    "copyright": "© 2025 KhaiFrost Technology LLC. Đã đăng ký bản quyền.",
+    "copyright": "© {{year}} KhaiFrost Technology LLC. Đã đăng ký bản quyền.",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản"
   }

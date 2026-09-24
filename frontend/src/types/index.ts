@@ -4,7 +4,7 @@ export interface LocalizedText {
 }
 
 export interface NavLink {
-  key: "home" | "service" | "discover" | "about" | "contact";
+  key: "home" | "service" | "discover" | "about" | "careers" | "contact";
   href: string;
 }
 
@@ -35,6 +35,7 @@ export interface Project {
 
 export interface BlogPost {
   id: string;
+  slug?: string;
   title: LocalizedText;
   excerpt: LocalizedText;
   date: string;
@@ -120,7 +121,9 @@ export type CategoryIcon =
   | "target"
   | "calendar"
   | "globe"
-  | "heart";
+  | "heart"
+  | "fileText"
+  | "check";
 
 export interface ServiceCategoryStat {
   icon: CategoryIcon;

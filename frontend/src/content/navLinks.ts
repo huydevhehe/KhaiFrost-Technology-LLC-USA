@@ -5,5 +5,6 @@ export const navLinks: NavLink[] = [
   { key: "service", href: "/dich-vu" },
   { key: "discover", href: "/du-an" },
   { key: "about", href: "/ve-chung-toi" },
+  { key: "careers", href: "/tuyen-dung" },
   { key: "contact", href: "/lien-he" },
 ];

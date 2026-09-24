@@ -20,6 +20,8 @@ import {
   Calendar,
   Globe,
   Heart,
+  FileText,
+  Check,
   LucideIcon,
 } from "lucide-react";
 import { WhyUsIcon, ServiceIcon, CategoryIcon } from "@/types";
@@ -46,6 +48,8 @@ const iconMap: Record<WhyUsIcon | ServiceIcon | CategoryIcon, LucideIcon> = {
   calendar: Calendar,
   globe: Globe,
   heart: Heart,
+  fileText: FileText,
+  check: Check,
 };
 
 export function IconCircle({
