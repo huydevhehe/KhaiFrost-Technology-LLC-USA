@@ -13,12 +13,15 @@ export async function restrictAuditToViewer<T extends ObjectLiteral>(
   alias = 'entry',
 ): Promise<SelectQueryBuilder<T>> {
   if (canSeeOwners(viewerRole) || !manager.connection.hasMetadata(User)) return builder;
+  // Drop every row an owner acted in, whatever entity it targets (login, session, settings, ...)
+  builder.andWhere(`${alias}.actorRole IS DISTINCT FROM 'owner'`);
   const owners = await manager.getRepository(User).find({
     select: { id: true },
     where: { role: Role.OWNER },
     withDeleted: true,
   });
   if (owners.length) {
+    // Also drop rows where someone else acted ON an owner's User record (e.g. an admin editing it)
     builder.andWhere(
       `(${alias}.entityName IS DISTINCT FROM 'User' OR ${alias}.entityId IS NULL OR ${alias}.entityId NOT IN (:...auditOwnerIds))`,
       { auditOwnerIds: owners.map((owner) => owner.id) },
