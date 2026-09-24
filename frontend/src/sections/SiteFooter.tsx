@@ -5,24 +5,53 @@ import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SocialIcons } from "@/components/ui/SocialIcons";
-import { useFooterNav, useSiteConfig } from "@/lib/content/site";
+import { useFooterNav, useSiteConfig, type ResolvedOffice } from "@/lib/content/site";
+import { useLocalizedField } from "@/lib/useLocalizedField";
+
+function OfficeMarker({ office }: { office: ResolvedOffice }) {
+  const label = useLocalizedField(office.label);
+  const addressParts = [office.street, [office.city, office.state].filter(Boolean).join(", ")].filter(Boolean);
+
+  const horizontalAnchor = office.x > 60 ? "right-0" : office.x < 40 ? "left-0" : "left-1/2 -translate-x-1/2";
+  const verticalAnchor = office.y > 70 ? "bottom-full mb-2" : "top-full mt-2";
+
+  return (
+    <div className="group absolute z-10" style={{ left: `${office.x}%`, top: `${office.y}%` }}>
+      <span className="absolute -left-1.5 -top-1.5 h-3 w-3 animate-ping rounded-full bg-accent/70" />
+      <span className="relative block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-accent shadow-[0_0_0_2px_rgba(11,17,32,0.5)]" />
+
+      <div
+        className={`pointer-events-none absolute ${horizontalAnchor} ${verticalAnchor} z-30 w-36 rounded-lg border border-white/10 bg-slate-900 p-2.5 opacity-0 shadow-2xl transition-opacity duration-200 group-hover:opacity-100`}
+      >
+        <p className="text-[11px] font-semibold text-white">{label}</p>
+        <p className="mt-1 text-[10px] leading-relaxed text-white/60">{addressParts.join(", ")}</p>
+      </div>
+    </div>
+  );
+}
 
 function OfficeMap() {
   const { t } = useTranslation();
+  const { offices } = useSiteConfig();
 
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
         {t("footer.ourOffices")}
       </p>
-      <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg bg-navy">
-        <Image
-          src="/images/map/global-reach.jpg"
-          alt="Global map showing KhaiFrost offices in Houston and Ho Chi Minh City"
-          fill
-          sizes="320px"
-          className="object-cover"
-        />
+      <div className="relative aspect-[2/1] w-full rounded-lg bg-navy">
+        <div className="absolute inset-0 overflow-hidden rounded-lg">
+          <Image
+            src="/images/map/global-reach.jpg"
+            alt="Global map showing KhaiFrost offices in Houston and Ho Chi Minh City"
+            fill
+            sizes="320px"
+            className="object-cover"
+          />
+        </div>
+        {offices.map((office) => (
+          <OfficeMarker key={office.id} office={office} />
+        ))}
       </div>
     </div>
   );
@@ -118,7 +147,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row">
-          <p>{t("footer.copyright")}</p>
+          <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
           <div className="flex items-center gap-4">
             <Link href="#">{t("footer.privacy")}</Link>
             <Link href="#">{t("footer.terms")}</Link>

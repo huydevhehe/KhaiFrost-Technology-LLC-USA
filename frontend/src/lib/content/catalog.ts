@@ -131,6 +131,7 @@ export function useProjectCategories(): ProjectCategoryFilter[] {
 
 interface PostDto {
   id?: string;
+  slug?: string;
   title?: string;
   excerpt?: string;
   coverImage?: { url?: string | null; thumbnailUrl?: string | null } | null;
@@ -150,15 +151,16 @@ function mapPosts(locale: ContentLocale, dtos: PostDto[] | undefined): BlogPost[
     const thumbnail = text(dto.coverImage?.url, "");
     if (typeof dto.id !== "string" || thumbnail === "") continue;
     const fallback = blogPosts[mapped.length];
+    const slug = text(dto.slug, "");
     mapped.push({
       id: dto.id,
+      slug: slug || undefined,
       title: localized(locale, dto.title, fallback?.title ?? { en: "", vi: "" }),
       excerpt: localized(locale, dto.excerpt, fallback?.excerpt ?? { en: "", vi: "" }),
       date: formatPostDate(dto.publishedAt, fallback?.date ?? ""),
       thumbnail,
       hasVideo: false,
-      // Article detail pages are built separately; the card stays a placeholder link for now.
-      href: "#",
+      href: slug ? `/bai-viet/${slug}` : "#",
     });
   }
   return mapped.length > 0 ? mapped : blogPosts;

@@ -138,7 +138,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
       <div className="flex w-full flex-1 items-center justify-center bg-white px-6 py-10 sm:px-8 lg:w-1/2">
         <div className="w-full max-w-sm">
           {children}
-          <p className="mt-8 text-center text-xs text-slate-400">© 2025 KhaiFrost Technology LLC</p>
+          <p className="mt-8 text-center text-xs text-slate-400">© {new Date().getFullYear()} KhaiFrost Technology LLC</p>
         </div>
       </div>
     </div>
