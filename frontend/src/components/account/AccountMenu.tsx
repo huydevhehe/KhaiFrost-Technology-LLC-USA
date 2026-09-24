@@ -32,21 +32,9 @@ export function AccountMenu() {
 
   if (status === "loading") return <div className="h-9 w-9" aria-hidden />;
 
-  if (!user) {
-    return (
-      <div className="flex items-center gap-2 text-sm font-medium text-white">
-        <Link href="/login" className="rounded-lg px-3 py-1.5 transition-colors hover:bg-white/10">
-          Đăng nhập
-        </Link>
-        <Link
-          href="/dang-ky"
-          className="hidden rounded-lg px-3 py-1.5 transition-colors hover:bg-white/10 sm:inline-block"
-        >
-          Đăng ký
-        </Link>
-      </div>
-    );
-  }
+  // Signed-out visitors already have a single entry point: the header's
+  // "Get Started" button (links to /login). Don't duplicate it here.
+  if (!user) return null;
 
   const itemClass = "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50";
 
