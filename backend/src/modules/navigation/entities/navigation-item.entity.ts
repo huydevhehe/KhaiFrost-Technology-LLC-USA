@@ -42,4 +42,8 @@ export class NavigationItem extends BaseEntity {
 
   @Column({ type: 'boolean', default: true })
   isVisible!: boolean;
+
+  /** Renders as a highlighted call-to-action instead of a plain link (e.g. header "Demo" button). */
+  @Column({ type: 'boolean', default: false })
+  isFeatured!: boolean;
 }

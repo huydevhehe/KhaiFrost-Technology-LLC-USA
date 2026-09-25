@@ -39,6 +39,7 @@ export interface NavigationItem {
   url: string | null;
   openInNewTab: boolean;
   isVisible: boolean;
+  isFeatured: boolean;
   translations: Partial<Record<Locale, { label: string }>>;
   children: NavigationItem[];
 }
@@ -58,6 +59,7 @@ export interface NavigationItemInput {
   url?: string | null;
   openInNewTab?: boolean;
   isVisible?: boolean;
+  isFeatured?: boolean;
   translations: Record<Locale, { label: string }>;
   children?: NavigationItemInput[];
 }

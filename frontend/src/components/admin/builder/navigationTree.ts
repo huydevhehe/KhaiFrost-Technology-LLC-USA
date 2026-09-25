@@ -20,6 +20,7 @@ export interface MenuNode {
   url: string;
   openInNewTab: boolean;
   isVisible: boolean;
+  isFeatured: boolean;
   labels: Record<Locale, string>;
   children: MenuNode[];
 }
@@ -41,6 +42,7 @@ export function createNode(): MenuNode {
     url: "",
     openInNewTab: false,
     isVisible: true,
+    isFeatured: false,
     labels: { vi: "", en: "" },
     children: [],
   };
@@ -55,6 +57,7 @@ export function toMenuNodes(items: NavigationItem[]): MenuNode[] {
     url: item.url ?? "",
     openInNewTab: item.openInNewTab,
     isVisible: item.isVisible,
+    isFeatured: item.isFeatured,
     labels: {
       vi: item.translations?.vi?.label ?? "",
       en: item.translations?.en?.label ?? "",
@@ -71,6 +74,7 @@ export function toNavigationInput(nodes: MenuNode[]): NavigationItemInput[] {
     url: node.linkType === "external" || node.linkType === "path" ? node.url.trim() : null,
     openInNewTab: node.openInNewTab,
     isVisible: node.isVisible,
+    isFeatured: node.isFeatured,
     translations: {
       vi: { label: node.labels.vi.trim() },
       en: { label: node.labels.en.trim() },
@@ -219,6 +223,7 @@ export interface PreviewNode {
   label: string;
   href: string | null;
   openInNewTab: boolean;
+  isFeatured: boolean;
   children: PreviewNode[];
 }
 
@@ -242,6 +247,7 @@ export function toPreview(
             ? null
             : node.url.trim() || null,
       openInNewTab: node.openInNewTab,
+      isFeatured: node.isFeatured,
       children: toPreview(node.children, locale, pathOfPage),
     }))
     .filter((node) => node.href !== null || node.children.length > 0);

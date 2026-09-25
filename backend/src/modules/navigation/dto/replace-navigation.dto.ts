@@ -73,6 +73,14 @@ export class NavigationItemInputDto {
   @IsBoolean()
   isVisible?: boolean;
 
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Renders as a highlighted call-to-action instead of a plain link',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
+
   @ApiProperty({ type: NavigationLabelsDto })
   @IsDefined()
   @ValidateNested()

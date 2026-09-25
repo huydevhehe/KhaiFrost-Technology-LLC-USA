@@ -8,6 +8,7 @@ export class AdminNavigationItemDto {
   @ApiProperty({ nullable: true, type: String }) url!: string | null;
   @ApiProperty() openInNewTab!: boolean;
   @ApiProperty() isVisible!: boolean;
+  @ApiProperty() isFeatured!: boolean;
   @ApiProperty({ type: Object }) translations!: Record<string, { label: string }>;
   @ApiProperty({ type: () => [AdminNavigationItemDto] }) children!: AdminNavigationItemDto[];
 }
@@ -23,6 +24,7 @@ export class PublicNavigationItemDto {
   @ApiProperty() label!: string;
   @ApiProperty({ nullable: true, type: String }) href!: string | null;
   @ApiProperty() openInNewTab!: boolean;
+  @ApiProperty() isFeatured!: boolean;
   @ApiProperty({ type: () => [PublicNavigationItemDto] }) children!: PublicNavigationItemDto[];
 }
 

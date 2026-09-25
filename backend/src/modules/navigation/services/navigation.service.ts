@@ -63,6 +63,7 @@ export class NavigationService {
         url: item.url,
         openInNewTab: item.openInNewTab,
         isVisible: item.isVisible,
+        isFeatured: item.isFeatured,
         translations: Object.fromEntries(
           Object.entries(labels).map(([locale, label]) => [locale, { label: label ?? '' }]),
         ),
@@ -135,6 +136,7 @@ export class NavigationService {
                 : null,
             openInNewTab: node.input.openInNewTab ?? false,
             isVisible: node.input.isVisible ?? true,
+            isFeatured: node.input.isFeatured ?? false,
           }),
         );
         await manager.save(NavigationItem, itemEntities, { chunk: 100 });
@@ -188,6 +190,7 @@ export class NavigationService {
         label: labels[locale] ?? labels[Locale.VI] ?? '',
         href,
         openInNewTab: item.openInNewTab,
+        isFeatured: item.isFeatured,
         children: [],
       });
       visibleItems.push(item);

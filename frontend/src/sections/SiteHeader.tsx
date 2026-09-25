@@ -43,35 +43,29 @@ export function SiteHeader() {
           )}
         </Link>
         <nav className="hidden items-center gap-2 text-base font-medium text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] md:flex">
-          {links.slice(0, 3).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              target={link.newTab ? "_blank" : undefined}
-              transitionTypes={["nav-forward"]}
-              className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/demo"
-            transitionTypes={["nav-forward"]}
-            className="rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-white shadow-md drop-shadow-none transition-all duration-300 ease-out hover:scale-105 hover:bg-accent/90"
-          >
-            {t("nav.demo")}
-          </Link>
-          {links.slice(3).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              target={link.newTab ? "_blank" : undefined}
-              transitionTypes={["nav-forward"]}
-              className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) =>
+            link.featured ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                target={link.newTab ? "_blank" : undefined}
+                transitionTypes={["nav-forward"]}
+                className="rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-white shadow-md drop-shadow-none transition-all duration-300 ease-out hover:scale-105 hover:bg-accent/90"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                target={link.newTab ? "_blank" : undefined}
+                transitionTypes={["nav-forward"]}
+                className="inline-block rounded-lg px-3 py-1.5 transition-all duration-300 ease-out hover:tracking-wide hover:bg-white/10 hover:text-accent hover:backdrop-blur-sm"
+              >
+                {link.label}
+              </Link>
+            ),
+          )}
         </nav>
         <div className="flex items-center gap-3 md:gap-4">
           <SearchBar />
@@ -101,31 +95,17 @@ export function SiteHeader() {
           <div className="mb-2">
             <SearchBar variant="panel" />
           </div>
-          {links.slice(0, 3).map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               target={link.newTab ? "_blank" : undefined}
               onClick={() => setMobileOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-800 transition-colors hover:bg-slate-100"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/demo"
-            onClick={() => setMobileOpen(false)}
-            className="rounded-lg px-3 py-2.5 text-base font-semibold text-accent transition-colors hover:bg-accent/10"
-          >
-            {t("nav.demo")}
-          </Link>
-          {links.slice(3).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              target={link.newTab ? "_blank" : undefined}
-              onClick={() => setMobileOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-800 transition-colors hover:bg-slate-100"
+              className={
+                link.featured
+                  ? "rounded-lg px-3 py-2.5 text-base font-semibold text-accent transition-colors hover:bg-accent/10"
+                  : "rounded-lg px-3 py-2.5 text-base font-medium text-slate-800 transition-colors hover:bg-slate-100"
+              }
             >
               {link.label}
             </Link>

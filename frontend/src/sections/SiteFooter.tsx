@@ -59,15 +59,15 @@ function OfficeMap() {
 
 export function SiteFooter() {
   const { t } = useTranslation();
-  const nav = useFooterNav();
+  const columns = useFooterNav();
   const { email, phone, logoDarkUrl, logoUrl } = useSiteConfig();
   const logo = logoDarkUrl ?? logoUrl;
 
   return (
     <footer className="border-t border-white/10 bg-navy py-14 text-white">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
+        <div className="flex flex-wrap gap-x-6 gap-y-10">
+          <div className="min-w-[11rem] flex-[2] basis-52">
             <div className="flex items-center gap-2">
               {logo ? (
                 <span className="relative block h-7 w-32">
@@ -90,39 +90,32 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {nav.quickTitle}
-            </p>
-            <ul className="space-y-3 text-sm text-white/70">
-              {nav.quickLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    target={link.newTab ? "_blank" : undefined}
-                    className="hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {columns.map((column) => (
+            <div key={column.key} className="min-w-[7rem] flex-1 basis-28">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
+                {column.title}
+              </p>
+              <ul className="space-y-3 text-sm text-white/70">
+                {column.links.map((link, index) => (
+                  <li key={link.href ?? `${column.key}-${index}`}>
+                    {link.href ? (
+                      <Link
+                        href={link.href}
+                        target={link.newTab ? "_blank" : undefined}
+                        className="hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      link.label
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
-          <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {nav.servicesTitle}
-            </p>
-            <ul className="space-y-3 text-sm text-white/70">
-              {nav.services.map((service) => (
-                <li key={service.key} className="hover:text-white">
-                  {service.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
+          <div className="min-w-[11rem] flex-1 basis-52">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/50">
               {t("footer.contactUs")}
             </p>

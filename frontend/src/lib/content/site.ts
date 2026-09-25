@@ -15,6 +15,7 @@ interface MediaLike {
 }
 
 interface SettingsDto {
+  company?: { companyName?: string };
   branding?: { logo?: string | MediaLike | null; logoDark?: string | MediaLike | null };
   social?: { links?: { network?: string; url?: string }[] };
   contact?: {
@@ -96,6 +97,7 @@ function mapSettings(locale: ContentLocale, dto: SettingsDto | undefined): Resol
 
   const offices = mapOffices(locale, dto);
   return {
+    companyName: text(dto.company?.companyName, siteConfig.companyName),
     email: text(email, siteConfig.email),
     phone: text(phone, siteConfig.phone),
     // No API equivalent (company.address is the registered address, a different value).
@@ -123,6 +125,7 @@ interface NavItemDto {
   label?: string;
   href?: string | null;
   openInNewTab?: boolean;
+  isFeatured?: boolean;
   children?: NavItemDto[];
 }
 
@@ -134,6 +137,7 @@ export interface ResolvedNavLink {
   href: string;
   label: string;
   newTab: boolean;
+  featured: boolean;
 }
 
 /** Header links in menu order (items without a link are skipped). */
@@ -143,43 +147,67 @@ export function useHeaderLinks(): ResolvedNavLink[] {
   return useMemo(() => {
     const items = asArray<NavItemDto>(dto?.items).filter((i) => typeof i.href === "string" && i.href !== "");
     if (items.length === 0) {
-      return navLinks.map((l) => ({ href: l.href, label: t(`nav.${l.key}`), newTab: false }));
+      return navLinks.map((l) => ({ href: l.href, label: t(`nav.${l.key}`), newTab: false, featured: false }));
     }
-    return items.map((i) => ({ href: i.href as string, label: text(i.label, i.href as string), newTab: !!i.openInNewTab }));
+    return items.map((i) => ({
+      href: i.href as string,
+      label: text(i.label, i.href as string),
+      newTab: !!i.openInNewTab,
+      featured: !!i.isFeatured,
+    }));
   }, [dto, t]);
 }
 
-export interface ResolvedFooterNav {
-  quickTitle: string;
-  quickLinks: ResolvedNavLink[];
-  servicesTitle: string;
-  services: { key: string; label: string }[];
+export interface ResolvedFooterLink {
+  /** Missing when the entry is plain text (no destination configured). */
+  href?: string;
+  label: string;
+  newTab: boolean;
 }
 
-/** Footer columns: the first group is "quick links", the second is the services list. */
-export function useFooterNav(): ResolvedFooterNav {
+export interface ResolvedFooterColumn {
+  key: string;
+  title: string;
+  links: ResolvedFooterLink[];
+}
+
+/**
+ * Footer columns: every top-level group in the "footer" menu becomes its own column,
+ * in menu order. A group with no linkable children is skipped (it renders no column).
+ * With no menu configured at all, falls back to the default quick-links + services columns.
+ */
+export function useFooterNav(): ResolvedFooterColumn[] {
   const { t, i18n } = useTranslation();
   const dto = usePublicData<NavigationDto>("/public/navigation/footer");
   return useMemo(() => {
     const lang = i18n.language?.startsWith("vi") ? "vi" : "en";
     const groups = asArray<NavItemDto>(dto?.items);
-    const toLinks = (group?: NavItemDto): ResolvedNavLink[] =>
+    const toLinks = (group?: NavItemDto): ResolvedFooterLink[] =>
       asArray<NavItemDto>(group?.children)
         .filter((c) => typeof c.href === "string" && c.href !== "")
         .map((c) => ({ href: c.href as string, label: text(c.label, c.href as string), newTab: !!c.openInNewTab }));
-    const quick = toLinks(groups[0]);
-    const serviceLinks = toLinks(groups[1]);
-    return {
-      quickTitle: text(groups[0]?.label, t("footer.quickLinks")),
-      quickLinks:
-        quick.length > 0
-          ? quick
-          : navLinks.map((l) => ({ href: l.href, label: t(`nav.${l.key}`), newTab: false })),
-      servicesTitle: text(groups[1]?.label, t("footer.ourServices")),
-      services:
-        serviceLinks.length > 0
-          ? serviceLinks.map((s) => ({ key: s.href, label: s.label }))
-          : services.map((s) => ({ key: s.id, label: s.title[lang] })),
-    };
+
+    if (groups.length === 0) {
+      return [
+        {
+          key: "quick",
+          title: t("footer.quickLinks"),
+          links: navLinks.map((l) => ({ href: l.href, label: t(`nav.${l.key}`), newTab: false })),
+        },
+        {
+          key: "services",
+          title: t("footer.ourServices"),
+          links: services.map((s) => ({ label: s.title[lang], newTab: false })),
+        },
+      ];
+    }
+
+    return groups
+      .map((group, index) => ({
+        key: group.id ?? String(index),
+        title: text(group.label, `Cột ${index + 1}`),
+        links: toLinks(group),
+      }))
+      .filter((column) => column.links.length > 0);
   }, [dto, t, i18n.language]);
 }
