@@ -9,8 +9,9 @@ const iconMap: Record<SocialLink["label"], LucideIcon> = {
   X,
 };
 
-export function SocialIcons() {
-  const { socialLinks } = useSiteConfig();
+export function SocialIcons({ links }: { links?: SocialLink[] } = {}) {
+  const { socialLinks: siteSocialLinks } = useSiteConfig();
+  const socialLinks = links ?? siteSocialLinks;
   return (
     <div className="flex items-center gap-4">
       {socialLinks.map((social) => {

@@ -4,8 +4,8 @@ import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useContactSubmit } from "@/lib/content/contact";
-import { useSectionText } from "@/lib/content/pages";
-import { useSiteConfig, type ResolvedOffice } from "@/lib/content/site";
+import { useSection } from "@/lib/content/pages";
+import { asArray, localized, text, useContentLocale } from "@/lib/content/store";
 import { useLocalizedField } from "@/lib/useLocalizedField";
 import {
   validateContactForm,
@@ -14,6 +14,32 @@ import {
 } from "@/lib/validateContactForm";
 import { Button } from "@/components/ui/Button";
 import { SocialIcons } from "@/components/ui/SocialIcons";
+import { LocalizedText, SocialLink } from "@/types";
+
+interface OfficeInfo {
+  id: string;
+  label: LocalizedText;
+  street: string;
+  city: string;
+  state: string | null;
+  zip: string | null;
+  country: string;
+}
+
+interface OfficeItemDto {
+  id?: string;
+  label?: string;
+  street?: string;
+  city?: string;
+  state?: string | null;
+  zip?: string | null;
+  country?: string;
+}
+
+interface SocialLinkDto {
+  network?: string;
+  url?: string;
+}
 
 const fieldClassName =
   "w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/50";
@@ -25,10 +51,10 @@ const initialValues: ContactFormValues = {
   message: "",
 };
 
-function OfficeRow({ office }: { office: ResolvedOffice }) {
+function OfficeRow({ office }: { office: OfficeInfo }) {
   const label = useLocalizedField(office.label);
   const addressLine = office.state
-    ? `${office.street}, ${office.city}, ${office.state} ${office.zip}`
+    ? `${office.street}, ${office.city}, ${office.state} ${office.zip ?? ""}`
     : `${office.street}, ${office.city}`;
 
   return (
@@ -48,8 +74,23 @@ function OfficeRow({ office }: { office: ResolvedOffice }) {
 
 export function ContactInfoForm() {
   const { t } = useTranslation();
-  const siteConfig = useSiteConfig();
-  const info = useSectionText("/lien-he", "contact-form");
+  const locale = useContentLocale();
+  const content = useSection("/lien-he", "contact-form");
+  const info = (field: string, fallback: string) => text(content[field], fallback);
+  const email = text(content.email, "");
+  const phone = text(content.phone, "");
+  const offices: OfficeInfo[] = asArray<OfficeItemDto>(content.offices).map((office, i) => ({
+    id: office.id ?? `office-${i}`,
+    label: localized(locale, office.label, { en: "", vi: "" }),
+    street: text(office.street, ""),
+    city: text(office.city, ""),
+    state: office.state ?? null,
+    zip: office.zip ?? null,
+    country: text(office.country, ""),
+  }));
+  const socialLinks: SocialLink[] = asArray<SocialLinkDto>(content.socialLinks)
+    .filter((link): link is Required<SocialLinkDto> => Boolean(link.network && link.url))
+    .map((link) => ({ label: link.network as SocialLink["label"], href: link.url }));
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [honeypot, setHoneypot] = useState("");
@@ -105,8 +146,8 @@ export function ContactInfoForm() {
                 <p className="text-xs text-white/50">
                   {t("contactPage.info.emailLabel")}
                 </p>
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-accent">
-                  {siteConfig.email}
+                <a href={`mailto:${email}`} className="hover:text-accent">
+                  {email}
                 </a>
               </div>
             </div>
@@ -118,8 +159,8 @@ export function ContactInfoForm() {
                 <p className="text-xs text-white/50">
                   {t("contactPage.info.phoneLabel")}
                 </p>
-                <a href={`tel:${siteConfig.phone}`} className="hover:text-accent">
-                  {siteConfig.phone}
+                <a href={`tel:${phone}`} className="hover:text-accent">
+                  {phone}
                 </a>
               </div>
             </div>
@@ -130,14 +171,14 @@ export function ContactInfoForm() {
               {t("contactPage.info.officesLabel")}
             </p>
             <div className="space-y-4">
-              {siteConfig.offices.map((office) => (
+              {offices.map((office) => (
                 <OfficeRow key={office.id} office={office} />
               ))}
             </div>
           </div>
 
           <div className="mt-8">
-            <SocialIcons />
+            <SocialIcons links={socialLinks} />
           </div>
         </div>
 

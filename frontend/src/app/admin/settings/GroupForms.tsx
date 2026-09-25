@@ -117,10 +117,6 @@ function LocalizedInputs({
 
 interface CompanyForm {
   companyName: string;
-  email: string;
-  phone: string;
-  addressVi: string;
-  addressEn: string;
   website: string;
 }
 
@@ -129,29 +125,17 @@ export function CompanyGroup() {
     <GroupEditor<CompanySettings, CompanyForm>
       group="company"
       title="Thông tin công ty"
-      description="Hiển thị ở chân trang, trang liên hệ và email gửi đi."
+      description="Tên công ty (hiển thị ở dòng bản quyền chân trang) và website. Email, số điện thoại, địa chỉ văn phòng sửa ở tab Liên hệ."
       toForm={(value) => ({
         companyName: value.companyName ?? "",
-        email: value.email ?? "",
-        phone: value.phone ?? "",
-        addressVi: value.address?.vi ?? "",
-        addressEn: value.address?.en ?? "",
         website: value.website ?? "",
       })}
       toValue={(form) => ({
         companyName: form.companyName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        address: { vi: form.addressVi.trim(), en: form.addressEn.trim() },
         website: form.website.trim(),
       })}
       validate={(form) => {
         if (!form.companyName.trim()) return "Vui lòng nhập tên công ty.";
-        if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return "Email chưa hợp lệ.";
-        if (!/^[0-9+()\-.\s]{5,30}$/.test(form.phone.trim())) return "Số điện thoại chưa hợp lệ.";
-        if (!form.addressVi.trim() || !form.addressEn.trim()) {
-          return "Vui lòng nhập địa chỉ bằng cả tiếng Việt và tiếng Anh.";
-        }
         if (!isHttpUrl(form.website)) return "Website phải bắt đầu bằng http:// hoặc https://.";
         return null;
       }}
@@ -166,35 +150,6 @@ export function CompanyGroup() {
               onChange={(event) => setForm({ companyName: event.target.value })}
             />
           </Field>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Email" htmlFor="company-email" required>
-              <Input
-                id="company-email"
-                type="email"
-                value={form.email}
-                maxLength={SETTING_LIMITS.emailMax}
-                onChange={(event) => setForm({ email: event.target.value })}
-              />
-            </Field>
-            <Field label="Số điện thoại" htmlFor="company-phone" required>
-              <Input
-                id="company-phone"
-                value={form.phone}
-                maxLength={SETTING_LIMITS.phoneMax}
-                onChange={(event) => setForm({ phone: event.target.value })}
-              />
-            </Field>
-          </div>
-          <LocalizedInputs
-            idPrefix="company-address"
-            label="Địa chỉ"
-            required
-            vi={form.addressVi}
-            en={form.addressEn}
-            onChange={(locale, value) =>
-              setForm(locale === "vi" ? { addressVi: value } : { addressEn: value })
-            }
-          />
           <Field label="Website" htmlFor="company-website" required hint="Bắt đầu bằng https://">
             <Input
               id="company-website"
@@ -454,7 +409,7 @@ export function ContactGroup() {
     <GroupEditor<ContactSettings, ContactForm>
       group="contact"
       title="Liên hệ"
-      description="Kênh liên hệ, giờ làm việc và các văn phòng hiển thị trên trang liên hệ."
+      description="Kênh liên hệ, giờ làm việc và các văn phòng hiển thị ở chân trang (footer)."
       toForm={(value, response) => ({
         channels: (value.channels ?? []).map((channel) => ({
           key: newKey(),

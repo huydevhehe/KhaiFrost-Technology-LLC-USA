@@ -7,10 +7,31 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLocalizedField } from "@/lib/useLocalizedField";
 import { aboutOfficeImages } from "@/content/aboutPageData";
-import { useSectionText } from "@/lib/content/pages";
-import { useSiteConfig, type ResolvedOffice } from "@/lib/content/site";
+import { useSection } from "@/lib/content/pages";
+import { asArray, localized, text, useContentLocale } from "@/lib/content/store";
+import { LocalizedText } from "@/types";
 
-function OfficeCard({ office }: { office: ResolvedOffice }) {
+interface OfficeInfo {
+  id: string;
+  label: LocalizedText;
+  street: string;
+  city: string;
+  state: string | null;
+  zip: string | null;
+  imageUrl: string | null;
+}
+
+interface OfficeItemDto {
+  id?: string;
+  label?: string;
+  street?: string;
+  city?: string;
+  state?: string | null;
+  zip?: string | null;
+  image?: { url?: string } | string | null;
+}
+
+function OfficeCard({ office }: { office: OfficeInfo }) {
   const label = useLocalizedField(office.label);
   const addressParts = [
     office.street,
@@ -47,8 +68,21 @@ function OfficeCard({ office }: { office: ResolvedOffice }) {
 
 export function AboutOffices() {
   const { t } = useTranslation();
-  const siteConfig = useSiteConfig();
-  const section = useSectionText("/ve-chung-toi", "offices");
+  const locale = useContentLocale();
+  const content = useSection("/ve-chung-toi", "offices");
+  const section = (field: string, fallback: string) => text(content[field], fallback);
+  const offices: OfficeInfo[] = asArray<OfficeItemDto>(content.items).map((office, i) => ({
+    id: office.id ?? `office-${i}`,
+    label: localized(locale, office.label, { en: "", vi: "" }),
+    street: text(office.street, ""),
+    city: text(office.city, ""),
+    state: office.state ?? null,
+    zip: office.zip ?? null,
+    imageUrl:
+      typeof office.image === "string"
+        ? office.image
+        : (office.image?.url ?? null),
+  }));
 
   return (
     <section className="bg-slate-50 py-16">
@@ -61,7 +95,7 @@ export function AboutOffices() {
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          {siteConfig.offices.map((office) => (
+          {offices.map((office) => (
             <OfficeCard key={office.id} office={office} />
           ))}
         </div>

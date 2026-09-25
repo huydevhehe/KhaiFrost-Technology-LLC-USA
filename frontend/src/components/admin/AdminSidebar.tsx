@@ -23,7 +23,6 @@ import {
   Languages,
   HeartPulse,
   MapPin,
-  Building2,
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PERMISSIONS, type Permission } from "@/lib/api/types";
@@ -49,7 +48,6 @@ const navItems: NavItem[] = [
   { href: "/admin/client-locations", label: "Bản đồ khách hàng", icon: MapPin, permission: PERMISSIONS.CLIENT_LOCATION_READ },
   { href: "/admin/pages", label: "Trang", icon: Layers, permission: PERMISSIONS.PAGE_READ },
   { href: "/admin/navigation", label: "Header & Footer", icon: Navigation, permission: PERMISSIONS.NAVIGATION_MANAGE },
-  { href: "/admin/company-contact", label: "Văn phòng & MXH", icon: Building2, permission: PERMISSIONS.SETTING_READ },
   { href: "/admin/translations", label: "Chuỗi giao diện", icon: Languages, permission: PERMISSIONS.UI_TRANSLATION_READ },
   { href: "/admin/seo", label: "SEO", icon: Search, permission: PERMISSIONS.SEO_READ },
   { href: "/admin/media", label: "Thư viện ảnh", icon: ImageIcon, permission: PERMISSIONS.MEDIA_READ },

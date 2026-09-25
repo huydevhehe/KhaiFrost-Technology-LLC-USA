@@ -142,6 +142,17 @@ const heading = (required = false) =>
 const iconField = () =>
   shared('text', 'icon', l('Biểu tượng', 'Icon key'), { maxLength: 40, pattern: ICON_KEY_PATTERN });
 
+const SOCIAL_NETWORKS = ['GitHub', 'LinkedIn', 'X'] as const;
+
+const officeItemFields = (): FieldDefinition[] => [
+  text('label', l('Tên văn phòng', 'Office name'), { required: true, maxLength: 150 }),
+  shared('text', 'street', l('Địa chỉ', 'Street'), { required: true, maxLength: 200 }),
+  shared('text', 'city', l('Thành phố', 'City'), { required: true, maxLength: 120 }),
+  shared('text', 'state', l('Bang/Tỉnh', 'State'), { maxLength: 120 }),
+  shared('text', 'zip', l('Mã bưu điện', 'Zip code'), { maxLength: 20 }),
+  shared('text', 'country', l('Quốc gia', 'Country'), { required: true, maxLength: 120 }),
+];
+
 const SECTION_TYPE_LIST: SectionTypeDefinition[] = [
   {
     type: 'hero',
@@ -342,20 +353,35 @@ const SECTION_TYPE_LIST: SectionTypeDefinition[] = [
       eyebrow(),
       heading(true),
       textarea('description', l('Mô tả', 'Description'), { maxLength: 1000 }),
-      shared('boolean', 'showOffices', l('Hiển thị văn phòng', 'Show offices')),
+      shared('text', 'email', l('Email liên hệ', 'Contact email'), { maxLength: 200 }),
+      shared('text', 'phone', l('Số điện thoại', 'Phone number'), { maxLength: 40 }),
+      text('address', l('Địa chỉ hiển thị', 'Displayed address'), { maxLength: 300 }),
+      list('offices', l('Văn phòng', 'Offices'), officeItemFields(), { maxItems: 10 }),
+      list(
+        'socialLinks',
+        l('Mạng xã hội', 'Social links'),
+        [
+          select('network', l('Kênh', 'Network'), [...SOCIAL_NETWORKS], true),
+          url('url', l('Liên kết', 'Link'), true),
+        ],
+        { maxItems: 8 },
+      ),
     ],
   },
   {
     type: 'offices',
     label: l('Văn phòng', 'Offices'),
-    description: l(
-      'Danh sách văn phòng lấy từ cài đặt Liên hệ',
-      'Offices taken from the contact settings',
-    ),
+    description: l('Danh sách văn phòng của trang này', "This page's own office list"),
     fields: [
       eyebrow(),
       heading(),
       textarea('intro', l('Giới thiệu', 'Intro'), { maxLength: 1000 }),
+      list(
+        'items',
+        l('Văn phòng', 'Offices'),
+        [...officeItemFields(), media('image', l('Ảnh', 'Image'), { altFieldKey: 'label' })],
+        { maxItems: 10 },
+      ),
     ],
   },
   {

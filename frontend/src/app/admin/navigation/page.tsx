@@ -60,7 +60,7 @@ import {
 import type { PageSummary } from "@/lib/api/admin/pages";
 import { PERMISSIONS } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth";
-import { BrandingGroup, CompanyGroup } from "../settings/GroupForms";
+import { BrandingGroup, CompanyGroup, ContactGroup, SocialGroup } from "../settings/GroupForms";
 import { HeaderFooterTextsPanel } from "./TextsPanel";
 
 interface NodeRowProps {
@@ -381,7 +381,7 @@ function PreviewList({ items }: { items: PreviewNode[] }) {
   );
 }
 
-type SectionKey = "header" | "footer" | "branding" | "texts";
+type SectionKey = "header" | "footer" | "branding" | "contact" | "texts";
 
 const MENU_SECTION_KEYS: SectionKey[] = ["header", "footer"];
 
@@ -390,6 +390,7 @@ const MAX_FOOTER_TOP_LEVEL_GROUPS = 5;
 
 const EXTRA_SECTIONS: { key: SectionKey; label: string }[] = [
   { key: "branding", label: "Thương hiệu" },
+  { key: "contact", label: "Liên hệ & MXH" },
   { key: "texts", label: "Nội dung chữ" },
 ];
 
@@ -575,6 +576,11 @@ export default function AdminNavigationPage() {
         <div className="flex flex-col gap-4">
           <BrandingGroup />
           <CompanyGroup />
+        </div>
+      ) : menuKey === "contact" ? (
+        <div className="flex flex-col gap-4">
+          <ContactGroup />
+          <SocialGroup />
         </div>
       ) : menuKey === "texts" ? (
         <HeaderFooterTextsPanel canUpdate={hasPermission(PERMISSIONS.UI_TRANSLATION_UPDATE)} />

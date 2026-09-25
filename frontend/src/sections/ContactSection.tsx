@@ -2,9 +2,9 @@
 
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useSectionText } from "@/lib/content/pages";
+import { useSection } from "@/lib/content/pages";
 import { useContactSubmit } from "@/lib/content/contact";
-import { useSiteConfig } from "@/lib/content/site";
+import { text } from "@/lib/content/store";
 import {
   validateContactForm,
   ContactFormValues,
@@ -24,8 +24,8 @@ const initialValues: ContactFormValues = {
 
 export function ContactSection() {
   const { t } = useTranslation();
-  const siteConfig = useSiteConfig();
-  const section = useSectionText("/", "contact");
+  const content = useSection("/", "contact");
+  const section = (field: string, fallback: string) => text(content[field], fallback);
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [honeypot, setHoneypot] = useState("");
@@ -72,9 +72,9 @@ export function ContactSection() {
           <h2 className="text-3xl font-bold text-slate-900">{section("heading", t("contact.heading"))}</h2>
           <p className="mt-4 text-slate-500">{section("description", t("contact.subtext"))}</p>
           <div className="mt-6 space-y-2 text-sm text-slate-600">
-            <p>{siteConfig.email}</p>
-            <p>{siteConfig.phone}</p>
-            <p>{siteConfig.address}</p>
+            <p>{text(content.email, "")}</p>
+            <p>{text(content.phone, "")}</p>
+            <p>{section("address", "")}</p>
           </div>
         </div>
         <form
