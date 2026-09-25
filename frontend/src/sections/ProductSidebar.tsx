@@ -11,24 +11,39 @@ import { loginUrl } from "@/lib/auth/redirect";
 import { accountApi } from "@/lib/api/account";
 import { formatMoney } from "@/lib/format";
 import type { PublicProductDetail } from "@/lib/content/productDetail";
-import type { BillingPeriod } from "@/lib/api/types";
+import type { BillingPeriod, Currency } from "@/lib/api/types";
 
 const PERIOD_ORDER: BillingPeriod[] = ["monthly", "yearly", "one_time"];
 
 export function ProductSidebar({ product }: { product: PublicProductDetail }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const { status } = useAuth();
 
-  const availablePeriods = useMemo(() => {
-    const present = new Set(product.prices.map((price) => price.billingPeriod));
-    return PERIOD_ORDER.filter((period) => present.has(period));
-  }, [product.prices]);
+  // vi shows VND, every other locale shows USD; falls back to whatever currency the product actually has priced
+  const preferredCurrency: Currency = i18n.language?.startsWith("vi") ? "VND" : "USD";
+  const pricesInCurrency = useMemo(() => {
+    const matching = product.prices.filter((price) => price.currency === preferredCurrency);
+    return matching.length > 0 ? matching : product.prices;
+  }, [product.prices, preferredCurrency]);
 
-  const defaultPrice = product.prices.find((price) => price.isDefault) ?? product.prices[0];
+  const availablePeriods = useMemo(() => {
+    const present = new Set(pricesInCurrency.map((price) => price.billingPeriod));
+    return PERIOD_ORDER.filter((period) => present.has(period));
+  }, [pricesInCurrency]);
+
+  const defaultPrice = pricesInCurrency.find((price) => price.isDefault) ?? pricesInCurrency[0];
   const [selectedPeriod, setSelectedPeriod] = useState<BillingPeriod>(defaultPrice?.billingPeriod ?? "one_time");
-  const selectedPrice = product.prices.find((price) => price.billingPeriod === selectedPeriod) ?? defaultPrice;
+  const selectedPrice = pricesInCurrency.find((price) => price.billingPeriod === selectedPeriod) ?? defaultPrice;
+
+  // Re-sync the toggle when the locale switch changes which currency (and periods) are in play
+  useEffect(() => {
+    if (defaultPrice && !pricesInCurrency.some((price) => price.billingPeriod === selectedPeriod)) {
+      setSelectedPeriod(defaultPrice.billingPeriod);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferredCurrency]);
 
   const [favorited, setFavorited] = useState(false);
   const [favBusy, setFavBusy] = useState(false);

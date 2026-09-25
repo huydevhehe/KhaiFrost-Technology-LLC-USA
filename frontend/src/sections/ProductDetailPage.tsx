@@ -34,6 +34,8 @@ function ProductDetailContent({ product }: { product: PublicProductDetail }) {
         categoryName={product.category?.name ?? null}
         categorySlug={product.category?.slug ?? null}
         productName={product.name}
+        tagline={product.tagline}
+        coverImageUrl={product.coverImageUrl}
       />
 
       <section className="bg-white py-10">

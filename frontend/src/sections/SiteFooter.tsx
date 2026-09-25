@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Mail, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SocialIcons } from "@/components/ui/SocialIcons";
@@ -60,8 +61,14 @@ function OfficeMap() {
 export function SiteFooter() {
   const { t } = useTranslation();
   const columns = useFooterNav();
-  const { email, phone, logoDarkUrl, logoUrl } = useSiteConfig();
+  const { companyName, email, phone, logoDarkUrl, logoUrl } = useSiteConfig();
   const logo = logoDarkUrl ?? logoUrl;
+
+  // Read from the browser's clock after mount so a cached/prerendered page never bakes in a stale year
+  const [year, setYear] = useState<number | null>(null);
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer className="border-t border-white/10 bg-navy py-14 text-white">
@@ -140,7 +147,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row">
-          <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
+          <p>{t("footer.copyright", { year: year ?? new Date().getFullYear(), companyName })}</p>
           <div className="flex items-center gap-4">
             <Link href="#">{t("footer.privacy")}</Link>
             <Link href="#">{t("footer.terms")}</Link>
