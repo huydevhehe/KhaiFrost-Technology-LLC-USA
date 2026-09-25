@@ -95,6 +95,7 @@ export interface OfficeLocation {
 }
 
 export interface SiteConfig {
+  companyName: string;
   email: string;
   phone: string;
   address: string;
