@@ -79,7 +79,7 @@ export function AdminSidebar() {
           <p className="text-[10px] leading-tight text-white/50">TECHNOLOGY</p>
         </div>
       </div>
-      <nav className="relative flex-1 overflow-y-auto px-3 pb-6">
+      <nav className="relative flex-1 px-3 pb-6">
         <ul className="flex flex-col gap-1">
           {visibleItems.map((item) => {
             const isActive =
@@ -103,6 +103,9 @@ export function AdminSidebar() {
           })}
         </ul>
       </nav>
+      <div className="relative border-t border-white/10 px-5 py-4 text-[11px] text-white/40">
+        Developed by Nguyen Quoc Huy
+      </div>
     </aside>
   );
 }

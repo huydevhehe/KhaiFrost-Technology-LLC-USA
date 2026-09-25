@@ -128,7 +128,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
           <AdminSidebar />
           <div className="flex h-screen min-w-0 flex-1 flex-col">
             <AdminTopbar />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+            <main className="flex-1 overflow-y-auto bg-slate-100 p-6">{children}</main>
           </div>
         </div>
       ) : (
