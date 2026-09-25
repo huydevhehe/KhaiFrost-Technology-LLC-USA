@@ -69,18 +69,18 @@ export function completeCategoryPayload(mediaId: string, title = 'AI & Tự đ�
     products: [
       {
         imageId: mediaId,
-        durationLabel: '02:15',
+        videoUrl: 'https://videos.example.com/ai-receptionist.mp4',
         tags: ['NLP', 'Voice AI'],
-        anchor: 'ai-receptionist',
+        linkType: 'external',
+        linkExternalUrl: '/dich-vu/ai-automation',
         translations: bilingual(
           { name: 'AI Lễ tân', description: 'Trả lời điện thoại tự động.' },
           { name: 'AI Receptionist', description: 'Answers calls automatically.' },
         ),
       },
       {
-        durationLabel: '01:48',
         tags: ['LLM'],
-        anchor: 'ai-employee',
+        linkType: 'none',
         translations: bilingual(
           { name: 'AI Nhân viên', description: 'Tự động hoá quy trình nội bộ.' },
           { name: 'AI Employee', description: 'Automates back-office work.' },

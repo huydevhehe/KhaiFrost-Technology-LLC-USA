@@ -1,14 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, X } from "lucide-react";
 import { LOCALES, MediaPicker, type Locale, type MediaSelection } from "@/components/admin/shared";
-import { ActionButton, SLUG_PATTERN, TagInput } from "@/components/admin/content";
+import { ActionButton, TagInput } from "@/components/admin/content";
 import { Field, Input, Select } from "@/components/admin/ui";
 import {
   CATEGORY_ICON_KEYS,
   DURATION_LABEL_PATTERN,
   describeCtaHrefProblem,
+  type ServiceProductLinkType,
 } from "@/lib/api/admin/serviceCatalog";
+import { LinkTargetPicker } from "./LinkTargetPicker";
+import { formatVideoDuration, probeVideoDuration } from "@/lib/videoDuration";
 
 /** Vietnamese labels of the icons a block can use. */
 const ICON_LABELS: Record<string, string> = {
@@ -49,10 +53,13 @@ export interface BlockConfig {
   value?: boolean;
   image?: string;
   duration?: boolean;
-  anchor?: boolean;
   tags?: boolean;
   authorName?: boolean;
   ctaHref?: boolean;
+  /** Product block only: a real video link, duration read automatically from it. */
+  video?: boolean;
+  /** Product block only: "Xem chi tiết" points at a real product, post or outside URL. */
+  productLink?: boolean;
 }
 
 export interface BlockForm {
@@ -61,10 +68,15 @@ export interface BlockForm {
   value: string;
   image: MediaSelection | null;
   durationLabel: string;
-  anchor: string;
   tags: string[];
   authorName: string;
   ctaHref: string;
+  videoUrl: string;
+  videoDurationSeconds: number | null;
+  linkType: ServiceProductLinkType;
+  linkProductId: string | null;
+  linkPostId: string | null;
+  linkExternalUrl: string;
   texts: Record<Locale, Record<string, string>>;
 }
 
@@ -77,10 +89,15 @@ export interface RawBlock {
   avatarId?: string | null;
   avatarUrl?: string | null;
   durationLabel?: string | null;
-  anchor?: string | null;
   tags?: string[];
   authorName?: string;
   ctaHref?: string;
+  videoUrl?: string | null;
+  videoDurationSeconds?: number | null;
+  linkType?: ServiceProductLinkType;
+  linkProductId?: string | null;
+  linkPostId?: string | null;
+  linkExternalUrl?: string | null;
   translations: Partial<Record<Locale, Record<string, string | null>>>;
 }
 
@@ -99,10 +116,15 @@ export function emptyBlock(config: BlockConfig): BlockForm {
     value: "",
     image: null,
     durationLabel: "",
-    anchor: "",
     tags: [],
     authorName: "",
     ctaHref: "",
+    videoUrl: "",
+    videoDurationSeconds: null,
+    linkType: "none",
+    linkProductId: null,
+    linkPostId: null,
+    linkExternalUrl: "",
     texts,
   };
 }
@@ -122,10 +144,15 @@ export function blockFromServer(raw: RawBlock, config: BlockConfig): BlockForm {
     value: raw.value ?? "",
     image: id && url ? { id, url, thumbnailUrl: url, name: "Ảnh" } : null,
     durationLabel: raw.durationLabel ?? "",
-    anchor: raw.anchor ?? "",
     tags: raw.tags ?? [],
     authorName: raw.authorName ?? "",
     ctaHref: raw.ctaHref ?? "",
+    videoUrl: raw.videoUrl ?? "",
+    videoDurationSeconds: raw.videoDurationSeconds ?? null,
+    linkType: raw.linkType ?? "none",
+    linkProductId: raw.linkProductId ?? null,
+    linkPostId: raw.linkPostId ?? null,
+    linkExternalUrl: raw.linkExternalUrl ?? "",
   };
 }
 
@@ -149,9 +176,18 @@ export function blockToInput(block: BlockForm, config: BlockConfig): Record<stri
     delete input.imageId;
   }
   if (config.duration) input.durationLabel = block.durationLabel.trim() || null;
-  if (config.anchor) input.anchor = block.anchor.trim() || null;
   if (config.tags) input.tags = block.tags;
   if (config.ctaHref) input.ctaHref = block.ctaHref.trim();
+  if (config.video) {
+    input.videoUrl = block.videoUrl.trim() || null;
+    input.videoDurationSeconds = block.videoUrl.trim() ? block.videoDurationSeconds : null;
+  }
+  if (config.productLink) {
+    input.linkType = block.linkType;
+    input.linkProductId = block.linkType === "product" ? block.linkProductId : null;
+    input.linkPostId = block.linkType === "post" ? block.linkPostId : null;
+    input.linkExternalUrl = block.linkType === "external" ? block.linkExternalUrl.trim() || null : null;
+  }
   return input;
 }
 
@@ -162,10 +198,14 @@ export function blockProblem(block: BlockForm, config: BlockConfig): string | nu
   if (config.duration && block.durationLabel.trim() && !DURATION_LABEL_PATTERN.test(block.durationLabel.trim())) {
     return "Thời lượng phải có dạng mm:ss, ví dụ 02:15.";
   }
-  if (config.anchor && block.anchor.trim() && !SLUG_PATTERN.test(block.anchor.trim())) {
-    return "Neo liên kết chỉ gồm chữ thường, số và dấu gạch ngang.";
-  }
   if (config.ctaHref) return describeCtaHrefProblem(block.ctaHref);
+  if (config.productLink) {
+    if (block.linkType === "product" && !block.linkProductId) return "Chọn một sản phẩm để gắn.";
+    if (block.linkType === "post" && !block.linkPostId) return "Chọn một bài viết để gắn.";
+    if (block.linkType === "external" && !block.linkExternalUrl.trim()) {
+      return "Nhập URL ngoài cho liên kết.";
+    }
+  }
   return null;
 }
 
@@ -189,8 +229,20 @@ interface BlockFieldsProps {
 
 /** All inputs of one block: shared properties, then vi / en texts side by side. */
 export function BlockFields({ idPrefix, config, block, onChange, disabled }: BlockFieldsProps) {
+  const [probingVideo, setProbingVideo] = useState(false);
   const setText = (locale: Locale, key: string, text: string) =>
     onChange({ texts: { ...block.texts, [locale]: { ...block.texts[locale], [key]: text } } });
+  const handleVideoUrlBlur = async () => {
+    const url = block.videoUrl.trim();
+    if (!url) {
+      onChange({ videoDurationSeconds: null });
+      return;
+    }
+    setProbingVideo(true);
+    const seconds = await probeVideoDuration(url);
+    setProbingVideo(false);
+    onChange({ videoDurationSeconds: seconds });
+  };
   return (
     <fieldset disabled={disabled} className="flex flex-col gap-3">
       {(config.icon || config.value || config.authorName || config.ctaHref) && (
@@ -247,29 +299,56 @@ export function BlockFields({ idPrefix, config, block, onChange, disabled }: Blo
           )}
         </div>
       )}
-      {(config.duration || config.anchor) && (
+      {config.duration && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {config.duration && (
-            <Field label="Thời lượng" htmlFor={`${idPrefix}-duration`} hint="Định dạng mm:ss, ví dụ 02:15.">
-              <Input
-                id={`${idPrefix}-duration`}
-                value={block.durationLabel}
-                maxLength={10}
-                onChange={(event) => onChange({ durationLabel: event.target.value })}
-              />
-            </Field>
-          )}
-          {config.anchor && (
-            <Field label="Neo liên kết" htmlFor={`${idPrefix}-anchor`} hint="Chữ thường, ví dụ ai-chatbot.">
-              <Input
-                id={`${idPrefix}-anchor`}
-                value={block.anchor}
-                maxLength={100}
-                onChange={(event) => onChange({ anchor: event.target.value })}
-              />
-            </Field>
-          )}
+          <Field label="Thời lượng" htmlFor={`${idPrefix}-duration`} hint="Định dạng mm:ss, ví dụ 02:15.">
+            <Input
+              id={`${idPrefix}-duration`}
+              value={block.durationLabel}
+              maxLength={10}
+              onChange={(event) => onChange({ durationLabel: event.target.value })}
+            />
+          </Field>
         </div>
+      )}
+      {config.video && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Field
+            label="Link video"
+            htmlFor={`${idPrefix}-video`}
+            hint="Dán bất kỳ link video nào (YouTube, Vimeo, file .mp4...). Không có thì chỉ hiện ảnh."
+          >
+            <Input
+              id={`${idPrefix}-video`}
+              value={block.videoUrl}
+              maxLength={1000}
+              placeholder="https://..."
+              disabled={disabled}
+              onChange={(event) => onChange({ videoUrl: event.target.value })}
+              onBlur={handleVideoUrlBlur}
+            />
+          </Field>
+          <div className="flex items-end pb-2.5 text-sm text-slate-500">
+            {probingVideo
+              ? "Đang tự phát hiện thời lượng..."
+              : !block.videoUrl.trim()
+                ? "Chưa có video."
+                : block.videoDurationSeconds != null
+                  ? `Thời lượng tự phát hiện: ${formatVideoDuration(block.videoDurationSeconds)}`
+                  : "Không tự phát hiện được thời lượng (video vẫn dùng được)."}
+          </div>
+        </div>
+      )}
+      {config.productLink && (
+        <LinkTargetPicker
+          idPrefix={idPrefix}
+          linkType={block.linkType}
+          linkProductId={block.linkProductId}
+          linkPostId={block.linkPostId}
+          linkExternalUrl={block.linkExternalUrl}
+          disabled={disabled}
+          onChange={onChange}
+        />
       )}
       {config.tags && (
         <TagInput
@@ -447,8 +526,8 @@ export const BLOCK_CONFIGS = {
     noun: "sản phẩm",
     max: 30,
     image: "Ảnh sản phẩm",
-    duration: true,
-    anchor: true,
+    video: true,
+    productLink: true,
     tags: true,
     fields: [
       { key: "name", label: "Tên", max: 200, required: true },

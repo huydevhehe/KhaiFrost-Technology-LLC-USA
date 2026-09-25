@@ -58,7 +58,8 @@ export class PublicServiceCatalogService {
     if (!category) throw notFound('Service');
     const aggregate = await this.loader.load(this.dataSource.manager, category);
     const urls = await this.loader.resolveAggregateUrls(aggregate);
-    return toPublicDetail(aggregate, locale, urls);
+    const productLinks = await this.loader.resolveProductLinks(aggregate);
+    return toPublicDetail(aggregate, locale, urls, productLinks);
   }
 
   async getOverview(locale: Locale): Promise<PublicServicesOverviewResponseDto> {

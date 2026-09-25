@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { MediaAsset } from '../../src/modules/media/entities/media-asset.entity';
+import { User } from '../../src/modules/users/entities/user.entity';
 import {
   SERVICE_CATALOG_ENTITIES,
   ServiceCatalogModule,
@@ -32,7 +33,7 @@ describe('service catalog (e2e)', () => {
 
   beforeAll(async () => {
     context = await createModuleTestingContext({
-      entities: [MediaAsset, ...SERVICE_CATALOG_ENTITIES],
+      entities: [MediaAsset, User, ...SERVICE_CATALOG_ENTITIES],
       imports: [ServiceCatalogModule],
     });
     mediaId = (await createMediaAsset(context.dataSource)).id;
@@ -99,8 +100,8 @@ describe('service catalog (e2e)', () => {
       }).then((response) => expect(response.status).toBe(400));
       await createCategory({
         iconKey: 'ai',
-        translations: { vi: { title: 'Bad duration' } },
-        products: [{ durationLabel: 'long', translations: {} }],
+        translations: { vi: { title: 'Bad video link' } },
+        products: [{ videoUrl: 'not-a-url', linkType: 'none', translations: {} }],
       }).then((response) => expect(response.status).toBe(400));
       await createCategory({
         iconKey: 'ai',
@@ -118,10 +119,8 @@ describe('service catalog (e2e)', () => {
       expect(created.translations.vi.title).toBe('AI & Tự động hoá');
       expect(created.translations.en.categoryName).toBe('AI & Automation');
       expect(created.stats[0]).toMatchObject({ iconKey: 'rocket', value: '50+' });
-      expect(created.products.map((item: any) => item.anchor)).toEqual([
-        'ai-receptionist',
-        'ai-employee',
-      ]);
+      expect(created.products.map((item: any) => item.linkType)).toEqual(['external', 'none']);
+      expect(created.products[0].linkExternalUrl).toBe('/dich-vu/ai-automation');
       expect(created.products[0]).toMatchObject({ tags: ['NLP', 'Voice AI'], imageId: mediaId });
       expect(created.products[0].imageUrl).toContain('image-');
       expect(created.products[1].imageUrl).toBeNull();
@@ -258,6 +257,7 @@ describe('service catalog (e2e)', () => {
           products: [
             {
               tags: [],
+              linkType: 'none',
               translations: bilingual(
                 { name: 'Sản phẩm mới', description: 'Mô tả' },
                 { name: 'New product', description: 'Text' },
@@ -403,7 +403,7 @@ describe('service catalog (e2e)', () => {
       expect(vi.body.data.processSteps.map((step: any) => step.step)).toEqual(['01', '02']);
       expect(vi.body.data.products[0]).toMatchObject({
         name: 'AI Lễ tân',
-        anchor: 'ai-receptionist',
+        href: '/dich-vu/ai-automation',
       });
       expect(vi.body.data.partnerBanner.ctaHref).toBe('/lien-he');
       expect(vi.body.data.seo.title).toBe('AI & Tự động hoá');

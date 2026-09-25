@@ -1,3 +1,4 @@
+import { ServiceProductLinkType } from '../../../modules/service-catalog/constants/service-product-link-type';
 import { CreateServiceCategoryDto } from '../../../modules/service-catalog/dto/service-category-input.dto';
 import { UpdateServicesOverviewDto } from '../../../modules/service-catalog/dto/update-services-overview.dto';
 import { ServiceCategory } from '../../../modules/service-catalog/entities/service-category.entity';
@@ -42,12 +43,6 @@ function iconTitleDescription(item: {
       description: item.description[locale],
     })),
   };
-}
-
-// "/dich-vu/ai-automation#ai-receptionist" -> "ai-receptionist"
-export function anchorOf(href: string): string | null {
-  const index = href.indexOf('#');
-  return index >= 0 && index < href.length - 1 ? href.slice(index + 1) : null;
 }
 
 export class ServiceCatalogSeeder implements Seeder {
@@ -117,9 +112,8 @@ export class ServiceCatalogSeeder implements Seeder {
     const products = [];
     for (const product of detail.products) {
       products.push({
-        anchor: anchorOf(product.href),
         imageId: await media.idFor(product.image),
-        durationLabel: product.duration,
+        linkType: ServiceProductLinkType.NONE,
         tags: product.tags,
         translations: both((locale) => ({
           name: product.name[locale],

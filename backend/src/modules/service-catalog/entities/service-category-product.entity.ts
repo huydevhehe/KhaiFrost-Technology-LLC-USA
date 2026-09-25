@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, Index } from 'typeorm';
 import { MediaAsset } from '../../media/entities/media-asset.entity';
+import { ServiceProductLinkType } from '../constants/service-product-link-type';
 import { CategoryChildEntity } from './category-child.entity';
 
 @Entity('service_category_products')
@@ -12,13 +13,28 @@ export class ServiceCategoryProduct extends CategoryChildEntity {
   @JoinColumn({ name: 'image_id' })
   image?: MediaAsset | null;
 
-  @Column({ type: 'varchar', length: 10, nullable: true })
-  durationLabel!: string | null;
+  // Any video link (YouTube, Vimeo, direct file...). Duration is read from it, never typed by hand.
+  @Column({ type: 'text', nullable: true })
+  videoUrl!: string | null;
+
+  @Column({ type: 'int', nullable: true })
+  videoDurationSeconds!: number | null;
 
   @Column({ type: 'text', array: true, default: () => "'{}'" })
   tags!: string[];
 
-  // Fragment of the category page this product links to (for example "ai-receptionist")
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  anchor!: string | null;
+  @Column({ type: 'varchar', length: 20, default: ServiceProductLinkType.NONE })
+  linkType!: ServiceProductLinkType;
+
+  // No ORM relation on purpose: the FK exists at the DB level (see migration), but declaring
+  // it here would pull the whole Products/Posts entity graph into every module that loads this
+  // entity. ProductLinkResolverService queries Product/Post directly by id instead.
+  @Column({ type: 'uuid', nullable: true })
+  linkProductId!: string | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  linkPostId!: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  linkExternalUrl!: string | null;
 }

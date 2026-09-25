@@ -5,19 +5,20 @@ import {
   IsArray,
   IsDefined,
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   Matches,
+  Max,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
-import {
-  ANCHOR_PATTERN,
-  CATEGORY_ICON_KEYS,
-  DURATION_LABEL_PATTERN,
-} from '../constants/service-catalog.constants';
+import { CATEGORY_ICON_KEYS, DURATION_LABEL_PATTERN } from '../constants/service-catalog.constants';
+import { ServiceProductLinkType } from '../constants/service-product-link-type';
 import { IsHttpUrlOrSitePath } from '../validators/is-http-url-or-site-path.validator';
 import { OptionalText } from './optional-text.decorator';
 import { TranslationsOf } from './translations-of';
@@ -73,13 +74,59 @@ export class ProductTranslationDto {
   @OptionalText(600) description?: string | null;
 }
 export class ProductTranslationsDto extends TranslationsOf(ProductTranslationDto) {}
-export class ProductInputDto extends ImageDurationTagsDto {
-  @ApiPropertyOptional({ example: 'ai-receptionist', nullable: true })
+export class ProductInputDto {
+  @ApiPropertyOptional({ description: 'MediaAsset id', nullable: true })
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  @Matches(ANCHOR_PATTERN, { message: 'anchor must be a lowercase slug' })
-  anchor?: string | null;
+  @IsUUID()
+  imageId?: string | null;
+
+  @ApiPropertyOptional({ type: [String], maxItems: 20 })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @MaxLength(40, { each: true })
+  tags?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Any video link (YouTube, Vimeo, direct file...)',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
+  @MaxLength(1000)
+  videoUrl?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Duration in seconds, read from the video — never typed by hand',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(36000)
+  videoDurationSeconds?: number | null;
+
+  @ApiProperty({ enum: ServiceProductLinkType, default: ServiceProductLinkType.NONE })
+  @IsIn(Object.values(ServiceProductLinkType))
+  linkType!: ServiceProductLinkType;
+
+  @ApiPropertyOptional({ description: 'Required when linkType is product', nullable: true })
+  @IsOptional()
+  @IsUUID()
+  linkProductId?: string | null;
+
+  @ApiPropertyOptional({ description: 'Required when linkType is post', nullable: true })
+  @IsOptional()
+  @IsUUID()
+  linkPostId?: string | null;
+
+  @ApiPropertyOptional({ description: 'Required when linkType is external', nullable: true })
+  @IsOptional()
+  @IsHttpUrlOrSitePath()
+  @MaxLength(500)
+  linkExternalUrl?: string | null;
 
   @ApiProperty({ type: ProductTranslationsDto })
   @IsDefined()

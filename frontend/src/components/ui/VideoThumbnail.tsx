@@ -24,15 +24,17 @@ export function VideoThumbnail({
     >
       <Image src={src} alt={alt} fill unoptimized className="object-cover" />
       {showVideoBadge && (
-        <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-white">
-          Video
-        </span>
+        <>
+          <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-white">
+            Video
+          </span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90">
+              <Play size={16} className="ml-0.5 text-slate-900" fill="currentColor" />
+            </div>
+          </div>
+        </>
       )}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90">
-          <Play size={16} className="ml-0.5 text-slate-900" fill="currentColor" />
-        </div>
-      </div>
       {duration && (
         <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-[11px] font-medium text-white">
           {duration}

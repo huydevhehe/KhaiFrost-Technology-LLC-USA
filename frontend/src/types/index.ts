@@ -138,9 +138,13 @@ export interface ServiceCategoryProduct {
   name: LocalizedText;
   description: LocalizedText;
   image: string;
-  duration: string;
+  /** Any video link (YouTube, Vimeo, direct file...); null/absent when this entry has no video. */
+  videoUrl?: string | null;
+  /** Formatted mm:ss, auto-detected from the video; null when it has no video or couldn't be read. */
+  duration: string | null;
   tags: string[];
-  href: string;
+  /** Where "Xem chi tiết" points to; null when nothing is linked. */
+  href: string | null;
 }
 
 export interface ServiceCategoryProcessStep {

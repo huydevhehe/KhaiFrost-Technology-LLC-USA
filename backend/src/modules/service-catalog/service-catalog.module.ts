@@ -25,6 +25,7 @@ import { ServiceCategoryWhyUsItemTranslation } from './entities/service-category
 import { ServiceHighlight } from './entities/service-highlight.entity';
 import { ServiceHighlightTranslation } from './entities/service-highlight-translation.entity';
 import { CategoryCollectionsService } from './services/category-collections.service';
+import { ProductLinkResolverService } from './services/product-link-resolver.service';
 import { PublicServiceCatalogService } from './services/public-service-catalog.service';
 import { ServiceCategoriesService } from './services/service-categories.service';
 import { ServiceCategoryAggregateLoader } from './services/service-category-aggregate-loader.service';
@@ -59,6 +60,7 @@ export const SERVICE_CATALOG_ENTITIES = [
   providers: [
     MediaReferenceService,
     CategoryCollectionsService,
+    ProductLinkResolverService,
     ServiceCategoryAggregateLoader,
     ServiceCategoriesService,
     ServicesOverviewService,

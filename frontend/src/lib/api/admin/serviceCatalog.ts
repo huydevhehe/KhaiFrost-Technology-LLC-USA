@@ -123,12 +123,18 @@ export interface StatBlock extends BlockBase {
   translations: Translated<{ label: string | null; description: string | null }>;
 }
 
+export type ServiceProductLinkType = "product" | "post" | "external" | "none";
+
 export interface ProductBlock extends BlockBase {
   imageId: string | null;
   imageUrl: string | null;
-  durationLabel: string | null;
-  anchor: string | null;
+  videoUrl: string | null;
+  videoDurationSeconds: number | null;
   tags: string[];
+  linkType: ServiceProductLinkType;
+  linkProductId: string | null;
+  linkPostId: string | null;
+  linkExternalUrl: string | null;
   translations: Translated<{ name: string | null; description: string | null }>;
 }
 
@@ -178,9 +184,13 @@ export interface StatInput {
 
 export interface ProductInput {
   imageId?: string | null;
-  durationLabel?: string | null;
-  anchor?: string | null;
+  videoUrl?: string | null;
+  videoDurationSeconds?: number | null;
   tags?: string[];
+  linkType: ServiceProductLinkType;
+  linkProductId?: string | null;
+  linkPostId?: string | null;
+  linkExternalUrl?: string | null;
   translations: TranslatedInput<{ name?: string | null; description?: string | null }>;
 }
 

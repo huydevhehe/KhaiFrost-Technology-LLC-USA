@@ -32,6 +32,7 @@ import {
   ServiceCategoryTranslationsDto,
   UpdateServiceCategoryDto,
 } from '../dto/service-category-input.dto';
+import { ProductInputDto } from '../dto/service-collection-input.dto';
 import {
   ServiceCategoryDetailResponseDto,
   ServiceCategoryListItemResponseDto,
@@ -46,6 +47,7 @@ import {
 import { CategoryCollectionsService, MissingTranslation } from './category-collections.service';
 import { CollectionItemInput } from './collection-definition';
 import { CATEGORY_COLLECTION_KEYS, CATEGORY_COLLECTIONS } from './collection-definitions';
+import { ProductLinkResolverService } from './product-link-resolver.service';
 import { ServiceCategoryAggregateLoader } from './service-category-aggregate-loader.service';
 
 const REQUIRED_TEXT_FIELDS = [
@@ -75,6 +77,7 @@ export class ServiceCategoriesService {
     private readonly collections: CategoryCollectionsService,
     private readonly loader: ServiceCategoryAggregateLoader,
     private readonly media: MediaReferenceService,
+    private readonly productLinks: ProductLinkResolverService,
   ) {}
 
   async list(
@@ -137,6 +140,7 @@ export class ServiceCategoriesService {
       throw validationFailed([{ field: 'slug', messages: ['This slug is reserved'] }]);
     }
     await this.assertMediaExist(dto);
+    await this.assertProductLinksExist(dto);
 
     const id = await this.insertWithUniqueSlug(dto, viTitle);
     return this.getById(id);
@@ -150,6 +154,7 @@ export class ServiceCategoriesService {
       throw validationFailed([{ field: 'slug', messages: ['This slug is reserved'] }]);
     }
     await this.assertMediaExist(dto);
+    await this.assertProductLinksExist(dto);
     try {
       await this.dataSource.transaction(async (manager) => {
         const category = await this.lockOrFail(manager, id);
@@ -376,6 +381,13 @@ export class ServiceCategoriesService {
       );
     }
     await this.media.assertAllExist(ids);
+  }
+
+  private async assertProductLinksExist(dto: ServiceCategoryContentDto): Promise<void> {
+    const payload = dto as unknown as CollectionPayload;
+    const products = payload.products as unknown as ProductInputDto[] | undefined;
+    if (!products) return;
+    await this.productLinks.assertLinksExist(products);
   }
 
   // Publishing needs every required text in both locales, for the page itself and for every repeated block

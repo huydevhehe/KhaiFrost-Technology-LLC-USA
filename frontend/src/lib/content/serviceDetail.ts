@@ -66,11 +66,15 @@ interface ProcessDto extends IconTextDto {
 interface MediaItemDto {
   id?: string;
   durationLabel?: string | null;
-  anchor?: string | null;
   tags?: string[];
   imageUrl?: string | null;
   name?: string;
   description?: string;
+}
+interface ProductDto extends MediaItemDto {
+  videoUrl?: string | null;
+  videoDurationLabel?: string | null;
+  href?: string | null;
 }
 interface TestimonialDto {
   id?: string;
@@ -102,7 +106,7 @@ export interface ServiceDetailDto {
   productsHeading?: string;
   productsIntro?: string;
   stats?: StatDto[];
-  products?: MediaItemDto[];
+  products?: ProductDto[];
   processSteps?: ProcessDto[];
   whyUs?: IconTextDto[];
   caseStudies?: MediaItemDto[];
@@ -147,7 +151,7 @@ function mapDetail(
   dto: ServiceDetailDto,
   fb: ServiceCategoryDetail | undefined,
 ): ServiceCategoryDetail {
-  const products = asArray<MediaItemDto>(dto.products);
+  const products = asArray<ProductDto>(dto.products);
   const whyUs = asArray<IconTextDto>(dto.whyUs);
   const cases = asArray<MediaItemDto>(dto.caseStudies);
   const testimonials = asArray<TestimonialDto>(dto.testimonials);
@@ -159,9 +163,10 @@ function mapDetail(
     name: localized(locale, p.name, fb?.products[i]?.name ?? EMPTY_LT),
     description: localized(locale, p.description, fb?.products[i]?.description ?? EMPTY_LT),
     image: text(p.imageUrl, fb?.products[i]?.image ?? ""),
-    duration: text(p.durationLabel, fb?.products[i]?.duration ?? ""),
+    videoUrl: p.videoUrl ?? fb?.products[i]?.videoUrl ?? null,
+    duration: p.videoDurationLabel ?? fb?.products[i]?.duration ?? null,
     tags: asArray<string>(p.tags),
-    href: p.anchor ? `/dich-vu/${slug}#${p.anchor}` : (fb?.products[i]?.href ?? `/dich-vu/${slug}`),
+    href: p.href ?? fb?.products[i]?.href ?? null,
   }));
   const mappedWhyUs: ServiceCategoryWhyUsItem[] = whyUs.map((w, i) => ({
     icon: categoryIcon(w.iconKey, fb?.whyUs[i]?.icon ?? "briefcase"),

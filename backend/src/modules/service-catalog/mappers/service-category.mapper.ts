@@ -212,10 +212,33 @@ export function toPublicCard(
   };
 }
 
+function formatVideoDuration(seconds: unknown): string | null {
+  if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return null;
+  const whole = Math.floor(seconds);
+  const minutes = Math.floor(whole / 60);
+  const remainingSeconds = whole % 60;
+  return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
+}
+
+function toPublicProducts(
+  records: CollectionItemRecord[],
+  locale: Locale,
+  urls: MediaUrlMap,
+  productLinks: Map<string, string>,
+): Loose[] {
+  return records.map((record) => {
+    const item = toPublicItem(CATEGORY_COLLECTIONS.products, record, locale, urls);
+    item.href = productLinks.get(record.id) ?? null;
+    item.videoDurationLabel = formatVideoDuration(record.fields.videoDurationSeconds);
+    return item;
+  });
+}
+
 export function toPublicDetail(
   aggregate: ServiceCategoryAggregate,
   locale: Locale,
   urls: MediaUrlMap,
+  productLinks: Map<string, string>,
 ): PublicServiceDetailResponseDto {
   const { category, translations, collections } = aggregate;
   const translation = translations.find((row) => row.locale === locale);
@@ -240,7 +263,7 @@ export function toPublicDetail(
         }
       : null,
     stats: toPublicItems(CATEGORY_COLLECTIONS.stats, collections.stats, locale, urls),
-    products: toPublicItems(CATEGORY_COLLECTIONS.products, collections.products, locale, urls),
+    products: toPublicProducts(collections.products, locale, urls, productLinks),
     processSteps: withStepNumbers(
       toPublicItems(CATEGORY_COLLECTIONS.processSteps, collections.processSteps, locale, urls),
     ),

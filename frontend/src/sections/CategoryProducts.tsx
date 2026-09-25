@@ -12,10 +12,26 @@ function ProductCard({ product }: { product: ServiceCategoryProduct }) {
   const { t } = useTranslation();
   const name = useLocalizedField(product.name);
   const description = useLocalizedField(product.description);
+  const hasVideo = Boolean(product.videoUrl);
+
+  const thumbnail = (
+    <VideoThumbnail
+      src={product.image}
+      alt={name}
+      showVideoBadge={hasVideo}
+      duration={product.duration ?? undefined}
+    />
+  );
 
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
-      <VideoThumbnail src={product.image} alt={name} duration={product.duration} />
+      {hasVideo ? (
+        <a href={product.videoUrl ?? undefined} target="_blank" rel="noreferrer">
+          {thumbnail}
+        </a>
+      ) : (
+        thumbnail
+      )}
       <h3 className="mt-4 font-semibold text-slate-900">{name}</h3>
       <p className="mt-1 text-sm text-slate-500">{description}</p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -23,12 +39,11 @@ function ProductCard({ product }: { product: ServiceCategoryProduct }) {
           <Pill key={tag} label={tag} />
         ))}
       </div>
-      <a
-        href={product.href}
-        className="mt-4 inline-block text-sm font-medium text-accent"
-      >
-        {t("serviceCategoryPage.products.viewDetails")}
-      </a>
+      {product.href && (
+        <a href={product.href} className="mt-4 inline-block text-sm font-medium text-accent">
+          {t("serviceCategoryPage.products.viewDetails")}
+        </a>
+      )}
     </div>
   );
 }

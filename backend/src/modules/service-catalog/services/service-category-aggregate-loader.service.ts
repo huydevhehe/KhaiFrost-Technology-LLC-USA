@@ -18,12 +18,14 @@ import {
   OVERVIEW_COLLECTION_KEYS,
   OVERVIEW_COLLECTIONS,
 } from './collection-definitions';
+import { ProductLinkResolverService } from './product-link-resolver.service';
 
 @Injectable()
 export class ServiceCategoryAggregateLoader {
   constructor(
     private readonly collections: CategoryCollectionsService,
     private readonly media: MediaReferenceService,
+    private readonly productLinks: ProductLinkResolverService,
   ) {}
 
   async load(manager: EntityManager, category: ServiceCategory): Promise<ServiceCategoryAggregate> {
@@ -47,6 +49,10 @@ export class ServiceCategoryAggregateLoader {
 
   resolveAggregateUrls(aggregate: ServiceCategoryAggregate): Promise<MediaUrlMap> {
     return this.media.resolveUrls(collectAggregateMediaIds(aggregate));
+  }
+
+  resolveProductLinks(aggregate: ServiceCategoryAggregate): Promise<Map<string, string>> {
+    return this.productLinks.resolveHrefs(aggregate.collections.products);
   }
 
   resolveOverviewUrls(collections: OverviewCollections): Promise<MediaUrlMap> {
